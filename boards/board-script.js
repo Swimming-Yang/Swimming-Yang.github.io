@@ -5,7 +5,7 @@ class BoardManager {
     this.posts = this.loadPosts();
     this.currentPostId = null;
     this.isAuthenticated = false;
-    this.adminPassword = "swimming2024!"; // 관리자 비밀번호 (실제 사용시 더 복잡하게 설정)
+    this.adminPassword = "tndud2203!@#"; // 관리자 비밀번호
     this.init();
   }
 
@@ -41,7 +41,41 @@ class BoardManager {
     this.isAuthenticated = false;
     sessionStorage.removeItem(`auth_${this.boardType}`);
     this.updateAdminStatus();
+    this.renderPosts(); // 삭제 버튼 숨기기 위해 다시 렌더링
     this.showNotification("🔒 로그아웃되었습니다.");
+  }
+
+  // 게시글 삭제 (관리자 전용)
+  deletePost(postId) {
+    if (!this.isAuthenticated) {
+      this.showNotification("❌ 관리자 권한이 필요합니다.", "error");
+      return;
+    }
+
+    if (confirm("정말로 이 게시글을 삭제하시겠습니까?")) {
+      this.posts = this.posts.filter(post => post.id !== postId);
+      this.savePosts();
+      this.renderPosts();
+      this.showNotification("🗑️ 게시글이 삭제되었습니다.");
+    }
+  }
+
+  // 모달에서 게시글 삭제 (관리자 전용)
+  deletePostFromModal() {
+    if (!this.isAuthenticated) {
+      this.showNotification("❌ 관리자 권한이 필요합니다.", "error");
+      return;
+    }
+
+    if (!this.currentPostId) return;
+
+    if (confirm("정말로 이 게시글을 삭제하시겠습니까?")) {
+      this.posts = this.posts.filter(post => post.id !== this.currentPostId);
+      this.savePosts();
+      this.closeModal(); // 모달 닫기
+      this.renderPosts(); // 목록 새로고침
+      this.showNotification("🗑️ 게시글이 삭제되었습니다.");
+    }
   }
 
   setupEventListeners() {
@@ -142,8 +176,8 @@ class BoardManager {
     container.innerHTML = sortedPosts
       .map(
         (post) => `
-      <div class="post-item" onclick="boardManager.openPost(${post.id})">
-        <div class="post-info">
+      <div class="post-item">
+        <div class="post-info" onclick="boardManager.openPost(${post.id})" style="cursor: pointer; flex: 1;">
           <div class="post-title">${this.escapeHtml(post.title)}</div>
           <div class="post-meta">
             <span>작성자: ${this.escapeHtml(post.author)}</span>
@@ -152,6 +186,14 @@ class BoardManager {
         </div>
         <div class="post-stats">
           <span>댓글 ${post.comments ? post.comments.length : 0}개</span>
+          ${this.isAuthenticated ? `
+            <button onclick="event.stopPropagation(); boardManager.deletePost(${post.id})" 
+                    class="delete-btn" 
+                    style="margin-left: 10px; background: #f44336; color: white; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer; font-size: 0.8rem;"
+                    title="게시글 삭제">
+              🗑️
+            </button>
+          ` : ''}
         </div>
       </div>
     `
@@ -201,6 +243,9 @@ class BoardManager {
       
       // 관리자 상태 표시 업데이트
       this.updateAdminStatus();
+      
+      // 삭제 버튼 표시를 위해 게시글 다시 렌더링
+      this.renderPosts();
       
       this.closeAuthModal();
       this.showWriteModal();
@@ -258,7 +303,13 @@ class BoardManager {
     );
     document.getElementById("postContent").textContent = post.content;
 
-    // 댓글 렌더링
+    // 관리자일 때만 삭제 버튼 표시
+    const deletePostBtn = document.getElementById("deletePostBtn");
+    if (deletePostBtn) {
+      deletePostBtn.style.display = this.isAuthenticated ? "block" : "none";
+    }
+
+    // 댓글 렌더링 (현재 인증 상태 반영)
     this.renderComments(post.comments || []);
 
     modal.style.display = "block";
@@ -319,9 +370,21 @@ class BoardManager {
       .map(
         (comment) => `
       <div class="comment-item">
-        <div class="comment-author">${this.escapeHtml(comment.author)}</div>
-        <div class="comment-content">${this.escapeHtml(comment.content)}</div>
-        <div class="comment-date">${this.formatDate(comment.createdAt)}</div>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <div style="flex: 1;">
+            <div class="comment-author">${this.escapeHtml(comment.author)}</div>
+            <div class="comment-content">${this.escapeHtml(comment.content)}</div>
+            <div class="comment-date">${this.formatDate(comment.createdAt)}</div>
+          </div>
+          ${this.isAuthenticated ? `
+            <button onclick="boardManager.deleteComment(${comment.id})" 
+                    class="delete-btn" 
+                    style="background: #f44336; color: white; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer; font-size: 0.8rem; margin-left: 10px;"
+                    title="댓글 삭제">
+              🗑️
+            </button>
+          ` : ''}
+        </div>
       </div>
     `
       )
@@ -363,6 +426,27 @@ class BoardManager {
     document.getElementById("commentForm").reset();
 
     this.showNotification("댓글이 성공적으로 작성되었습니다!");
+  }
+
+  // 댓글 삭제 (관리자 전용)
+  deleteComment(commentId) {
+    if (!this.isAuthenticated) {
+      this.showNotification("❌ 관리자 권한이 필요합니다.", "error");
+      return;
+    }
+
+    if (!this.currentPostId) return;
+
+    if (confirm("정말로 이 댓글을 삭제하시겠습니까?")) {
+      const post = this.posts.find((p) => p.id === this.currentPostId);
+      if (post && post.comments) {
+        post.comments = post.comments.filter(comment => comment.id !== commentId);
+        this.savePosts();
+        this.renderComments(post.comments);
+        this.renderPosts(); // 댓글 수 업데이트
+        this.showNotification("🗑️ 댓글이 삭제되었습니다.");
+      }
+    }
   }
 
   // HTML 이스케이프

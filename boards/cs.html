@@ -124,13 +124,22 @@
         </div>
         <div class="modal-body">
           <div class="post-detail">
-            <div class="post-detail-header">
-              <h2 id="postTitle" class="post-detail-title"></h2>
-              <div class="post-detail-meta">
-                <span>작성자: <strong id="postAuthor"></strong></span>
-                <span>작성일: <strong id="postDate"></strong></span>
-              </div>
-            </div>
+                         <div class="post-detail-header">
+               <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                 <div style="flex: 1;">
+                   <h2 id="postTitle" class="post-detail-title"></h2>
+                   <div class="post-detail-meta">
+                     <span>작성자: <strong id="postAuthor"></strong></span>
+                     <span>작성일: <strong id="postDate"></strong></span>
+                   </div>
+                 </div>
+                 <button id="deletePostBtn" onclick="boardManager.deletePostFromModal()" 
+                         style="background: #f44336; color: white; border: none; border-radius: 8px; padding: 8px 12px; cursor: pointer; display: none;"
+                         title="게시글 삭제">
+                   🗑️ 삭제
+                 </button>
+               </div>
+             </div>
             <div id="postContent" class="post-detail-content"></div>
 
             <!-- 댓글 섹션 -->

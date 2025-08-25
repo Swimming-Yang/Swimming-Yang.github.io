@@ -4,12 +4,44 @@ class BoardManager {
     this.boardType = boardType;
     this.posts = this.loadPosts();
     this.currentPostId = null;
+    this.isAuthenticated = false;
+    this.adminPassword = "swimming2024!"; // 관리자 비밀번호 (실제 사용시 더 복잡하게 설정)
     this.init();
   }
 
   init() {
+    this.checkAuthenticationStatus();
     this.setupEventListeners();
     this.renderPosts();
+  }
+
+  // 인증 상태 확인 (세션 스토리지에서)
+  checkAuthenticationStatus() {
+    const authStatus = sessionStorage.getItem(`auth_${this.boardType}`);
+    if (authStatus === "true") {
+      this.isAuthenticated = true;
+      this.updateAdminStatus();
+    }
+  }
+
+  // 관리자 상태 표시 업데이트
+  updateAdminStatus() {
+    const adminStatus = document.getElementById("adminStatus");
+    if (adminStatus) {
+      if (this.isAuthenticated) {
+        adminStatus.style.display = "block";
+      } else {
+        adminStatus.style.display = "none";
+      }
+    }
+  }
+
+  // 로그아웃
+  logout() {
+    this.isAuthenticated = false;
+    sessionStorage.removeItem(`auth_${this.boardType}`);
+    this.updateAdminStatus();
+    this.showNotification("🔒 로그아웃되었습니다.");
   }
 
   setupEventListeners() {
@@ -17,6 +49,15 @@ class BoardManager {
     const writeBtn = document.getElementById("writeBtn");
     if (writeBtn) {
       writeBtn.addEventListener("click", () => this.openWriteModal());
+    }
+
+    // 인증 폼 제출
+    const authForm = document.getElementById("authForm");
+    if (authForm) {
+      authForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        this.handleAuthentication();
+      });
     }
 
     // 모달 닫기
@@ -118,8 +159,75 @@ class BoardManager {
       .join("");
   }
 
-  // 글쓰기 모달 열기
+  // 글쓰기 모달 열기 (인증 필요)
   openWriteModal() {
+    // 이미 인증되었다면 바로 모달 열기
+    if (this.isAuthenticated) {
+      this.showWriteModal();
+      return;
+    }
+
+    // 인증되지 않았다면 비밀번호 요구
+    this.showPasswordPrompt();
+  }
+
+  // 인증 모달 표시
+  showPasswordPrompt() {
+    const authModal = document.getElementById("authModal");
+    if (authModal) {
+      authModal.style.display = "block";
+      document.body.style.overflow = "hidden";
+      
+      // 비밀번호 입력 필드에 포커스
+      const passwordInput = document.getElementById("adminPasswordInput");
+      if (passwordInput) {
+        passwordInput.focus();
+        passwordInput.value = "";
+      }
+    }
+  }
+
+  // 인증 처리
+  handleAuthentication() {
+    const passwordInput = document.getElementById("adminPasswordInput");
+    const password = passwordInput.value;
+
+    if (password === this.adminPassword) {
+      this.isAuthenticated = true;
+      this.showNotification("✅ 인증되었습니다! 이제 글을 작성할 수 있습니다.");
+      
+      // 세션 동안 인증 상태 유지
+      sessionStorage.setItem(`auth_${this.boardType}`, "true");
+      
+      // 관리자 상태 표시 업데이트
+      this.updateAdminStatus();
+      
+      this.closeAuthModal();
+      this.showWriteModal();
+    } else {
+      this.showNotification("❌ 비밀번호가 올바르지 않습니다.", "error");
+      passwordInput.value = "";
+      passwordInput.focus();
+    }
+  }
+
+  // 인증 모달 닫기
+  closeAuthModal() {
+    const authModal = document.getElementById("authModal");
+    if (authModal) {
+      authModal.style.display = "none";
+      document.body.style.overflow = "auto";
+      
+      // 비밀번호 입력 필드 초기화
+      const passwordInput = document.getElementById("adminPasswordInput");
+      if (passwordInput) {
+        passwordInput.value = "";
+      }
+    }
+  }
+
+  // 실제 글쓰기 모달 표시
+  showWriteModal() {
     const modal = document.getElementById("writeModal");
     if (modal) {
       modal.style.display = "block";
@@ -287,7 +395,7 @@ class BoardManager {
   }
 
   // 알림 표시
-  showNotification(message) {
+  showNotification(message, type = "success") {
     // 기존 알림 제거
     const existingNotification = document.querySelector(".notification");
     if (existingNotification) {
@@ -297,11 +405,14 @@ class BoardManager {
     // 새 알림 생성
     const notification = document.createElement("div");
     notification.className = "notification";
+    
+    const backgroundColor = type === "error" ? "#f44336" : "#4CAF50";
+    
     notification.style.cssText = `
       position: fixed;
       top: 20px;
       right: 20px;
-      background: #4CAF50;
+      background: ${backgroundColor};
       color: white;
       padding: 1rem 1.5rem;
       border-radius: 10px;

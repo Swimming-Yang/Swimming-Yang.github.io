@@ -32,6 +32,9 @@
       <!-- 글쓰기 버튼 -->
       <div style="text-align: center; margin-bottom: 2rem">
         <button id="writeBtn" class="write-btn">✍️ 새 글 작성하기</button>
+        <div id="adminStatus" style="margin-top: 1rem; font-size: 0.9rem; color: rgba(255,255,255,0.8); display: none;">
+          🔓 관리자 모드 | <button onclick="boardManager.logout()" style="background: none; border: none; color: rgba(255,255,255,0.8); text-decoration: underline; cursor: pointer;">로그아웃</button>
+        </div>
       </div>
 
       <!-- 게시글 목록 -->
@@ -84,6 +87,28 @@
             <div class="form-actions">
               <button type="button" class="btn btn-secondary">취소</button>
               <button type="submit" class="btn btn-primary">게시글 작성</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- 관리자 인증 모달 -->
+    <div id="authModal" class="modal">
+      <div class="modal-content" style="max-width: 400px;">
+        <div class="modal-header">
+          <h2>🔐 관리자 인증</h2>
+          <span class="close" onclick="boardManager.closeAuthModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+          <form id="authForm">
+            <div class="form-group">
+              <label for="adminPasswordInput">관리자 비밀번호</label>
+              <input type="password" id="adminPasswordInput" placeholder="비밀번호를 입력하세요" required>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn btn-secondary" onclick="boardManager.closeAuthModal()">취소</button>
+              <button type="submit" class="btn btn-primary">인증</button>
             </div>
           </form>
         </div>

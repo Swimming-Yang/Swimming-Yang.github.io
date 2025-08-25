@@ -10,6 +10,55 @@ body {
   overflow-x: hidden;
 }
 
+/* 네비게이션 */
+.main-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  z-index: 10;
+  padding: 1rem 0;
+}
+
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 2rem;
+}
+
+.logo a {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-decoration: none;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.nav-links a:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
 /* 배경 영상 컨테이너 */
 .video-background {
   position: fixed;
@@ -100,6 +149,38 @@ p {
   border-color: rgba(255, 255, 255, 0.8);
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* 게시판 링크 버튼 */
+.board-links {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+}
+
+.board-btn {
+  display: inline-block;
+  padding: 1rem 2rem;
+  background: rgba(74, 144, 226, 0.8);
+  color: white;
+  text-decoration: none;
+  border-radius: 30px;
+  border: 2px solid rgba(74, 144, 226, 0.9);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  min-width: 140px;
+  text-align: center;
+}
+
+.board-btn:hover {
+  background: rgba(74, 144, 226, 1);
+  border-color: rgba(74, 144, 226, 1);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(74, 144, 226, 0.4);
 }
 
 /* 비디오 인디케이터 */

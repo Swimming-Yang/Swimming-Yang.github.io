@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>코딩테스트 게시판 - Swimming Yang</title>
+    <link rel="stylesheet" href="board-style.css" />
+  </head>
+  <body>
+    <!-- 네비게이션 -->
+    <nav class="main-nav">
+      <div class="nav-container">
+        <div class="logo">
+          <a href="../index.html">Swimming Yang</a>
+        </div>
+        <div class="nav-links">
+          <a href="algorithm.html">알고리즘</a>
+          <a href="coding-test.html">코딩테스트</a>
+          <a href="cs.html">CS</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- 메인 컨테이너 -->
+    <div class="container">
+      <!-- 페이지 헤더 -->
+      <div class="page-header">
+        <h1>💻 코딩테스트</h1>
+        <p>코딩테스트 경험과 팁을 공유하는 공간입니다</p>
+      </div>
+
+      <!-- 글쓰기 버튼 -->
+      <div style="text-align: center; margin-bottom: 2rem">
+        <button id="writeBtn" class="write-btn">✍️ 새 글 작성하기</button>
+      </div>
+
+      <!-- 게시글 목록 -->
+      <div class="posts-container">
+        <div class="posts-header">
+          <h2>게시글 목록</h2>
+          <span id="postCount">0개의 게시글</span>
+        </div>
+        <div id="postsContainer">
+          <!-- 게시글 목록이 여기에 동적으로 로드됩니다 -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 글쓰기 모달 -->
+    <div id="writeModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>새 글 작성하기</h2>
+          <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+          <form id="writeForm">
+            <div class="form-group">
+              <label for="postTitleInput">제목</label>
+              <input
+                type="text"
+                id="postTitleInput"
+                placeholder="게시글 제목을 입력하세요"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="postAuthorInput">작성자</label>
+              <input
+                type="text"
+                id="postAuthorInput"
+                placeholder="작성자명을 입력하세요"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="postContentInput">내용</label>
+              <textarea
+                id="postContentInput"
+                placeholder="게시글 내용을 입력하세요&#10;&#10;코딩테스트 관련 내용을 자세히 작성해주세요.&#10;- 회사/사이트명&#10;- 문제 유형&#10;- 난이도&#10;- 출제 경향&#10;- 준비 팁&#10;- 후기 등"
+                required
+              ></textarea>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn btn-secondary">취소</button>
+              <button type="submit" class="btn btn-primary">게시글 작성</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- 게시글 상세보기 모달 -->
+    <div id="postModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>게시글 상세보기</h2>
+          <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+          <div class="post-detail">
+            <div class="post-detail-header">
+              <h2 id="postTitle" class="post-detail-title"></h2>
+              <div class="post-detail-meta">
+                <span>작성자: <strong id="postAuthor"></strong></span>
+                <span>작성일: <strong id="postDate"></strong></span>
+              </div>
+            </div>
+            <div id="postContent" class="post-detail-content"></div>
+
+            <!-- 댓글 섹션 -->
+            <div class="comments-section">
+              <h3 class="comments-header">💬 댓글</h3>
+
+              <!-- 댓글 작성 폼 -->
+              <form id="commentForm" class="comment-form">
+                <div class="form-group">
+                  <label for="commentAuthorInput">작성자</label>
+                  <input
+                    type="text"
+                    id="commentAuthorInput"
+                    placeholder="작성자명을 입력하세요"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="commentContentInput">댓글</label>
+                  <textarea
+                    id="commentContentInput"
+                    placeholder="댓글을 입력하세요"
+                    rows="3"
+                    required
+                  ></textarea>
+                </div>
+                <div class="form-actions">
+                  <button type="submit" class="btn btn-primary">
+                    댓글 작성
+                  </button>
+                </div>
+              </form>
+
+              <!-- 댓글 목록 -->
+              <div id="commentsContainer">
+                <!-- 댓글이 여기에 동적으로 로드됩니다 -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="board-script.js"></script>
+  </body>
+</html>

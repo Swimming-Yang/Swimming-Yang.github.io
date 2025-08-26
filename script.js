@@ -1,7 +1,7 @@
 // 페이지 로딩 관리 클래스
 class LoadingManager {
   constructor() {
-    this.overlay = document.getElementById("loadingOverlay");
+    this.overlay = null;
     this.init();
   }
 
@@ -11,42 +11,46 @@ class LoadingManager {
 
     // 이벤트 위임 방식으로 문서 전체에 클릭 이벤트 설정
     this.setupEventDelegation();
-    
+
     // 추가적으로 직접 바인딩도 시도
     this.addLoadingToLinks();
   }
 
   setupEventDelegation() {
     console.log("🎯 이벤트 위임 설정 시작");
-    
+
     // 문서 전체에 클릭 이벤트 위임
-    document.addEventListener('click', (e) => {
-      console.log("📱 문서 클릭 감지:", e.target);
-      
-      // 그리드 버튼인지 확인
-      let target = e.target;
-      
-      // 클릭된 요소가 그리드 버튼이거나 그 자식인지 확인
-      while (target && target !== document) {
-        if (target.classList && target.classList.contains('grid-btn')) {
-          console.log("🎯 그리드 버튼 클릭 감지:", target);
-          
-          const href = target.getAttribute('href');
-          const isDisabled = target.classList.contains('btn-disabled');
-          
-          if (href && !isDisabled) {
-            console.log("🚀 로딩 시작! href:", href);
-            e.preventDefault();
-            e.stopPropagation();
-            this.showLoadingAndNavigate(href);
-            return;
+    document.addEventListener(
+      "click",
+      (e) => {
+        console.log("📱 문서 클릭 감지:", e.target);
+
+        // 그리드 버튼인지 확인
+        let target = e.target;
+
+        // 클릭된 요소가 그리드 버튼이거나 그 자식인지 확인
+        while (target && target !== document) {
+          if (target.classList && target.classList.contains("grid-btn")) {
+            console.log("🎯 그리드 버튼 클릭 감지:", target);
+
+            const href = target.getAttribute("href");
+            const isDisabled = target.classList.contains("btn-disabled");
+
+            if (href && !isDisabled) {
+              console.log("🚀 로딩 시작! href:", href);
+              e.preventDefault();
+              e.stopPropagation();
+              this.showLoadingAndNavigate(href);
+              return;
+            }
+            break;
           }
-          break;
+          target = target.parentElement;
         }
-        target = target.parentElement;
-      }
-    }, true); // useCapture: true
-    
+      },
+      true
+    ); // useCapture: true
+
     console.log("✅ 이벤트 위임 설정 완료");
   }
 
@@ -139,24 +143,35 @@ class LoadingManager {
     }, randomDelay);
   }
 
+  getOverlay() {
+    if (!this.overlay) {
+      this.overlay = document.getElementById("loadingOverlay");
+      console.log("🔍 오버레이 검색 결과:", this.overlay);
+    }
+    return this.overlay;
+  }
+
   showLoading() {
     console.log("🎬 로딩 표시 시작");
 
-    if (!this.overlay) {
-      console.error("❌ 로딩 오버레이가 없음!");
-      // 오버레이가 없으면 즉시 생성
-      this.overlay = document.getElementById("loadingOverlay");
-      if (!this.overlay) {
-        console.error("❌ loadingOverlay 요소를 찾을 수 없음!");
-        return;
-      }
+    const overlay = this.getOverlay();
+    if (!overlay) {
+      console.error("❌ loadingOverlay 요소를 찾을 수 없음!");
+      console.log("📋 현재 DOM 상태:");
+      console.log("- document.readyState:", document.readyState);
+      console.log("- document.body:", document.body);
+      console.log("- All elements with id:", document.querySelectorAll('[id]'));
+      
+      // 동적으로 오버레이 생성 시도
+      this.createOverlay();
+      return;
     }
 
-    console.log("✅ 로딩 오버레이 발견:", this.overlay);
+    console.log("✅ 로딩 오버레이 발견:", overlay);
 
     // 모든 클래스와 스타일 초기화 후 강제로 보이도록 설정
-    this.overlay.className = "loading-overlay";
-    this.overlay.style.cssText = `
+    overlay.className = "loading-overlay";
+    overlay.style.cssText = `
       position: fixed !important;
       top: 0 !important;
       left: 0 !important;
@@ -176,13 +191,13 @@ class LoadingManager {
 
     // 브라우저 렌더링 후 fade in
     requestAnimationFrame(() => {
-      this.overlay.style.opacity = "1 !important";
-      this.overlay.classList.add("show");
+      overlay.style.opacity = "1 !important";
+      overlay.classList.add("show");
       console.log("✨ 페이드인 시작");
     });
 
     // 로딩 비디오 재생 시작
-    const video = this.overlay.querySelector(".loading-video");
+    const video = overlay.querySelector(".loading-video");
     if (video) {
       console.log("🎥 프리렌 비디오 재생 시도");
       video.currentTime = 0;
@@ -196,21 +211,65 @@ class LoadingManager {
     }
   }
 
+  createOverlay() {
+    console.log("🛠️ 동적으로 로딩 오버레이 생성 시작");
+    
+    // 오버레이 생성
+    const overlay = document.createElement('div');
+    overlay.id = 'loadingOverlay';
+    overlay.className = 'loading-overlay';
+    
+    // 컨텐츠 컨테이너 생성
+    const content = document.createElement('div');
+    content.className = 'loading-content';
+    
+    // 비디오 생성
+    const video = document.createElement('video');
+    video.className = 'loading-video';
+    video.autoplay = true;
+    video.muted = true;
+    video.loop = true;
+    video.setAttribute('playsinline', '');
+    
+    // 비디오 소스 생성
+    const source = document.createElement('source');
+    source.src = 'asserts/videos/loading_frieren.mp4';
+    source.type = 'video/mp4';
+    
+    // 요소들 조립
+    video.appendChild(source);
+    content.appendChild(video);
+    overlay.appendChild(content);
+    
+    // DOM에 추가
+    document.body.appendChild(overlay);
+    
+    // 캐시 업데이트
+    this.overlay = overlay;
+    
+    console.log("✅ 동적 오버레이 생성 완료:", overlay);
+    
+    // 다시 showLoading 호출
+    this.showLoading();
+  }
+
   hideLoading() {
     console.log("로딩 숨기기 시작");
-    if (this.overlay) {
-      this.overlay.style.opacity = "0";
+    const overlay = this.getOverlay();
+    if (overlay) {
+      overlay.style.opacity = "0";
       setTimeout(() => {
-        this.overlay.classList.remove("show");
-        this.overlay.style.display = "none";
-        this.overlay.style.visibility = "hidden";
+        overlay.classList.remove("show");
+        overlay.style.display = "none";
+        overlay.style.visibility = "hidden";
       }, 500);
     }
   }
 
   // 디버깅을 위한 수동 로딩 테스트 함수
   testLoading() {
-    console.log("로딩 테스트 시작");
+    console.log("🧪 로딩 테스트 시작");
+    console.log("🔍 현재 오버레이 상태:", this.overlay);
     this.showLoading();
     setTimeout(() => {
       this.hideLoading();
@@ -403,11 +462,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 디버깅: 콘솔에서 window.testLoading() 호출 가능
   window.testLoading = () => loadingManager.testLoading();
-  
+
   // 테스트용 버튼 추가 (임시)
   setTimeout(() => {
-    const testBtn = document.createElement('button');
-    testBtn.textContent = '로딩 테스트';
+    const testBtn = document.createElement("button");
+    testBtn.textContent = "로딩 테스트";
     testBtn.style.cssText = `
       position: fixed;
       top: 10px;

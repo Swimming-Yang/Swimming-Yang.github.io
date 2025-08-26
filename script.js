@@ -13,24 +13,35 @@ class LoadingManager {
     this.addLoadingToLinks();
   }
 
-  addLoadingToLinks() {
-    // 페이지 로드 후 약간의 지연을 두고 링크 이벤트 추가
+    addLoadingToLinks() {
+    // 페이지 로드 후 확실한 지연을 두고 링크 이벤트 추가
     setTimeout(() => {
-      // 모든 내부 링크에 로딩 이벤트 추가 (네비게이션 + 그리드 버튼)
+      // 모든 그리드 버튼들을 우선 처리
+      const gridBtns = document.querySelectorAll(".grid-btn");
+      console.log(`그리드 버튼 ${gridBtns.length}개 발견`);
+      
+      gridBtns.forEach((btn, index) => {
+        const href = btn.getAttribute("href");
+        console.log(`그리드 버튼 ${index}: href=${href}, 클래스=${btn.className}`);
+        
+        if (href && !btn.classList.contains("btn-disabled") && !btn.hasAttribute("data-loading-added")) {
+          btn.setAttribute("data-loading-added", "true");
+          btn.addEventListener("click", (e) => {
+            e.preventDefault();
+            console.log(`그리드 버튼 클릭: ${href}`);
+            this.showLoadingAndNavigate(href);
+          });
+          console.log(`그리드 버튼 ${index}에 이벤트 리스너 추가됨`);
+        }
+      });
+
+      // 기타 모든 내부 링크들 처리
       const allLinks = document.querySelectorAll(
         'a[href]:not([href^="http"]):not([href^="mailto"]):not([href^="tel"]):not([href="#"])'
       );
+      
+      console.log(`전체 링크 ${allLinks.length}개 발견`);
 
-      // 그리드 버튼들 별도로 추가 (클래스 기반 선택)
-      const gridBtns = document.querySelectorAll(
-        ".grid-btn[href]:not(.btn-disabled)"
-      );
-
-      console.log(
-        `일반 링크 ${allLinks.length}개, 그리드 버튼 ${gridBtns.length}개에 로딩 이벤트 추가`
-      );
-
-      // 일반 링크들 처리
       allLinks.forEach((link) => {
         if (!link.hasAttribute("data-loading-added")) {
           link.setAttribute("data-loading-added", "true");
@@ -42,20 +53,9 @@ class LoadingManager {
           });
         }
       });
-
-      // 그리드 버튼들 처리
-      gridBtns.forEach((btn) => {
-        if (!btn.hasAttribute("data-loading-added")) {
-          btn.setAttribute("data-loading-added", "true");
-          btn.addEventListener("click", (e) => {
-            e.preventDefault();
-            const href = btn.getAttribute("href");
-            console.log(`그리드 버튼 클릭: ${href}`);
-            this.showLoadingAndNavigate(href);
-          });
-        }
-      });
-    }, 100);
+      
+      console.log("모든 링크 이벤트 리스너 추가 완료");
+    }, 300);
   }
 
   showLoadingAndNavigate(url) {
@@ -183,8 +183,18 @@ class VideoBackgroundManager {
     const video = this.videos[index];
     if (video) {
       video.currentTime = 0;
+      
+      // 모바일에서 비디오 재생을 위한 추가 속성 설정
+      video.setAttribute('playsinline', '');
+      video.setAttribute('webkit-playsinline', '');
+      video.muted = true;
+      
       video.play().catch((e) => {
         console.error(`비디오 ${index} 재생 실패:`, e);
+        // 모바일에서 자동재생 실패 시 사용자 상호작용 후 재시도
+        document.addEventListener('touchstart', () => {
+          video.play().catch(console.error);
+        }, { once: true });
       });
     }
   }
@@ -273,53 +283,23 @@ class VideoBackgroundManager {
   }
 }
 
-// 네비게이션 토글 기능
-function initMobileNavigation() {
-  const navToggle = document.getElementById("navToggle");
-  const navLinks = document.getElementById("navLinks");
-
-  if (navToggle && navLinks) {
-    navToggle.addEventListener("click", () => {
-      navToggle.classList.toggle("active");
-      navLinks.classList.toggle("active");
-    });
-
-    // 링크 클릭 시 메뉴 닫기
-    navLinks.addEventListener("click", (e) => {
-      if (e.target.tagName === "A") {
-        navToggle.classList.remove("active");
-        navLinks.classList.remove("active");
-      }
-    });
-
-    // 배경 클릭 시 메뉴 닫기
-    document.addEventListener("click", (e) => {
-      if (!navToggle.contains(e.target) && !navLinks.contains(e.target)) {
-        navToggle.classList.remove("active");
-        navLinks.classList.remove("active");
-      }
-    });
-  }
-}
+// 모바일 네비게이션 기능 제거됨 (헤더 제거로 인해)
 
 // 페이지 로드 완료 후 초기화
 document.addEventListener("DOMContentLoaded", () => {
-  // 모바일 네비게이션 초기화
-  initMobileNavigation();
-
   // 비디오 백그라운드 매니저 먼저 초기화
   const videoManager = new VideoBackgroundManager();
 
   // 로딩 매니저 나중에 초기화 (DOM 완전 준비 후)
   setTimeout(() => {
     const loadingManager = new LoadingManager();
-
+    
     // 전역에서 접근 가능하도록 설정 (디버깅용)
     window.loadingManager = loadingManager;
-
+    
     // 디버깅: 콘솔에서 window.testLoading() 호출 가능
     window.testLoading = () => loadingManager.testLoading();
-  }, 200);
+  }, 500); // 500ms로 증가하여 확실하게 DOM 준비 대기
 
   // 전역에서 접근 가능하도록 설정 (디버깅용)
   window.videoManager = videoManager;
@@ -355,13 +335,24 @@ let userInteracted = false;
 const enableAutoplay = () => {
   if (!userInteracted) {
     userInteracted = true;
-    // 사용자가 상호작용한 후 비디오 재생 보장
+    console.log("사용자 상호작용 감지됨 - 비디오 재생 시도");
+    // 사용자가 상호작용한 후 모든 비디오 재생 보장
     if (window.videoManager) {
-      window.videoManager.playVideo(window.videoManager.currentIndex);
+      // 모든 비디오에 대해 재생 시도
+      window.videoManager.videos.forEach((video, index) => {
+        video.muted = true;
+        video.setAttribute('playsinline', '');
+        if (index === window.videoManager.currentIndex) {
+          video.play().catch(e => console.error(`비디오 ${index} 재생 실패:`, e));
+        }
+      });
     }
   }
 };
 
+// 다양한 사용자 상호작용 이벤트 리스닝
 document.addEventListener("click", enableAutoplay);
 document.addEventListener("keydown", enableAutoplay);
 document.addEventListener("touchstart", enableAutoplay);
+document.addEventListener("touchend", enableAutoplay);
+document.addEventListener("mousedown", enableAutoplay);

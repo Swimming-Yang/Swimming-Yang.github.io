@@ -7,7 +7,7 @@
 
 body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #f5f5f5;
   min-height: 100vh;
   color: #333;
 }
@@ -82,39 +82,50 @@ body {
 .page-header {
   text-align: center;
   margin-bottom: 3rem;
-  color: white;
+  color: #333;
+  background: white;
+  padding: 3rem 2rem;
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
 }
 
 .page-header h1 {
   font-size: 3rem;
   margin-bottom: 1rem;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  color: #333;
+  text-shadow: none;
 }
 
 .page-header p {
   font-size: 1.2rem;
-  opacity: 0.9;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  opacity: 0.8;
+  color: #666;
+  text-shadow: none;
 }
 
 /* 글 작성 버튼 */
 .write-btn {
   display: inline-block;
-  background: rgba(255, 255, 255, 0.9);
-  color: #667eea;
+  background: white;
+  color: #333;
   padding: 1rem 2rem;
-  border-radius: 30px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 500;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   margin-bottom: 2rem;
+  cursor: pointer;
+  border: none;
+  font-size: 1rem;
 }
 
 .write-btn:hover {
-  background: white;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  background: #f8f9fa;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* 게시글 목록 */
@@ -412,53 +423,85 @@ body {
   .container {
     padding: 90px 1rem 1rem;
   }
-
+  
   .nav-container {
     padding: 0 1rem;
   }
-
+  
   .nav-links {
-    gap: 1rem;
+    gap: 0.5rem;
   }
-
+  
   .nav-links a {
-    padding: 0.3rem 0.8rem;
-    font-size: 0.9rem;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.8rem;
   }
-
+  
+  .page-header {
+    padding: 2rem 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
   .page-header h1 {
     font-size: 2rem;
   }
-
+  
+  .page-header p {
+    font-size: 1rem;
+  }
+  
   .posts-container {
     padding: 1.5rem;
   }
-
+  
   .post-item {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
+    padding: 1rem;
   }
-
+  
+  .post-info {
+    width: 100%;
+  }
+  
+  .post-stats {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
   .modal-content {
     width: 95%;
-    margin: 10% auto;
+    margin: 5% auto;
+    max-height: 90vh;
   }
-
+  
   .modal-header {
     padding: 1.5rem;
   }
-
+  
   .modal-body {
     padding: 1.5rem;
   }
-
+  
   .form-actions {
     flex-direction: column;
+    gap: 0.5rem;
   }
-
+  
   .btn {
     width: 100%;
+  }
+  
+  /* 플로팅 버튼 모바일 조정 */
+  #floatingAdminBtn {
+    bottom: 15px !important;
+    right: 15px !important;
+    width: 50px !important;
+    height: 50px !important;
+    font-size: 1.2rem !important;
   }
 }
 
@@ -517,4 +560,31 @@ body {
 .empty-state p {
   font-size: 1.1rem;
   margin-bottom: 2rem;
+}
+
+/* 플로팅 관리자 버튼 */
+#floatingAdminBtn {
+  position: fixed !important;
+  bottom: 20px !important;
+  right: 20px !important;
+  width: 60px !important;
+  height: 60px !important;
+  border-radius: 50% !important;
+  background: #667eea !important;
+  color: white !important;
+  border: none !important;
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4) !important;
+  cursor: pointer !important;
+  font-size: 1.5rem !important;
+  transition: all 0.3s ease !important;
+  z-index: 1000 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+#floatingAdminBtn:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6) !important;
+  background: #5a6fd8 !important;
 }

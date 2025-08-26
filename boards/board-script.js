@@ -34,6 +34,20 @@ class BoardManager {
         adminStatus.style.display = "none";
       }
     }
+
+    // 플로팅 버튼 아이콘 업데이트
+    const floatingBtn = document.getElementById("floatingAdminBtn");
+    if (floatingBtn) {
+      if (this.isAuthenticated) {
+        floatingBtn.innerHTML = "🔓";
+        floatingBtn.title = "관리자 모드 (로그아웃하려면 클릭)";
+        floatingBtn.onclick = () => this.logout();
+      } else {
+        floatingBtn.innerHTML = "🔒";
+        floatingBtn.title = "관리자 로그인";
+        floatingBtn.onclick = () => this.showPasswordPrompt();
+      }
+    }
   }
 
   // 로그아웃

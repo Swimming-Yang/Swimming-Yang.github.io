@@ -32,8 +32,8 @@
       <!-- 글쓰기 버튼 -->
       <div style="text-align: center; margin-bottom: 2rem">
         <button id="writeBtn" class="write-btn">✍️ 새 글 작성하기</button>
-        <div id="adminStatus" style="margin-top: 1rem; font-size: 0.9rem; color: rgba(255,255,255,0.8); display: none;">
-          🔓 관리자 모드 | <button onclick="boardManager.logout()" style="background: none; border: none; color: rgba(255,255,255,0.8); text-decoration: underline; cursor: pointer;">로그아웃</button>
+        <div id="adminStatus" style="margin-top: 1rem; font-size: 0.9rem; color: #666; display: none;">
+          🔓 관리자 모드 | <button onclick="boardManager.logout()" style="background: none; border: none; color: #666; text-decoration: underline; cursor: pointer;">로그아웃</button>
         </div>
       </div>
 
@@ -182,6 +182,17 @@
         </div>
       </div>
     </div>
+
+    <!-- 플로팅 관리자 로그인 버튼 -->
+    <button id="floatingAdminBtn" onclick="boardManager.showPasswordPrompt()" 
+            style="position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; 
+                   border-radius: 50%; background: #667eea; color: white; border: none; 
+                   box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4); cursor: pointer; 
+                   font-size: 1.5rem; transition: all 0.3s ease; z-index: 1000;
+                   display: flex; align-items: center; justify-content: center;"
+            title="관리자 로그인">
+      🔒
+    </button>
 
     <script src="board-script.js"></script>
   </body>

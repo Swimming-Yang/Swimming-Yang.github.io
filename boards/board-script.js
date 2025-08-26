@@ -6,6 +6,7 @@ class BoardManager {
     this.currentPostId = null;
     this.isAuthenticated = false;
     this.adminPassword = "tndud2203!@#"; // 관리자 비밀번호
+    this.quillEditor = null; // Quill 에디터 인스턴스
     this.init();
   }
 
@@ -13,6 +14,32 @@ class BoardManager {
     this.checkAuthenticationStatus();
     this.setupEventListeners();
     this.renderPosts();
+    this.initializeQuillEditor();
+  }
+
+  // Quill 에디터 초기화
+  initializeQuillEditor() {
+    if (typeof Quill !== 'undefined') {
+      const editorContainer = document.getElementById('quillEditor');
+      if (editorContainer) {
+        this.quillEditor = new Quill('#quillEditor', {
+          theme: 'snow',
+          modules: {
+            toolbar: [
+              [{ 'header': [1, 2, 3, false] }],
+              ['bold', 'italic', 'underline', 'strike'],
+              [{ 'color': [] }, { 'background': [] }],
+              [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+              [{ 'indent': '-1'}, { 'indent': '+1' }],
+              ['blockquote', 'code-block'],
+              ['link', 'image'],
+              ['clean']
+            ]
+          },
+          placeholder: '게시글 내용을 입력하세요...\n\n• 텍스트 서식 (굵게, 기울임, 밑줄)\n• 헤더와 목록\n• 코드 블록과 인용문\n• 이미지와 링크\n• 다양한 색상 옵션'
+        });
+      }
+    }
   }
 
   // 인증 상태 확인 (세션 스토리지에서)
@@ -27,12 +54,16 @@ class BoardManager {
   // 관리자 상태 표시 업데이트
   updateAdminStatus() {
     const adminStatus = document.getElementById("adminStatus");
-    if (adminStatus) {
-      if (this.isAuthenticated) {
-        adminStatus.style.display = "block";
-      } else {
-        adminStatus.style.display = "none";
-      }
+    const writeBtn = document.getElementById("writeBtn");
+    
+    if (this.isAuthenticated) {
+      // 관리자 인증 시
+      if (adminStatus) adminStatus.style.display = "block";
+      if (writeBtn) writeBtn.style.display = "inline-block";
+    } else {
+      // 비인증 시
+      if (adminStatus) adminStatus.style.display = "none";
+      if (writeBtn) writeBtn.style.display = "none";
     }
 
     // 플로팅 버튼 아이콘 업데이트
@@ -297,6 +328,14 @@ class BoardManager {
       if (form) {
         form.reset();
       }
+
+      // Quill 에디터 초기화 (아직 초기화되지 않았다면)
+      if (!this.quillEditor) {
+        this.initializeQuillEditor();
+      } else {
+        // 이미 초기화된 경우 내용 초기화
+        this.quillEditor.setContents([]);
+      }
     }
   }
 
@@ -315,7 +354,11 @@ class BoardManager {
     document.getElementById("postDate").textContent = this.formatDate(
       post.createdAt
     );
-    document.getElementById("postContent").textContent = post.content;
+    // HTML 내용으로 설정 (Quill 에디터로 작성된 내용 지원)
+    const postContentElement = document.getElementById("postContent");
+    if (postContentElement) {
+      postContentElement.innerHTML = post.content;
+    }
 
     // 관리자일 때만 삭제 버튼 표시
     const deletePostBtn = document.getElementById("deletePostBtn");
@@ -344,7 +387,18 @@ class BoardManager {
   submitPost() {
     const title = document.getElementById("postTitleInput").value.trim();
     const author = document.getElementById("postAuthorInput").value.trim();
-    const content = document.getElementById("postContentInput").value.trim();
+    
+    // Quill 에디터에서 HTML 내용 가져오기
+    let content = "";
+    if (this.quillEditor) {
+      const delta = this.quillEditor.getContents();
+      content = this.quillEditor.root.innerHTML.trim();
+      
+      // 빈 에디터인지 확인 (Quill은 빈 내용이어도 <p><br></p> 형태로 저장됨)
+      if (content === "<p><br></p>" || content === "" || !this.quillEditor.getText().trim()) {
+        content = "";
+      }
+    }
 
     if (!title || !author || !content) {
       alert("모든 필드를 입력해주세요.");

@@ -122,7 +122,7 @@ class LoadingManager {
       return;
     }
 
-    // 강제 표시
+    // 초기 상태 (투명하게 시작)
     overlay.style.cssText = `
       position: fixed !important;
       top: 0 !important;
@@ -136,10 +136,11 @@ class LoadingManager {
       align-items: center !important;
       visibility: visible !important;
       pointer-events: auto !important;
-      opacity: 1 !important;
+      opacity: 0 !important;
+      transition: opacity 0.3s ease-in-out !important;
     `;
 
-    overlay.className = "loading-overlay show";
+    overlay.className = "loading-overlay";
 
     // 로딩 비디오 재생 시작
     const video = overlay.querySelector(".loading-video");
@@ -148,6 +149,12 @@ class LoadingManager {
       video.style.display = "block";
       video.play().catch(() => {});
     }
+
+    // 페이드인 효과 (브라우저 렌더링 후)
+    requestAnimationFrame(() => {
+      overlay.style.opacity = "1 !important";
+      overlay.classList.add("show");
+    });
   }
 
   createOverlay() {
@@ -191,11 +198,16 @@ class LoadingManager {
   hideLoading() {
     const overlay = this.getOverlay();
     if (overlay) {
-      // 즉시 숨기기
+      // 페이드아웃 효과 시작
+      overlay.style.transition = "opacity 0.3s ease-in-out !important";
       overlay.style.opacity = "0 !important";
-      overlay.style.display = "none !important";
-      overlay.style.visibility = "hidden !important";
       overlay.classList.remove("show");
+      
+      // 페이드아웃 완료 후 완전히 숨기기
+      setTimeout(() => {
+        overlay.style.display = "none !important";
+        overlay.style.visibility = "hidden !important";
+      }, 300); // 0.3초 후
     }
   }
 }

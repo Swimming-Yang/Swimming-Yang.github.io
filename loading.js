@@ -73,22 +73,44 @@ class PageLoadingManager {
   }
 
   showLoading() {
+    console.log('페이지 로딩 표시 시작');
     if (this.overlay) {
-      this.overlay.classList.add('show');
+      // 강제로 보이도록 설정
+      this.overlay.style.display = 'flex';
+      this.overlay.style.opacity = '0';
+      this.overlay.style.visibility = 'visible';
+      
+      // 브라우저 렌더링 후 fade in
+      setTimeout(() => {
+        this.overlay.classList.add('show');
+        this.overlay.style.opacity = '1';
+      }, 10);
+      
       // 로딩 비디오 재생 시작
       const video = this.overlay.querySelector('.loading-video');
       if (video) {
+        console.log('페이지 비디오 재생 시도');
         video.currentTime = 0;
-        video.play().catch(e => console.log('로딩 비디오 재생 실패:', e));
+        video.play()
+          .then(() => console.log('페이지 비디오 재생 성공'))
+          .catch(e => console.log('페이지 로딩 비디오 재생 실패:', e));
+      } else {
+        console.log('페이지 로딩 비디오를 찾을 수 없음');
       }
+    } else {
+      console.log('페이지 로딩 오버레이를 찾을 수 없음');
     }
   }
 
   hideLoading() {
+    console.log('페이지 로딩 숨기기 시작');
     if (this.overlay) {
+      this.overlay.style.opacity = '0';
       setTimeout(() => {
         this.overlay.classList.remove('show');
-      }, 100);
+        this.overlay.style.display = 'none';
+        this.overlay.style.visibility = 'hidden';
+      }, 500);
     }
   }
 }

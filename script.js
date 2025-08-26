@@ -52,23 +52,54 @@ class LoadingManager {
   }
 
   showLoading() {
+    console.log('로딩 표시 시작');
     if (this.overlay) {
-      this.overlay.classList.add('show');
+      // 강제로 보이도록 설정
+      this.overlay.style.display = 'flex';
+      this.overlay.style.opacity = '0';
+      this.overlay.style.visibility = 'visible';
+      
+      // 브라우저 렌더링 후 fade in
+      setTimeout(() => {
+        this.overlay.classList.add('show');
+        this.overlay.style.opacity = '1';
+      }, 10);
+      
       // 로딩 비디오 재생 시작
       const video = this.overlay.querySelector('.loading-video');
       if (video) {
+        console.log('비디오 재생 시도');
         video.currentTime = 0;
-        video.play().catch(e => console.log('로딩 비디오 재생 실패:', e));
+        video.play()
+          .then(() => console.log('비디오 재생 성공'))
+          .catch(e => console.log('로딩 비디오 재생 실패:', e));
+      } else {
+        console.log('로딩 비디오를 찾을 수 없음');
       }
+    } else {
+      console.log('로딩 오버레이를 찾을 수 없음');
     }
   }
 
   hideLoading() {
+    console.log('로딩 숨기기 시작');
     if (this.overlay) {
+      this.overlay.style.opacity = '0';
       setTimeout(() => {
         this.overlay.classList.remove('show');
-      }, 100);
+        this.overlay.style.display = 'none';
+        this.overlay.style.visibility = 'hidden';
+      }, 500);
     }
+  }
+
+  // 디버깅을 위한 수동 로딩 테스트 함수
+  testLoading() {
+    console.log('로딩 테스트 시작');
+    this.showLoading();
+    setTimeout(() => {
+      this.hideLoading();
+    }, 3000);
   }
 }
 
@@ -234,6 +265,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // 전역에서 접근 가능하도록 설정 (디버깅용)
   window.videoManager = videoManager;
   window.loadingManager = loadingManager;
+  
+  // 디버깅: 콘솔에서 window.testLoading() 호출 가능
+  window.testLoading = () => loadingManager.testLoading();
 
   // 페이지 가시성 변경 시 비디오 제어
   document.addEventListener("visibilitychange", () => {

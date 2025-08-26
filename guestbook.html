@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>방명록 - Swimming Yang</title>
+    <link rel="stylesheet" href="boards/board-style.css">
+    <style>
+        .guestbook-form {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .message-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+        
+        .message-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 0.5rem;
+        }
+        
+        .message-author {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 1.1rem;
+        }
+        
+        .message-date {
+            color: #999;
+            font-size: 0.9rem;
+        }
+        
+        .message-content {
+            color: #333;
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+        
+        .char-counter {
+            text-align: right;
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+        
+        .char-counter.warning {
+            color: #ff6b6b;
+        }
+        
+        .delete-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .delete-btn:hover {
+            background: #ff5252;
+            transform: scale(1.1);
+        }
+        
+        .messages-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .write-form {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            color: white;
+        }
+        
+        .write-form h3 {
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        .write-form .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .write-form label {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        
+        .write-form input,
+        .write-form textarea {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: box-shadow 0.3s ease;
+            font-family: inherit;
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        .write-form input:focus,
+        .write-form textarea:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+        }
+        
+        .write-form textarea {
+            resize: vertical;
+            min-height: 120px;
+            max-height: 200px;
+        }
+        
+        .submit-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            width: 100%;
+        }
+        
+        .submit-btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.6);
+            transform: translateY(-2px);
+        }
+        
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .message-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .delete-btn {
+                position: static;
+                margin-top: 1rem;
+                width: auto;
+                padding: 0.5rem 1rem;
+                border-radius: 20px;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 0.5rem;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 네비게이션 -->
+    <nav class="main-nav">
+        <div class="nav-container">
+            <div class="logo">
+                <a href="index.html">Swimming Yang</a>
+            </div>
+            <div class="nav-links">
+                <a href="portfolio.html">포트폴리오</a>
+                <a href="boards/algorithm.html">알고리즘</a>
+                <a href="boards/coding-test.html">코딩테스트</a>
+                <a href="boards/cs.html">CS</a>
+                <a href="guestbook.html" class="active">방명록</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 메인 컨테이너 -->
+    <div class="container">
+        <!-- 페이지 헤더 -->
+        <div class="page-header">
+            <h1>📚 방명록</h1>
+            <p>자유롭게 인사말이나 응원 메시지를 남겨주세요!</p>
+        </div>
+
+        <!-- 글쓰기 폼 -->
+        <div class="write-form">
+            <h3>✍️ 새로운 메시지 작성하기</h3>
+            <form id="guestbookForm">
+                <div class="form-group">
+                    <label for="authorInput">작성자</label>
+                    <input type="text" id="authorInput" placeholder="이름을 입력해주세요" required maxlength="20">
+                </div>
+                <div class="form-group">
+                    <label for="messageInput">메시지 (최대 200자)</label>
+                    <textarea id="messageInput" placeholder="따뜻한 메시지를 남겨주세요... 😊" required maxlength="200"></textarea>
+                    <div class="char-counter" id="charCounter">0 / 200</div>
+                </div>
+                <button type="submit" class="submit-btn" id="submitBtn">💌 메시지 등록하기</button>
+            </form>
+        </div>
+
+        <!-- 방명록 목록 -->
+        <div class="messages-container">
+            <div class="stats" id="statsContainer">
+                <div>
+                    <strong>📝 총 <span id="messageCount">0</span>개의 메시지</strong>
+                </div>
+                <div style="font-size: 0.9rem; color: #666;">
+                    최근 메시지가 위에 표시됩니다
+                </div>
+            </div>
+            
+            <div id="messagesContainer">
+                <!-- 메시지들이 여기에 동적으로 로드됩니다 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 플로팅 관리자 로그인 버튼 -->
+    <button id="floatingAdminBtn" onclick="guestbookManager.showPasswordPrompt()" 
+            style="position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; 
+                   border-radius: 50%; background: #667eea; color: white; border: none; 
+                   box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4); cursor: pointer; 
+                   font-size: 1.5rem; transition: all 0.3s ease; z-index: 1000;
+                   display: flex; align-items: center; justify-content: center;"
+            title="관리자 로그인">
+      🔒
+    </button>
+
+    <!-- 관리자 인증 모달 -->
+    <div id="authModal" class="modal">
+      <div class="modal-content" style="max-width: 400px;">
+        <div class="modal-header">
+          <h2>🔐 관리자 인증</h2>
+          <span class="close" onclick="guestbookManager.closeAuthModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+          <form id="authForm">
+            <div class="form-group">
+              <label for="adminPasswordInput">관리자 비밀번호</label>
+              <input type="password" id="adminPasswordInput" placeholder="비밀번호를 입력하세요" required>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn btn-secondary" onclick="guestbookManager.closeAuthModal()">취소</button>
+              <button type="submit" class="btn btn-primary">인증</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script src="guestbook-script.js"></script>
+</body>
+</html>

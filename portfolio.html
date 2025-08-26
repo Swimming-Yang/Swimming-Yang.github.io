@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>포트폴리오 - Swimming Yang</title>
+    <link rel="stylesheet" href="boards/board-style.css">
+    <style>
+        .profile-section {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .profile-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            margin: 0 auto 2rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: white;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .skill-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .skill-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .skill-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .projects-section {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .project-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: box-shadow 0.3s ease;
+        }
+        
+        .project-card:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .contact-section {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 20px;
+            padding: 3rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .contact-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .contact-link {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .contact-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 768px) {
+            .profile-image {
+                width: 150px;
+                height: 150px;
+                font-size: 3rem;
+            }
+            
+            .skills-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .contact-links {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .contact-link {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 네비게이션 -->
+    <nav class="main-nav">
+        <div class="nav-container">
+            <div class="logo">
+                <a href="index.html">Swimming Yang</a>
+            </div>
+            <div class="nav-links">
+                <a href="portfolio.html" class="active">포트폴리오</a>
+                <a href="boards/algorithm.html">알고리즘</a>
+                <a href="boards/coding-test.html">코딩테스트</a>
+                <a href="boards/cs.html">CS</a>
+                <a href="guestbook.html">방명록</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 메인 컨테이너 -->
+    <div class="container">
+        <!-- 페이지 헤더 -->
+        <div class="page-header">
+            <h1>📝 포트폴리오</h1>
+            <p>웹 개발자 Swimming Yang의 이력과 기술 스택을 소개합니다</p>
+        </div>
+
+        <!-- 프로필 섹션 -->
+        <div class="profile-section">
+            <div class="profile-image">
+                👨‍💻
+            </div>
+            <h2>Swimming Yang</h2>
+            <h3 style="color: #667eea; margin-bottom: 2rem;">Full Stack Web Developer</h3>
+            <p style="font-size: 1.1rem; line-height: 1.8; max-width: 600px; margin: 0 auto;">
+                안녕하세요! 웹 개발에 열정을 가진 Swimming Yang입니다.<br>
+                프론트엔드와 백엔드 모두에 관심이 많으며, 사용자 경험을 중시하는 개발자로 성장하고 있습니다.<br>
+                새로운 기술 학습을 즐기며, 문제 해결을 통해 더 나은 서비스를 만들어가는 것이 목표입니다.
+            </p>
+        </div>
+
+        <!-- 기술 스택 -->
+        <div class="projects-section">
+            <h2 style="text-align: center; margin-bottom: 3rem; color: #333;">🛠️ 기술 스택</h2>
+            <div class="skills-grid">
+                <div class="skill-card">
+                    <div class="skill-icon">🎨</div>
+                    <h3>Frontend</h3>
+                    <p>HTML5, CSS3, JavaScript (ES6+)<br>
+                    React.js, Vue.js<br>
+                    Responsive Design, Bootstrap</p>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-icon">⚙️</div>
+                    <h3>Backend</h3>
+                    <p>Node.js, Express.js<br>
+                    Python, Django<br>
+                    RESTful API 설계</p>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-icon">🗄️</div>
+                    <h3>Database</h3>
+                    <p>MySQL, PostgreSQL<br>
+                    MongoDB<br>
+                    데이터베이스 설계 및 최적화</p>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-icon">🔧</div>
+                    <h3>Tools & Others</h3>
+                    <p>Git/GitHub, VS Code<br>
+                    AWS, Docker<br>
+                    Agile/Scrum 방법론</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 프로젝트 섹션 -->
+        <div class="projects-section">
+            <h2 style="text-align: center; margin-bottom: 3rem; color: #333;">🚀 주요 프로젝트</h2>
+            
+            <div class="project-card">
+                <h3 style="color: #667eea; margin-bottom: 1rem;">📚 개인 블로그 & 게시판 시스템</h3>
+                <p style="color: #666; margin-bottom: 1rem;"><strong>기간:</strong> 2024.01 - 진행중</p>
+                <p style="line-height: 1.6; margin-bottom: 1rem;">
+                    개인 학습 기록과 지식 공유를 위한 블로그 겸 게시판 시스템입니다. 
+                    관리자 인증 시스템, 리치 텍스트 에디터, 댓글 시스템 등을 구현했습니다.
+                </p>
+                <p><strong>사용 기술:</strong> HTML5, CSS3, JavaScript, Quill.js, Local Storage</p>
+                <p><strong>주요 기능:</strong> 관리자 권한 관리, 게시글 CRUD, 댓글 시스템, 반응형 디자인</p>
+            </div>
+
+            <div class="project-card">
+                <h3 style="color: #667eea; margin-bottom: 1rem;">🛒 쇼핑몰 프로젝트 (예정)</h3>
+                <p style="color: #666; margin-bottom: 1rem;"><strong>기간:</strong> 계획 중</p>
+                <p style="line-height: 1.6; margin-bottom: 1rem;">
+                    사용자 친화적인 온라인 쇼핑몰 구축을 목표로 하는 프로젝트입니다.
+                    현대적인 UI/UX와 안전한 결제 시스템을 제공할 예정입니다.
+                </p>
+                <p><strong>계획 기술:</strong> React.js, Node.js, MongoDB, AWS</p>
+                <p><strong>계획 기능:</strong> 상품 관리, 장바구니, 결제 시스템, 사용자 인증</p>
+            </div>
+        </div>
+
+        <!-- 교육 및 경력 -->
+        <div class="projects-section">
+            <h2 style="text-align: center; margin-bottom: 3rem; color: #333;">🎓 교육 & 경력</h2>
+            
+            <div class="project-card">
+                <h3 style="color: #667eea; margin-bottom: 1rem;">SSAFY (삼성 청년 SW 아카데미)</h3>
+                <p style="color: #666; margin-bottom: 1rem;"><strong>기간:</strong> 2024.01 - 2024.12</p>
+                <p style="line-height: 1.6;">
+                    풀스택 웹 개발 과정을 수강하며 체계적인 소프트웨어 개발 능력을 기르고 있습니다.
+                    알고리즘, 웹 프론트엔드, 백엔드, 데이터베이스 등 전반적인 웹 개발 지식을 학습하고 있습니다.
+                </p>
+            </div>
+        </div>
+
+        <!-- 연락처 섹션 -->
+        <div class="contact-section">
+            <h2 style="margin-bottom: 1rem;">📞 연락처</h2>
+            <p style="margin-bottom: 2rem; opacity: 0.9;">
+                프로젝트 협업이나 채용 제안이 있으시면 언제든 연락 주세요!
+            </p>
+            <div class="contact-links">
+                <a href="mailto:your.email@example.com" class="contact-link">
+                    📧 이메일
+                </a>
+                <a href="https://github.com/yourusername" class="contact-link" target="_blank">
+                    💻 GitHub
+                </a>
+                <a href="https://linkedin.com/in/yourusername" class="contact-link" target="_blank">
+                    💼 LinkedIn
+                </a>
+                <a href="guestbook.html" class="contact-link">
+                    📚 방명록 남기기
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

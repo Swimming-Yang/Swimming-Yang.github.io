@@ -151,37 +151,108 @@ p {
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
-/* 게시판 링크 버튼 */
-.board-links {
+/* 게시판 그리드 버튼 */
+.board-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-top: 3rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.grid-btn {
   display: flex;
-  gap: 1rem;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  flex-wrap: wrap;
-  margin-top: 2rem;
-}
-
-.board-btn {
-  display: inline-block;
-  padding: 1rem 2rem;
-  background: rgba(255, 255, 255, 0.9);
-  color: #333;
+  padding: 2rem 1rem;
   text-decoration: none;
-  border-radius: 8px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  transition: all 0.3s ease;
+  border-radius: 20px;
   backdrop-filter: blur(10px);
-  font-weight: 500;
-  letter-spacing: 0.5px;
-  min-width: 140px;
-  text-align: center;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  min-height: 140px;
+  position: relative;
+  overflow: hidden;
 }
 
-.board-btn:hover {
-  background: white;
-  border-color: rgba(255, 255, 255, 0.8);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+.grid-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: inherit;
+  border-radius: inherit;
+  opacity: 0.9;
+  z-index: -1;
+}
+
+.btn-icon {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+  transition: transform 0.3s ease;
+}
+
+.btn-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.8);
+  text-align: center;
+}
+
+/* 파스텔 컬러 테마 */
+.btn-red {
+  background: linear-gradient(135deg, #ffb3ba, #ff8a95);
+}
+
+.btn-orange {
+  background: linear-gradient(135deg, #ffdfba, #ffc947);
+}
+
+.btn-yellow {
+  background: linear-gradient(135deg, #ffffba, #fff066);
+}
+
+.btn-green {
+  background: linear-gradient(135deg, #baffc9, #85e085);
+}
+
+.btn-blue {
+  background: linear-gradient(135deg, #bae1ff, #74b9ff);
+}
+
+.btn-purple {
+  background: linear-gradient(135deg, #e1baff, #b885ff);
+}
+
+/* 호버 효과 */
+.grid-btn:hover:not(.btn-disabled) {
+  transform: translateY(-8px) scale(1.05);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+}
+
+.grid-btn:hover:not(.btn-disabled) .btn-icon {
+  transform: scale(1.2) rotate(5deg);
+}
+
+.grid-btn:hover:not(.btn-disabled)::before {
+  opacity: 1;
+}
+
+/* 비활성화된 버튼 */
+.btn-disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.btn-disabled .btn-label {
+  color: rgba(0, 0, 0, 0.5);
 }
 
 /* 비디오 인디케이터 */
@@ -252,14 +323,24 @@ p {
     font-size: 0.9rem;
   }
 
-  .board-links {
-    flex-direction: column;
-    gap: 0.8rem;
+  .board-grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 1rem;
+    max-width: 400px;
   }
   
-  .board-btn {
-    width: 100%;
-    max-width: 300px;
+  .grid-btn {
+    min-height: 120px;
+    padding: 1.5rem 1rem;
+  }
+  
+  .btn-icon {
+    font-size: 2.5rem;
+  }
+  
+  .btn-label {
+    font-size: 0.9rem;
   }
 
   .video-indicators {
@@ -287,6 +368,26 @@ p {
 
   .btn {
     padding: 0.7rem 1.2rem;
+    font-size: 0.8rem;
+  }
+
+  .board-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(6, 1fr);
+    gap: 0.8rem;
+    max-width: 280px;
+  }
+  
+  .grid-btn {
+    min-height: 100px;
+    padding: 1rem;
+  }
+  
+  .btn-icon {
+    font-size: 2rem;
+  }
+  
+  .btn-label {
     font-size: 0.8rem;
   }
 

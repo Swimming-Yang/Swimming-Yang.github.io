@@ -160,8 +160,8 @@ class LoadingManager {
       console.log("📋 현재 DOM 상태:");
       console.log("- document.readyState:", document.readyState);
       console.log("- document.body:", document.body);
-      console.log("- All elements with id:", document.querySelectorAll('[id]'));
-      
+      console.log("- All elements with id:", document.querySelectorAll("[id]"));
+
       // 동적으로 오버레이 생성 시도
       this.createOverlay();
       return;
@@ -169,8 +169,7 @@ class LoadingManager {
 
     console.log("✅ 로딩 오버레이 발견:", overlay);
 
-    // 모든 클래스와 스타일 초기화 후 강제로 보이도록 설정
-    overlay.className = "loading-overlay";
+    // 🎯 간단하고 확실한 접근법: 바로 보이게 하기
     overlay.style.cssText = `
       position: fixed !important;
       top: 0 !important;
@@ -182,19 +181,14 @@ class LoadingManager {
       display: flex !important;
       justify-content: center !important;
       align-items: center !important;
-      opacity: 0 !important;
       visibility: visible !important;
       pointer-events: auto !important;
+      opacity: 1 !important;
     `;
+    
+    overlay.className = "loading-overlay show";
 
-    console.log("📦 오버레이 강제 스타일 설정 완료");
-
-    // 브라우저 렌더링 후 fade in
-    requestAnimationFrame(() => {
-      overlay.style.opacity = "1 !important";
-      overlay.classList.add("show");
-      console.log("✨ 페이드인 시작");
-    });
+    console.log("📦 오버레이 강제 표시 완료 - 바로 보임!");
 
     // 로딩 비디오 재생 시작
     const video = overlay.querySelector(".loading-video");
@@ -213,56 +207,56 @@ class LoadingManager {
 
   createOverlay() {
     console.log("🛠️ 동적으로 로딩 오버레이 생성 시작");
-    
+
     // 오버레이 생성
-    const overlay = document.createElement('div');
-    overlay.id = 'loadingOverlay';
-    overlay.className = 'loading-overlay';
-    
+    const overlay = document.createElement("div");
+    overlay.id = "loadingOverlay";
+    overlay.className = "loading-overlay";
+
     // 컨텐츠 컨테이너 생성
-    const content = document.createElement('div');
-    content.className = 'loading-content';
-    
+    const content = document.createElement("div");
+    content.className = "loading-content";
+
     // 비디오 생성
-    const video = document.createElement('video');
-    video.className = 'loading-video';
+    const video = document.createElement("video");
+    video.className = "loading-video";
     video.autoplay = true;
     video.muted = true;
     video.loop = true;
-    video.setAttribute('playsinline', '');
-    
+    video.setAttribute("playsinline", "");
+
     // 비디오 소스 생성
-    const source = document.createElement('source');
-    source.src = 'asserts/videos/loading_frieren.mp4';
-    source.type = 'video/mp4';
-    
+    const source = document.createElement("source");
+    source.src = "asserts/videos/loading_frieren.mp4";
+    source.type = "video/mp4";
+
     // 요소들 조립
     video.appendChild(source);
     content.appendChild(video);
     overlay.appendChild(content);
-    
+
     // DOM에 추가
     document.body.appendChild(overlay);
-    
+
     // 캐시 업데이트
     this.overlay = overlay;
-    
+
     console.log("✅ 동적 오버레이 생성 완료:", overlay);
-    
+
     // 다시 showLoading 호출
     this.showLoading();
   }
 
   hideLoading() {
-    console.log("로딩 숨기기 시작");
+    console.log("🫥 로딩 숨기기 시작");
     const overlay = this.getOverlay();
     if (overlay) {
-      overlay.style.opacity = "0";
-      setTimeout(() => {
-        overlay.classList.remove("show");
-        overlay.style.display = "none";
-        overlay.style.visibility = "hidden";
-      }, 500);
+      // 즉시 숨기기
+      overlay.style.opacity = "0 !important";
+      overlay.style.display = "none !important";
+      overlay.style.visibility = "hidden !important";
+      overlay.classList.remove("show");
+      console.log("✅ 로딩 숨기기 완료");
     }
   }
 

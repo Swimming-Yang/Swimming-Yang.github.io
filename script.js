@@ -20,11 +20,15 @@ class LoadingManager {
       const allLinks = document.querySelectorAll(
         'a[href]:not([href^="http"]):not([href^="mailto"]):not([href^="tel"]):not([href="#"])'
       );
-      
+
       // 그리드 버튼들 별도로 추가 (클래스 기반 선택)
-      const gridBtns = document.querySelectorAll('.grid-btn[href]:not(.btn-disabled)');
-      
-      console.log(`일반 링크 ${allLinks.length}개, 그리드 버튼 ${gridBtns.length}개에 로딩 이벤트 추가`);
+      const gridBtns = document.querySelectorAll(
+        ".grid-btn[href]:not(.btn-disabled)"
+      );
+
+      console.log(
+        `일반 링크 ${allLinks.length}개, 그리드 버튼 ${gridBtns.length}개에 로딩 이벤트 추가`
+      );
 
       // 일반 링크들 처리
       allLinks.forEach((link) => {
@@ -273,13 +277,13 @@ class VideoBackgroundManager {
 function initMobileNavigation() {
   const navToggle = document.getElementById("navToggle");
   const navLinks = document.getElementById("navLinks");
-  
+
   if (navToggle && navLinks) {
     navToggle.addEventListener("click", () => {
       navToggle.classList.toggle("active");
       navLinks.classList.toggle("active");
     });
-    
+
     // 링크 클릭 시 메뉴 닫기
     navLinks.addEventListener("click", (e) => {
       if (e.target.tagName === "A") {
@@ -287,7 +291,7 @@ function initMobileNavigation() {
         navLinks.classList.remove("active");
       }
     });
-    
+
     // 배경 클릭 시 메뉴 닫기
     document.addEventListener("click", (e) => {
       if (!navToggle.contains(e.target) && !navLinks.contains(e.target)) {
@@ -302,17 +306,17 @@ function initMobileNavigation() {
 document.addEventListener("DOMContentLoaded", () => {
   // 모바일 네비게이션 초기화
   initMobileNavigation();
-  
+
   // 비디오 백그라운드 매니저 먼저 초기화
   const videoManager = new VideoBackgroundManager();
 
   // 로딩 매니저 나중에 초기화 (DOM 완전 준비 후)
   setTimeout(() => {
     const loadingManager = new LoadingManager();
-    
+
     // 전역에서 접근 가능하도록 설정 (디버깅용)
     window.loadingManager = loadingManager;
-    
+
     // 디버깅: 콘솔에서 window.testLoading() 호출 가능
     window.testLoading = () => loadingManager.testLoading();
   }, 200);

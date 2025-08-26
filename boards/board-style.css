@@ -455,21 +455,23 @@ body {
   .container {
     padding: 90px 1rem 1rem;
   }
-  
+
   .nav-container {
     padding: 0 1rem;
   }
-  
-  /* 모바일 네비게이션 */
+
+    /* 모바일 네비게이션 */
   .nav-toggle {
     display: flex;
+    position: relative;
+    z-index: 1002;
   }
   
   .nav-links {
     position: fixed;
     top: 0;
     right: -100%;
-    width: 250px;
+    width: 280px;
     height: 100vh;
     background: rgba(0, 0, 0, 0.95);
     backdrop-filter: blur(20px);
@@ -478,7 +480,9 @@ body {
     align-items: center;
     gap: 2rem;
     transition: right 0.3s ease;
-    z-index: 1000;
+    z-index: 1001;
+    overflow-y: auto;
+    padding: 2rem 0;
   }
   
   .nav-links.active {
@@ -492,66 +496,75 @@ body {
     width: 80%;
     text-align: center;
     color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.1);
   }
   
+  .nav-links a:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+
   .page-header {
     padding: 2rem 1rem;
     margin-bottom: 1.5rem;
   }
-  
+
   .page-header h1 {
     font-size: 2rem;
   }
-  
+
   .page-header p {
     font-size: 1rem;
   }
-  
+
   .posts-container {
     padding: 1.5rem;
   }
-  
+
   .post-item {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
     padding: 1rem;
   }
-  
+
   .post-info {
     width: 100%;
   }
-  
+
   .post-stats {
     width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
-  
+
   .modal-content {
     width: 95%;
-    margin: 5% auto;
-    max-height: 90vh;
+    margin: 2% auto;
+    max-height: 95vh;
+    overflow-y: auto;
+    max-width: none;
   }
-  
+
   .modal-header {
     padding: 1.5rem;
   }
-  
+
   .modal-body {
     padding: 1.5rem;
   }
-  
+
   .form-actions {
     flex-direction: column;
     gap: 0.5rem;
   }
-  
+
   .btn {
     width: 100%;
   }
-  
+
   /* 플로팅 버튼 모바일 조정 */
   #floatingAdminBtn {
     bottom: 15px !important;
@@ -559,6 +572,13 @@ body {
     width: 50px !important;
     height: 50px !important;
     font-size: 1.2rem !important;
+    z-index: 999 !important;
+  }
+  
+  /* 네비게이션이 열렸을 때 플로팅 버튼 숨김 */
+  .nav-links.active ~ #floatingAdminBtn {
+    opacity: 0;
+    pointer-events: none;
   }
 }
 
@@ -634,7 +654,7 @@ body {
   cursor: pointer !important;
   font-size: 1.5rem !important;
   transition: all 0.3s ease !important;
-  z-index: 1000 !important;
+  z-index: 2000 !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -664,7 +684,7 @@ body {
   border-bottom: 1px solid #ccc;
   border-left: 1px solid #ccc;
   border-right: 1px solid #ccc;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .ql-editor.ql-blank::before {
@@ -688,9 +708,15 @@ body {
   color: #333;
 }
 
-.post-detail-content h1 { font-size: 1.8rem; }
-.post-detail-content h2 { font-size: 1.5rem; }
-.post-detail-content h3 { font-size: 1.3rem; }
+.post-detail-content h1 {
+  font-size: 1.8rem;
+}
+.post-detail-content h2 {
+  font-size: 1.5rem;
+}
+.post-detail-content h3 {
+  font-size: 1.3rem;
+}
 
 .post-detail-content p {
   margin-bottom: 1rem;
@@ -710,7 +736,7 @@ body {
   padding: 1rem;
   border-radius: 4px;
   overflow-x: auto;
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
   border: 1px solid #ddd;
 }
 
@@ -779,7 +805,8 @@ body {
 }
 
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0px);
   }
   50% {

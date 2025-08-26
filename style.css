@@ -220,7 +220,7 @@ p {
 }
 
 .grid-btn::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -342,16 +342,18 @@ p {
 
 /* 반응형 디자인 */
 @media (max-width: 768px) {
-  /* 모바일 네비게이션 */
+    /* 모바일 네비게이션 */
   .nav-toggle {
     display: flex;
+    position: relative;
+    z-index: 1002;
   }
   
   .nav-links {
     position: fixed;
     top: 0;
     right: -100%;
-    width: 250px;
+    width: 280px;
     height: 100vh;
     background: rgba(0, 0, 0, 0.95);
     backdrop-filter: blur(20px);
@@ -360,7 +362,9 @@ p {
     align-items: center;
     gap: 2rem;
     transition: right 0.3s ease;
-    z-index: 1000;
+    z-index: 1001;
+    overflow-y: auto;
+    padding: 2rem 0;
   }
   
   .nav-links.active {
@@ -373,6 +377,7 @@ p {
     border-radius: 15px;
     width: 80%;
     text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.2);
   }
 
   h1 {
@@ -394,16 +399,16 @@ p {
     gap: 1rem;
     max-width: 400px;
   }
-  
+
   .grid-btn {
     min-height: 120px;
     padding: 1.5rem 1rem;
   }
-  
+
   .btn-icon {
     font-size: 2.5rem;
   }
-  
+
   .btn-label {
     font-size: 0.9rem;
   }
@@ -442,16 +447,16 @@ p {
     gap: 0.8rem;
     max-width: 280px;
   }
-  
+
   .grid-btn {
     min-height: 100px;
     padding: 1rem;
   }
-  
+
   .btn-icon {
     font-size: 2rem;
   }
-  
+
   .btn-label {
     font-size: 0.8rem;
   }
@@ -528,7 +533,8 @@ p {
 }
 
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0px);
   }
   50% {

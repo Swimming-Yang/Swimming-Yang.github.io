@@ -115,7 +115,40 @@ class PageLoadingManager {
   }
 }
 
+// 네비게이션 토글 기능
+function initMobileNavigation() {
+  const navToggle = document.getElementById("navToggle");
+  const navLinks = document.getElementById("navLinks");
+  
+  if (navToggle && navLinks) {
+    navToggle.addEventListener("click", () => {
+      navToggle.classList.toggle("active");
+      navLinks.classList.toggle("active");
+    });
+    
+    // 링크 클릭 시 메뉴 닫기
+    navLinks.addEventListener("click", (e) => {
+      if (e.target.tagName === "A") {
+        navToggle.classList.remove("active");
+        navLinks.classList.remove("active");
+      }
+    });
+    
+    // 배경 클릭 시 메뉴 닫기
+    document.addEventListener("click", (e) => {
+      if (!navToggle.contains(e.target) && !navLinks.contains(e.target)) {
+        navToggle.classList.remove("active");
+        navLinks.classList.remove("active");
+      }
+    });
+  }
+}
+
 // 페이지 로드 시 자동 초기화
 document.addEventListener('DOMContentLoaded', () => {
+  // 모바일 네비게이션 초기화
+  initMobileNavigation();
+  
+  // 로딩 매니저 초기화
   new PageLoadingManager();
 });

@@ -1,101 +1,116 @@
 // 페이지 로딩 관리 클래스
 class LoadingManager {
   constructor() {
-    this.overlay = document.getElementById('loadingOverlay');
+    this.overlay = document.getElementById("loadingOverlay");
     this.init();
   }
 
   init() {
+    // 페이지 로드 시 로딩 즉시 숨기기 (첫 진입 시 로딩창 방지)
+    this.hideLoading();
+
     // 모든 링크에 로딩 이벤트 추가
     this.addLoadingToLinks();
-    
-    // 페이지 로드 시 로딩 숨기기
-    window.addEventListener('load', () => {
-      this.hideLoading();
-    });
   }
 
   addLoadingToLinks() {
-    // 모든 내부 링크에 로딩 이벤트 추가
-    const links = document.querySelectorAll('a[href^="boards/"], a[href^="pages/"], a[href="index.html"]');
-    
-    links.forEach(link => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        const href = link.getAttribute('href');
-        this.showLoadingAndNavigate(href);
-      });
-    });
+    // 페이지 로드 후 약간의 지연을 두고 링크 이벤트 추가
+    setTimeout(() => {
+      // 모든 내부 링크에 로딩 이벤트 추가 (네비게이션 + 그리드 버튼)
+      const allLinks = document.querySelectorAll(
+        'a[href]:not([href^="http"]):not([href^="mailto"]):not([href^="tel"]):not([href="#"])'
+      );
+      
+      // 그리드 버튼들 별도로 추가 (클래스 기반 선택)
+      const gridBtns = document.querySelectorAll('.grid-btn[href]:not(.btn-disabled)');
+      
+      console.log(`일반 링크 ${allLinks.length}개, 그리드 버튼 ${gridBtns.length}개에 로딩 이벤트 추가`);
 
-    // 그리드 버튼들에도 로딩 추가
-    const gridBtns = document.querySelectorAll('.grid-btn:not(.btn-disabled)');
-    gridBtns.forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const href = btn.getAttribute('href');
-        if (href) {
-          this.showLoadingAndNavigate(href);
+      // 일반 링크들 처리
+      allLinks.forEach((link) => {
+        if (!link.hasAttribute("data-loading-added")) {
+          link.setAttribute("data-loading-added", "true");
+          link.addEventListener("click", (e) => {
+            e.preventDefault();
+            const href = link.getAttribute("href");
+            console.log(`일반 링크 클릭: ${href}`);
+            this.showLoadingAndNavigate(href);
+          });
         }
       });
-    });
+
+      // 그리드 버튼들 처리
+      gridBtns.forEach((btn) => {
+        if (!btn.hasAttribute("data-loading-added")) {
+          btn.setAttribute("data-loading-added", "true");
+          btn.addEventListener("click", (e) => {
+            e.preventDefault();
+            const href = btn.getAttribute("href");
+            console.log(`그리드 버튼 클릭: ${href}`);
+            this.showLoadingAndNavigate(href);
+          });
+        }
+      });
+    }, 100);
   }
 
   showLoadingAndNavigate(url) {
     this.showLoading();
-    
+
     // 0.5초에서 1초 사이의 랜덤 시간
     const randomDelay = Math.random() * 500 + 500; // 500-1000ms
-    
+
     setTimeout(() => {
       window.location.href = url;
     }, randomDelay);
   }
 
   showLoading() {
-    console.log('로딩 표시 시작');
+    console.log("로딩 표시 시작");
     if (this.overlay) {
       // 강제로 보이도록 설정
-      this.overlay.style.display = 'flex';
-      this.overlay.style.opacity = '0';
-      this.overlay.style.visibility = 'visible';
-      
+      this.overlay.style.display = "flex";
+      this.overlay.style.opacity = "0";
+      this.overlay.style.visibility = "visible";
+
       // 브라우저 렌더링 후 fade in
       setTimeout(() => {
-        this.overlay.classList.add('show');
-        this.overlay.style.opacity = '1';
+        this.overlay.classList.add("show");
+        this.overlay.style.opacity = "1";
       }, 10);
-      
+
       // 로딩 비디오 재생 시작
-      const video = this.overlay.querySelector('.loading-video');
+      const video = this.overlay.querySelector(".loading-video");
       if (video) {
-        console.log('비디오 재생 시도');
+        console.log("비디오 재생 시도");
         video.currentTime = 0;
-        video.play()
-          .then(() => console.log('비디오 재생 성공'))
-          .catch(e => console.log('로딩 비디오 재생 실패:', e));
+        video
+          .play()
+          .then(() => console.log("비디오 재생 성공"))
+          .catch((e) => console.log("로딩 비디오 재생 실패:", e));
       } else {
-        console.log('로딩 비디오를 찾을 수 없음');
+        console.log("로딩 비디오를 찾을 수 없음");
       }
     } else {
-      console.log('로딩 오버레이를 찾을 수 없음');
+      console.log("로딩 오버레이를 찾을 수 없음");
     }
   }
 
   hideLoading() {
-    console.log('로딩 숨기기 시작');
+    console.log("로딩 숨기기 시작");
     if (this.overlay) {
-      this.overlay.style.opacity = '0';
+      this.overlay.style.opacity = "0";
       setTimeout(() => {
-        this.overlay.classList.remove('show');
-        this.overlay.style.display = 'none';
-        this.overlay.style.visibility = 'hidden';
+        this.overlay.classList.remove("show");
+        this.overlay.style.display = "none";
+        this.overlay.style.visibility = "hidden";
       }, 500);
     }
   }
 
   // 디버깅을 위한 수동 로딩 테스트 함수
   testLoading() {
-    console.log('로딩 테스트 시작');
+    console.log("로딩 테스트 시작");
     this.showLoading();
     setTimeout(() => {
       this.hideLoading();
@@ -254,20 +269,56 @@ class VideoBackgroundManager {
   }
 }
 
+// 네비게이션 토글 기능
+function initMobileNavigation() {
+  const navToggle = document.getElementById("navToggle");
+  const navLinks = document.getElementById("navLinks");
+  
+  if (navToggle && navLinks) {
+    navToggle.addEventListener("click", () => {
+      navToggle.classList.toggle("active");
+      navLinks.classList.toggle("active");
+    });
+    
+    // 링크 클릭 시 메뉴 닫기
+    navLinks.addEventListener("click", (e) => {
+      if (e.target.tagName === "A") {
+        navToggle.classList.remove("active");
+        navLinks.classList.remove("active");
+      }
+    });
+    
+    // 배경 클릭 시 메뉴 닫기
+    document.addEventListener("click", (e) => {
+      if (!navToggle.contains(e.target) && !navLinks.contains(e.target)) {
+        navToggle.classList.remove("active");
+        navLinks.classList.remove("active");
+      }
+    });
+  }
+}
+
 // 페이지 로드 완료 후 초기화
 document.addEventListener("DOMContentLoaded", () => {
-  // 로딩 매니저 초기화
-  const loadingManager = new LoadingManager();
+  // 모바일 네비게이션 초기화
+  initMobileNavigation();
   
-  // 비디오 백그라운드 매니저 초기화
+  // 비디오 백그라운드 매니저 먼저 초기화
   const videoManager = new VideoBackgroundManager();
+
+  // 로딩 매니저 나중에 초기화 (DOM 완전 준비 후)
+  setTimeout(() => {
+    const loadingManager = new LoadingManager();
+    
+    // 전역에서 접근 가능하도록 설정 (디버깅용)
+    window.loadingManager = loadingManager;
+    
+    // 디버깅: 콘솔에서 window.testLoading() 호출 가능
+    window.testLoading = () => loadingManager.testLoading();
+  }, 200);
 
   // 전역에서 접근 가능하도록 설정 (디버깅용)
   window.videoManager = videoManager;
-  window.loadingManager = loadingManager;
-  
-  // 디버깅: 콘솔에서 window.testLoading() 호출 가능
-  window.testLoading = () => loadingManager.testLoading();
 
   // 페이지 가시성 변경 시 비디오 제어
   document.addEventListener("visibilitychange", () => {

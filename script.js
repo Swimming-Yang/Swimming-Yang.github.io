@@ -17,27 +17,20 @@ class LoadingManager {
   }
 
   setupEventDelegation() {
-    console.log("🎯 이벤트 위임 설정 시작");
-
     // 문서 전체에 클릭 이벤트 위임
     document.addEventListener(
       "click",
       (e) => {
-        console.log("📱 문서 클릭 감지:", e.target);
-
         // 그리드 버튼인지 확인
         let target = e.target;
 
         // 클릭된 요소가 그리드 버튼이거나 그 자식인지 확인
         while (target && target !== document) {
           if (target.classList && target.classList.contains("grid-btn")) {
-            console.log("🎯 그리드 버튼 클릭 감지:", target);
-
             const href = target.getAttribute("href");
             const isDisabled = target.classList.contains("btn-disabled");
 
             if (href && !isDisabled) {
-              console.log("🚀 로딩 시작! href:", href);
               e.preventDefault();
               e.stopPropagation();
               this.showLoadingAndNavigate(href);
@@ -50,13 +43,9 @@ class LoadingManager {
       },
       true
     ); // useCapture: true
-
-    console.log("✅ 이벤트 위임 설정 완료");
   }
 
   addLoadingToLinks() {
-    console.log("=== addLoadingToLinks 시작 ===");
-
     // 즉시 한 번 시도
     this.attachLoadingEvents();
 
@@ -67,45 +56,25 @@ class LoadingManager {
   }
 
   attachLoadingEvents() {
-    console.log("=== attachLoadingEvents 실행 ===");
-
     // 모든 그리드 버튼들을 우선 처리
     const gridBtns = document.querySelectorAll(".grid-btn");
-    console.log(`그리드 버튼 ${gridBtns.length}개 발견`);
 
-    gridBtns.forEach((btn, index) => {
+    gridBtns.forEach((btn) => {
       const href = btn.getAttribute("href");
       const isDisabled = btn.classList.contains("btn-disabled");
       const hasListener = btn.hasAttribute("data-loading-added");
 
-      console.log(`그리드 버튼 ${index}:`, {
-        href,
-        disabled: isDisabled,
-        hasListener,
-        tagName: btn.tagName,
-        className: btn.className,
-      });
-
       if (href && !isDisabled && !hasListener) {
         btn.setAttribute("data-loading-added", "true");
 
-        // 기존 이벤트 제거 후 새로 추가
-        btn.removeEventListener("click", this.handleGridButtonClick);
         btn.addEventListener(
           "click",
           (e) => {
-            console.log(`🚀 그리드 버튼 클릭됨: ${href}`);
             e.preventDefault();
             e.stopPropagation();
             this.showLoadingAndNavigate(href);
           },
           true
-        ); // useCapture: true로 설정
-
-        console.log(`✅ 그리드 버튼 ${index}에 이벤트 리스너 추가됨`);
-      } else {
-        console.log(
-          `❌ 그리드 버튼 ${index} 건너뜀 - href:${href}, disabled:${isDisabled}, hasListener:${hasListener}`
         );
       }
     });
@@ -115,21 +84,16 @@ class LoadingManager {
       'a[href]:not([href^="http"]):not([href^="mailto"]):not([href^="tel"]):not([href="#"])'
     );
 
-    console.log(`전체 링크 ${allLinks.length}개 발견`);
-
     allLinks.forEach((link) => {
       if (!link.hasAttribute("data-loading-added")) {
         link.setAttribute("data-loading-added", "true");
         link.addEventListener("click", (e) => {
-          console.log(`🔗 일반 링크 클릭됨: ${link.href}`);
           e.preventDefault();
           const href = link.getAttribute("href");
           this.showLoadingAndNavigate(href);
         });
       }
     });
-
-    console.log("=== 이벤트 리스너 추가 완료 ===");
   }
 
   showLoadingAndNavigate(url) {
@@ -146,30 +110,19 @@ class LoadingManager {
   getOverlay() {
     if (!this.overlay) {
       this.overlay = document.getElementById("loadingOverlay");
-      console.log("🔍 오버레이 검색 결과:", this.overlay);
     }
     return this.overlay;
   }
 
   showLoading() {
-    console.log("🎬 로딩 표시 시작");
-
     const overlay = this.getOverlay();
     if (!overlay) {
-      console.error("❌ loadingOverlay 요소를 찾을 수 없음!");
-      console.log("📋 현재 DOM 상태:");
-      console.log("- document.readyState:", document.readyState);
-      console.log("- document.body:", document.body);
-      console.log("- All elements with id:", document.querySelectorAll("[id]"));
-
       // 동적으로 오버레이 생성 시도
       this.createOverlay();
       return;
     }
 
-    console.log("✅ 로딩 오버레이 발견:", overlay);
-
-    // 🎯 간단하고 확실한 접근법: 바로 보이게 하기
+    // 강제 표시
     overlay.style.cssText = `
       position: fixed !important;
       top: 0 !important;
@@ -185,29 +138,19 @@ class LoadingManager {
       pointer-events: auto !important;
       opacity: 1 !important;
     `;
-    
-    overlay.className = "loading-overlay show";
 
-    console.log("📦 오버레이 강제 표시 완료 - 바로 보임!");
+    overlay.className = "loading-overlay show";
 
     // 로딩 비디오 재생 시작
     const video = overlay.querySelector(".loading-video");
     if (video) {
-      console.log("🎥 프리렌 비디오 재생 시도");
       video.currentTime = 0;
       video.style.display = "block";
-      video
-        .play()
-        .then(() => console.log("🎬 프리렌 비디오 재생 성공"))
-        .catch((e) => console.log("❌ 프리렌 비디오 재생 실패:", e));
-    } else {
-      console.log("❌ 프리렌 비디오를 찾을 수 없음");
+      video.play().catch(() => {});
     }
   }
 
   createOverlay() {
-    console.log("🛠️ 동적으로 로딩 오버레이 생성 시작");
-
     // 오버레이 생성
     const overlay = document.createElement("div");
     overlay.id = "loadingOverlay";
@@ -241,14 +184,11 @@ class LoadingManager {
     // 캐시 업데이트
     this.overlay = overlay;
 
-    console.log("✅ 동적 오버레이 생성 완료:", overlay);
-
     // 다시 showLoading 호출
     this.showLoading();
   }
 
   hideLoading() {
-    console.log("🫥 로딩 숨기기 시작");
     const overlay = this.getOverlay();
     if (overlay) {
       // 즉시 숨기기
@@ -256,18 +196,7 @@ class LoadingManager {
       overlay.style.display = "none !important";
       overlay.style.visibility = "hidden !important";
       overlay.classList.remove("show");
-      console.log("✅ 로딩 숨기기 완료");
     }
-  }
-
-  // 디버깅을 위한 수동 로딩 테스트 함수
-  testLoading() {
-    console.log("🧪 로딩 테스트 시작");
-    console.log("🔍 현재 오버레이 상태:", this.overlay);
-    this.showLoading();
-    setTimeout(() => {
-      this.hideLoading();
-    }, 3000);
   }
 }
 
@@ -440,48 +369,15 @@ class VideoBackgroundManager {
 
 // 페이지 로드 완료 후 초기화
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("🚀 DOMContentLoaded 이벤트 발생");
-
   // 로딩 매니저를 먼저 초기화 (가장 중요!)
   const loadingManager = new LoadingManager();
-  console.log("✅ LoadingManager 초기화 완료");
 
   // 비디오 매니저 초기화
   const videoManager = new VideoBackgroundManager();
-  console.log("✅ VideoBackgroundManager 초기화 완료");
 
   // 전역에서 접근 가능하도록 설정 (디버깅용)
   window.loadingManager = loadingManager;
   window.videoManager = videoManager;
-
-  // 디버깅: 콘솔에서 window.testLoading() 호출 가능
-  window.testLoading = () => loadingManager.testLoading();
-
-  // 테스트용 버튼 추가 (임시)
-  setTimeout(() => {
-    const testBtn = document.createElement("button");
-    testBtn.textContent = "로딩 테스트";
-    testBtn.style.cssText = `
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      z-index: 10000;
-      background: red;
-      color: white;
-      padding: 10px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    `;
-    testBtn.onclick = () => {
-      console.log("🧪 테스트 버튼 클릭됨");
-      loadingManager.showLoading();
-    };
-    document.body.appendChild(testBtn);
-    console.log("🧪 테스트 버튼 추가됨");
-  }, 1000);
-
-  console.log("🎉 모든 매니저 초기화 완료");
 
   // 페이지 가시성 변경 시 비디오 제어
   document.addEventListener("visibilitychange", () => {

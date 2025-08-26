@@ -1,3 +1,77 @@
+// 페이지 로딩 관리 클래스
+class LoadingManager {
+  constructor() {
+    this.overlay = document.getElementById('loadingOverlay');
+    this.init();
+  }
+
+  init() {
+    // 모든 링크에 로딩 이벤트 추가
+    this.addLoadingToLinks();
+    
+    // 페이지 로드 시 로딩 숨기기
+    window.addEventListener('load', () => {
+      this.hideLoading();
+    });
+  }
+
+  addLoadingToLinks() {
+    // 모든 내부 링크에 로딩 이벤트 추가
+    const links = document.querySelectorAll('a[href^="boards/"], a[href^="pages/"], a[href="index.html"]');
+    
+    links.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const href = link.getAttribute('href');
+        this.showLoadingAndNavigate(href);
+      });
+    });
+
+    // 그리드 버튼들에도 로딩 추가
+    const gridBtns = document.querySelectorAll('.grid-btn:not(.btn-disabled)');
+    gridBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const href = btn.getAttribute('href');
+        if (href) {
+          this.showLoadingAndNavigate(href);
+        }
+      });
+    });
+  }
+
+  showLoadingAndNavigate(url) {
+    this.showLoading();
+    
+    // 0.5초에서 1초 사이의 랜덤 시간
+    const randomDelay = Math.random() * 500 + 500; // 500-1000ms
+    
+    setTimeout(() => {
+      window.location.href = url;
+    }, randomDelay);
+  }
+
+  showLoading() {
+    if (this.overlay) {
+      this.overlay.classList.add('show');
+      // 로딩 비디오 재생 시작
+      const video = this.overlay.querySelector('.loading-video');
+      if (video) {
+        video.currentTime = 0;
+        video.play().catch(e => console.log('로딩 비디오 재생 실패:', e));
+      }
+    }
+  }
+
+  hideLoading() {
+    if (this.overlay) {
+      setTimeout(() => {
+        this.overlay.classList.remove('show');
+      }, 100);
+    }
+  }
+}
+
 class VideoBackgroundManager {
   constructor() {
     this.videos = document.querySelectorAll(".background-video");
@@ -151,11 +225,15 @@ class VideoBackgroundManager {
 
 // 페이지 로드 완료 후 초기화
 document.addEventListener("DOMContentLoaded", () => {
+  // 로딩 매니저 초기화
+  const loadingManager = new LoadingManager();
+  
   // 비디오 백그라운드 매니저 초기화
   const videoManager = new VideoBackgroundManager();
 
   // 전역에서 접근 가능하도록 설정 (디버깅용)
   window.videoManager = videoManager;
+  window.loadingManager = loadingManager;
 
   // 페이지 가시성 변경 시 비디오 제어
   document.addEventListener("visibilitychange", () => {

@@ -467,14 +467,20 @@ p {
   width: 100vw;
   height: 100vh;
   background: rgb(255, 255, 255);
-  z-index: 9999;
-  display: flex;
+  z-index: 99999 !important;
+  display: none;
   justify-content: center;
   align-items: center;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
-  pointer-events: none;
+  pointer-events: auto;
+}
+
+.loading-overlay.show {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
 }
 
 .loading-content {

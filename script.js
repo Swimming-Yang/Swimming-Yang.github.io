@@ -9,53 +9,123 @@ class LoadingManager {
     // 페이지 로드 시 로딩 즉시 숨기기 (첫 진입 시 로딩창 방지)
     this.hideLoading();
 
-    // 모든 링크에 로딩 이벤트 추가
+    // 이벤트 위임 방식으로 문서 전체에 클릭 이벤트 설정
+    this.setupEventDelegation();
+    
+    // 추가적으로 직접 바인딩도 시도
     this.addLoadingToLinks();
   }
 
-    addLoadingToLinks() {
-    // 페이지 로드 후 확실한 지연을 두고 링크 이벤트 추가
-    setTimeout(() => {
-      // 모든 그리드 버튼들을 우선 처리
-      const gridBtns = document.querySelectorAll(".grid-btn");
-      console.log(`그리드 버튼 ${gridBtns.length}개 발견`);
+  setupEventDelegation() {
+    console.log("🎯 이벤트 위임 설정 시작");
+    
+    // 문서 전체에 클릭 이벤트 위임
+    document.addEventListener('click', (e) => {
+      console.log("📱 문서 클릭 감지:", e.target);
       
-      gridBtns.forEach((btn, index) => {
-        const href = btn.getAttribute("href");
-        console.log(`그리드 버튼 ${index}: href=${href}, 클래스=${btn.className}`);
-        
-        if (href && !btn.classList.contains("btn-disabled") && !btn.hasAttribute("data-loading-added")) {
-          btn.setAttribute("data-loading-added", "true");
-          btn.addEventListener("click", (e) => {
+      // 그리드 버튼인지 확인
+      let target = e.target;
+      
+      // 클릭된 요소가 그리드 버튼이거나 그 자식인지 확인
+      while (target && target !== document) {
+        if (target.classList && target.classList.contains('grid-btn')) {
+          console.log("🎯 그리드 버튼 클릭 감지:", target);
+          
+          const href = target.getAttribute('href');
+          const isDisabled = target.classList.contains('btn-disabled');
+          
+          if (href && !isDisabled) {
+            console.log("🚀 로딩 시작! href:", href);
             e.preventDefault();
-            console.log(`그리드 버튼 클릭: ${href}`);
+            e.stopPropagation();
             this.showLoadingAndNavigate(href);
-          });
-          console.log(`그리드 버튼 ${index}에 이벤트 리스너 추가됨`);
+            return;
+          }
+          break;
         }
+        target = target.parentElement;
+      }
+    }, true); // useCapture: true
+    
+    console.log("✅ 이벤트 위임 설정 완료");
+  }
+
+  addLoadingToLinks() {
+    console.log("=== addLoadingToLinks 시작 ===");
+
+    // 즉시 한 번 시도
+    this.attachLoadingEvents();
+
+    // 그리고 여러 타이밍에서 재시도 (DOM 완전 로드 대기)
+    setTimeout(() => this.attachLoadingEvents(), 100);
+    setTimeout(() => this.attachLoadingEvents(), 500);
+    setTimeout(() => this.attachLoadingEvents(), 1000);
+  }
+
+  attachLoadingEvents() {
+    console.log("=== attachLoadingEvents 실행 ===");
+
+    // 모든 그리드 버튼들을 우선 처리
+    const gridBtns = document.querySelectorAll(".grid-btn");
+    console.log(`그리드 버튼 ${gridBtns.length}개 발견`);
+
+    gridBtns.forEach((btn, index) => {
+      const href = btn.getAttribute("href");
+      const isDisabled = btn.classList.contains("btn-disabled");
+      const hasListener = btn.hasAttribute("data-loading-added");
+
+      console.log(`그리드 버튼 ${index}:`, {
+        href,
+        disabled: isDisabled,
+        hasListener,
+        tagName: btn.tagName,
+        className: btn.className,
       });
 
-      // 기타 모든 내부 링크들 처리
-      const allLinks = document.querySelectorAll(
-        'a[href]:not([href^="http"]):not([href^="mailto"]):not([href^="tel"]):not([href="#"])'
-      );
-      
-      console.log(`전체 링크 ${allLinks.length}개 발견`);
+      if (href && !isDisabled && !hasListener) {
+        btn.setAttribute("data-loading-added", "true");
 
-      allLinks.forEach((link) => {
-        if (!link.hasAttribute("data-loading-added")) {
-          link.setAttribute("data-loading-added", "true");
-          link.addEventListener("click", (e) => {
+        // 기존 이벤트 제거 후 새로 추가
+        btn.removeEventListener("click", this.handleGridButtonClick);
+        btn.addEventListener(
+          "click",
+          (e) => {
+            console.log(`🚀 그리드 버튼 클릭됨: ${href}`);
             e.preventDefault();
-            const href = link.getAttribute("href");
-            console.log(`일반 링크 클릭: ${href}`);
+            e.stopPropagation();
             this.showLoadingAndNavigate(href);
-          });
-        }
-      });
-      
-      console.log("모든 링크 이벤트 리스너 추가 완료");
-    }, 300);
+          },
+          true
+        ); // useCapture: true로 설정
+
+        console.log(`✅ 그리드 버튼 ${index}에 이벤트 리스너 추가됨`);
+      } else {
+        console.log(
+          `❌ 그리드 버튼 ${index} 건너뜀 - href:${href}, disabled:${isDisabled}, hasListener:${hasListener}`
+        );
+      }
+    });
+
+    // 기타 모든 내부 링크들 처리
+    const allLinks = document.querySelectorAll(
+      'a[href]:not([href^="http"]):not([href^="mailto"]):not([href^="tel"]):not([href="#"])'
+    );
+
+    console.log(`전체 링크 ${allLinks.length}개 발견`);
+
+    allLinks.forEach((link) => {
+      if (!link.hasAttribute("data-loading-added")) {
+        link.setAttribute("data-loading-added", "true");
+        link.addEventListener("click", (e) => {
+          console.log(`🔗 일반 링크 클릭됨: ${link.href}`);
+          e.preventDefault();
+          const href = link.getAttribute("href");
+          this.showLoadingAndNavigate(href);
+        });
+      }
+    });
+
+    console.log("=== 이벤트 리스너 추가 완료 ===");
   }
 
   showLoadingAndNavigate(url) {
@@ -70,33 +140,59 @@ class LoadingManager {
   }
 
   showLoading() {
-    console.log("로딩 표시 시작");
-    if (this.overlay) {
-      // 강제로 보이도록 설정
-      this.overlay.style.display = "flex";
-      this.overlay.style.opacity = "0";
-      this.overlay.style.visibility = "visible";
+    console.log("🎬 로딩 표시 시작");
 
-      // 브라우저 렌더링 후 fade in
-      setTimeout(() => {
-        this.overlay.classList.add("show");
-        this.overlay.style.opacity = "1";
-      }, 10);
-
-      // 로딩 비디오 재생 시작
-      const video = this.overlay.querySelector(".loading-video");
-      if (video) {
-        console.log("비디오 재생 시도");
-        video.currentTime = 0;
-        video
-          .play()
-          .then(() => console.log("비디오 재생 성공"))
-          .catch((e) => console.log("로딩 비디오 재생 실패:", e));
-      } else {
-        console.log("로딩 비디오를 찾을 수 없음");
+    if (!this.overlay) {
+      console.error("❌ 로딩 오버레이가 없음!");
+      // 오버레이가 없으면 즉시 생성
+      this.overlay = document.getElementById("loadingOverlay");
+      if (!this.overlay) {
+        console.error("❌ loadingOverlay 요소를 찾을 수 없음!");
+        return;
       }
+    }
+
+    console.log("✅ 로딩 오버레이 발견:", this.overlay);
+
+    // 모든 클래스와 스타일 초기화 후 강제로 보이도록 설정
+    this.overlay.className = "loading-overlay";
+    this.overlay.style.cssText = `
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      background: rgb(255, 255, 255) !important;
+      z-index: 99999 !important;
+      display: flex !important;
+      justify-content: center !important;
+      align-items: center !important;
+      opacity: 0 !important;
+      visibility: visible !important;
+      pointer-events: auto !important;
+    `;
+
+    console.log("📦 오버레이 강제 스타일 설정 완료");
+
+    // 브라우저 렌더링 후 fade in
+    requestAnimationFrame(() => {
+      this.overlay.style.opacity = "1 !important";
+      this.overlay.classList.add("show");
+      console.log("✨ 페이드인 시작");
+    });
+
+    // 로딩 비디오 재생 시작
+    const video = this.overlay.querySelector(".loading-video");
+    if (video) {
+      console.log("🎥 프리렌 비디오 재생 시도");
+      video.currentTime = 0;
+      video.style.display = "block";
+      video
+        .play()
+        .then(() => console.log("🎬 프리렌 비디오 재생 성공"))
+        .catch((e) => console.log("❌ 프리렌 비디오 재생 실패:", e));
     } else {
-      console.log("로딩 오버레이를 찾을 수 없음");
+      console.log("❌ 프리렌 비디오를 찾을 수 없음");
     }
   }
 
@@ -183,18 +279,22 @@ class VideoBackgroundManager {
     const video = this.videos[index];
     if (video) {
       video.currentTime = 0;
-      
+
       // 모바일에서 비디오 재생을 위한 추가 속성 설정
-      video.setAttribute('playsinline', '');
-      video.setAttribute('webkit-playsinline', '');
+      video.setAttribute("playsinline", "");
+      video.setAttribute("webkit-playsinline", "");
       video.muted = true;
-      
+
       video.play().catch((e) => {
         console.error(`비디오 ${index} 재생 실패:`, e);
         // 모바일에서 자동재생 실패 시 사용자 상호작용 후 재시도
-        document.addEventListener('touchstart', () => {
-          video.play().catch(console.error);
-        }, { once: true });
+        document.addEventListener(
+          "touchstart",
+          () => {
+            video.play().catch(console.error);
+          },
+          { once: true }
+        );
       });
     }
   }
@@ -287,22 +387,48 @@ class VideoBackgroundManager {
 
 // 페이지 로드 완료 후 초기화
 document.addEventListener("DOMContentLoaded", () => {
-  // 비디오 백그라운드 매니저 먼저 초기화
-  const videoManager = new VideoBackgroundManager();
+  console.log("🚀 DOMContentLoaded 이벤트 발생");
 
-  // 로딩 매니저 나중에 초기화 (DOM 완전 준비 후)
-  setTimeout(() => {
-    const loadingManager = new LoadingManager();
-    
-    // 전역에서 접근 가능하도록 설정 (디버깅용)
-    window.loadingManager = loadingManager;
-    
-    // 디버깅: 콘솔에서 window.testLoading() 호출 가능
-    window.testLoading = () => loadingManager.testLoading();
-  }, 500); // 500ms로 증가하여 확실하게 DOM 준비 대기
+  // 로딩 매니저를 먼저 초기화 (가장 중요!)
+  const loadingManager = new LoadingManager();
+  console.log("✅ LoadingManager 초기화 완료");
+
+  // 비디오 매니저 초기화
+  const videoManager = new VideoBackgroundManager();
+  console.log("✅ VideoBackgroundManager 초기화 완료");
 
   // 전역에서 접근 가능하도록 설정 (디버깅용)
+  window.loadingManager = loadingManager;
   window.videoManager = videoManager;
+
+  // 디버깅: 콘솔에서 window.testLoading() 호출 가능
+  window.testLoading = () => loadingManager.testLoading();
+  
+  // 테스트용 버튼 추가 (임시)
+  setTimeout(() => {
+    const testBtn = document.createElement('button');
+    testBtn.textContent = '로딩 테스트';
+    testBtn.style.cssText = `
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 10000;
+      background: red;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    `;
+    testBtn.onclick = () => {
+      console.log("🧪 테스트 버튼 클릭됨");
+      loadingManager.showLoading();
+    };
+    document.body.appendChild(testBtn);
+    console.log("🧪 테스트 버튼 추가됨");
+  }, 1000);
+
+  console.log("🎉 모든 매니저 초기화 완료");
 
   // 페이지 가시성 변경 시 비디오 제어
   document.addEventListener("visibilitychange", () => {
@@ -341,9 +467,11 @@ const enableAutoplay = () => {
       // 모든 비디오에 대해 재생 시도
       window.videoManager.videos.forEach((video, index) => {
         video.muted = true;
-        video.setAttribute('playsinline', '');
+        video.setAttribute("playsinline", "");
         if (index === window.videoManager.currentIndex) {
-          video.play().catch(e => console.error(`비디오 ${index} 재생 실패:`, e));
+          video
+            .play()
+            .catch((e) => console.error(`비디오 ${index} 재생 실패:`, e));
         }
       });
     }

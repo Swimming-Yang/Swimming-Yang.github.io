@@ -4,29 +4,47 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Swimming Yang - Portfolio</title>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css?v=13.0" />
   </head>
   <body>
+    <!-- 로딩 오버레이 -->
+    <div id="loadingOverlay" class="loading-overlay">
+      <div class="loading-content">
+        <video 
+          class="loading-video" 
+          autoplay 
+          muted 
+          loop 
+          playsinline
+        >
+          <source src="asserts/videos/loading_frieren.mp4" type="video/mp4" />
+        </video>
+      </div>
+    </div>
+
     <!-- 배경 영상들 -->
     <div class="video-background">
       <video
         class="background-video active"
+        autoplay
         muted
+        loop
+        playsinline
         preload="auto"
         data-index="0"
       >
         <source src="asserts/videos/background00.mp4" type="video/mp4" />
       </video>
-      <video class="background-video" muted preload="auto" data-index="1">
+      <video class="background-video" autoplay muted loop playsinline preload="auto" data-index="1">
         <source src="asserts/videos/background01.mp4" type="video/mp4" />
       </video>
-      <video class="background-video" muted preload="auto" data-index="2">
+      <video class="background-video" autoplay muted loop playsinline preload="auto" data-index="2">
         <source src="asserts/videos/background02.mp4" type="video/mp4" />
       </video>
-      <video class="background-video" muted preload="auto" data-index="3">
+      <video class="background-video" autoplay muted loop playsinline preload="auto" data-index="3">
         <source src="asserts/videos/background03.mp4" type="video/mp4" />
       </video>
-      <video class="background-video" muted preload="auto" data-index="4">
+      <video class="background-video" autoplay muted loop playsinline preload="auto" data-index="4">
         <source src="asserts/videos/background04.mp4" type="video/mp4" />
       </video>
     </div>
@@ -34,21 +52,7 @@
     <!-- 오버레이 -->
     <div class="video-overlay"></div>
 
-    <!-- 네비게이션 -->
-    <nav class="main-nav">
-      <div class="nav-container">
-        <div class="logo">
-          <a href="index.html">Swimming Yang</a>
-        </div>
-        <div class="nav-links">
-          <a href="pages/portfolio.html">포트폴리오</a>
-          <a href="boards/algorithm.html">알고리즘</a>
-          <a href="boards/coding-test.html">코딩테스트</a>
-          <a href="boards/cs.html">CS</a>
-          <a href="pages/guestbook.html">방명록</a>
-        </div>
-      </div>
-    </nav>
+
 
     <!-- 메인 콘텐츠 -->
     <div class="main-content">

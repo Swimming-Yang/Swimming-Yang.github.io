@@ -17,31 +17,8 @@ class LoadingManager {
   }
 
   setupEventDelegation() {
-    // 문서 전체에 클릭 이벤트 위임
-    document.addEventListener(
-      "click",
-      (e) => {
-        // 프로젝트 링크인지 확인
-        let target = e.target;
-
-        // 클릭된 요소가 프로젝트 링크이거나 그 자식인지 확인
-        while (target && target !== document) {
-          if (target.classList && target.classList.contains("project-link")) {
-            const href = target.getAttribute("href");
-
-            if (href && href !== "#") {
-              e.preventDefault();
-              e.stopPropagation();
-              this.showLoadingAndNavigate(href);
-              return;
-            }
-            break;
-          }
-          target = target.parentElement;
-        }
-      },
-      true
-    ); // useCapture: true
+    // 더 이상 외부 페이지 이동이 없으므로 단순화
+    // 외부 링크들은 attachLoadingEvents에서 처리
   }
 
   addLoadingToLinks() {
@@ -55,40 +32,21 @@ class LoadingManager {
   }
 
   attachLoadingEvents() {
-    // 프로젝트 링크들을 처리
-    const projectLinks = document.querySelectorAll(".project-link");
+    // 외부 링크들만 처리 (GitHub, LinkedIn 등)
+    const externalLinks = document.querySelectorAll(
+      'a[href^="http"]:not([href^="#"])'
+    );
 
-    projectLinks.forEach((link) => {
+    externalLinks.forEach((link) => {
       const href = link.getAttribute("href");
       const hasListener = link.hasAttribute("data-loading-added");
 
-      if (href && href !== "#" && !hasListener) {
-        link.setAttribute("data-loading-added", "true");
-
-        link.addEventListener(
-          "click",
-          (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.showLoadingAndNavigate(href);
-          },
-          true
-        );
-      }
-    });
-
-    // 기타 모든 내부 링크들 처리
-    const allLinks = document.querySelectorAll(
-      'a[href]:not([href^="http"]):not([href^="mailto"]):not([href^="tel"]):not([href="#"])'
-    );
-
-    allLinks.forEach((link) => {
-      if (!link.hasAttribute("data-loading-added")) {
+      if (href && !hasListener) {
         link.setAttribute("data-loading-added", "true");
         link.addEventListener("click", (e) => {
-          e.preventDefault();
-          const href = link.getAttribute("href");
-          this.showLoadingAndNavigate(href);
+          // 외부 링크는 새 탭에서 열기
+          link.setAttribute("target", "_blank");
+          link.setAttribute("rel", "noopener noreferrer");
         });
       }
     });
@@ -433,6 +391,29 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
+
+  // 연락처 폼 처리
+  const contactForm = document.querySelector(".form");
+  if (contactForm) {
+    contactForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(contactForm);
+      const name = contactForm.querySelector('input[type="text"]').value;
+      const email = contactForm.querySelector('input[type="email"]').value;
+      const message = contactForm.querySelector("textarea").value;
+
+      if (name && email && message) {
+        // 여기서 실제 폼 제출 로직을 구현할 수 있습니다
+        alert(
+          `메시지가 전송되었습니다!\n\n이름: ${name}\n이메일: ${email}\n메시지: ${message}`
+        );
+        contactForm.reset();
+      } else {
+        alert("모든 필드를 입력해주세요.");
+      }
+    });
+  }
 });
 
 // 에러 핸들링

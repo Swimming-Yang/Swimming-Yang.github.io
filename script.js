@@ -21,16 +21,15 @@ class LoadingManager {
     document.addEventListener(
       "click",
       (e) => {
-        // 그리드 버튼인지 확인
+        // 프로젝트 링크인지 확인
         let target = e.target;
 
-        // 클릭된 요소가 그리드 버튼이거나 그 자식인지 확인
+        // 클릭된 요소가 프로젝트 링크이거나 그 자식인지 확인
         while (target && target !== document) {
-          if (target.classList && target.classList.contains("grid-btn")) {
+          if (target.classList && target.classList.contains("project-link")) {
             const href = target.getAttribute("href");
-            const isDisabled = target.classList.contains("btn-disabled");
 
-            if (href && !isDisabled) {
+            if (href && href !== "#") {
               e.preventDefault();
               e.stopPropagation();
               this.showLoadingAndNavigate(href);
@@ -56,18 +55,17 @@ class LoadingManager {
   }
 
   attachLoadingEvents() {
-    // 모든 그리드 버튼들을 우선 처리
-    const gridBtns = document.querySelectorAll(".grid-btn");
+    // 프로젝트 링크들을 처리
+    const projectLinks = document.querySelectorAll(".project-link");
 
-    gridBtns.forEach((btn) => {
-      const href = btn.getAttribute("href");
-      const isDisabled = btn.classList.contains("btn-disabled");
-      const hasListener = btn.hasAttribute("data-loading-added");
+    projectLinks.forEach((link) => {
+      const href = link.getAttribute("href");
+      const hasListener = link.hasAttribute("data-loading-added");
 
-      if (href && !isDisabled && !hasListener) {
-        btn.setAttribute("data-loading-added", "true");
+      if (href && href !== "#" && !hasListener) {
+        link.setAttribute("data-loading-added", "true");
 
-        btn.addEventListener(
+        link.addEventListener(
           "click",
           (e) => {
             e.preventDefault();
@@ -400,16 +398,41 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // 콘텐츠 버튼 클릭 이벤트 (예시)
-  const btn = document.querySelector(".btn");
-  if (btn) {
-    btn.addEventListener("click", (e) => {
+  // 네비게이션 링크 스무스 스크롤
+  const navLinks = document.querySelectorAll('.nav-link[href^="#"]');
+  navLinks.forEach((link) => {
+    link.addEventListener("click", (e) => {
       e.preventDefault();
-      // 여기에 원하는 동작 추가
-      console.log("더 알아보기 버튼 클릭됨");
-      // 예: 스크롤 이동, 페이지 전환 등
+      const targetId = link.getAttribute("href");
+      const targetElement = document.querySelector(targetId);
+
+      if (targetElement) {
+        targetElement.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
     });
-  }
+  });
+
+  // 히어로 버튼 스무스 스크롤
+  const heroButtons = document.querySelectorAll(
+    '.btn-primary[href^="#"], .btn-secondary[href^="#"]'
+  );
+  heroButtons.forEach((button) => {
+    button.addEventListener("click", (e) => {
+      e.preventDefault();
+      const targetId = button.getAttribute("href");
+      const targetElement = document.querySelector(targetId);
+
+      if (targetElement) {
+        targetElement.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
+    });
+  });
 });
 
 // 에러 핸들링

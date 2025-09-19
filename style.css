@@ -592,7 +592,7 @@ html {
 
 .timeline-item:nth-child(odd) {
   left: 0;
-  text-align: right;
+  text-align: left;
   padding-right: 3rem;
 }
 
@@ -645,6 +645,7 @@ html {
   border-radius: 15px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   position: relative;
+  text-align: left;
 }
 
 .timeline-content h3 {
@@ -652,6 +653,7 @@ html {
   font-weight: 600;
   color: #3b82f6;
   margin-bottom: 0.5rem;
+  text-align: left;
 }
 
 .timeline-content h4 {
@@ -659,6 +661,7 @@ html {
   font-weight: 500;
   color: #374151;
   margin-bottom: 0.5rem;
+  text-align: left;
 }
 
 .timeline-date {
@@ -676,11 +679,13 @@ html {
   color: #6b7280;
   line-height: 1.6;
   margin-bottom: 1rem;
+  text-align: left;
 }
 
 .timeline-content ul {
   list-style: none;
   padding: 0;
+  text-align: left;
 }
 
 .timeline-content li {
@@ -688,6 +693,7 @@ html {
   margin-bottom: 0.5rem;
   position: relative;
   padding-left: 1.5rem;
+  text-align: left;
 }
 
 .timeline-content li::before {

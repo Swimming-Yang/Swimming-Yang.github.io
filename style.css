@@ -116,6 +116,7 @@ html {
   justify-content: center;
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   position: relative;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .hero-container {
@@ -326,8 +327,10 @@ html {
 
 /* About 섹션 */
 .about {
-  padding: 5rem 0;
-  background: white;
+  padding: 6rem 0;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  position: relative;
 }
 
 .section-title {
@@ -339,6 +342,20 @@ html {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  position: relative;
+  padding-top: 2rem;
+}
+
+.section-title::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(135deg, #3b82f6, #1e40af);
+  border-radius: 2px;
 }
 
 .about-content {
@@ -530,8 +547,15 @@ html {
 
 /* Experience 섹션 */
 .experience {
-  padding: 5rem 0;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  padding: 6rem 0;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-bottom: 1px solid #e5e7eb;
+  position: relative;
+  margin-bottom: 0;
+}
+
+.experience .timeline {
+  margin-bottom: 2rem;
 }
 
 .timeline {
@@ -545,7 +569,7 @@ html {
   position: absolute;
   left: 50%;
   top: 0;
-  bottom: 0;
+  height: calc(100% - 3rem);
   width: 2px;
   background: linear-gradient(135deg, #3b82f6, #1e40af);
   transform: translateX(-50%);
@@ -586,6 +610,24 @@ html {
 
 .timeline-item:nth-child(even) .timeline-marker {
   left: -13px;
+}
+
+.timeline-item:last-child {
+  margin-bottom: 0;
+}
+
+.timeline-item:last-child::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -20px;
+  transform: translateX(-50%);
+  width: 12px;
+  height: 12px;
+  background: #3b82f6;
+  border-radius: 50%;
+  border: 4px solid white;
+  box-shadow: 0 0 0 2px #3b82f6;
 }
 
 .timeline-content {
@@ -649,8 +691,27 @@ html {
 
 /* Projects 섹션 */
 .projects {
-  padding: 5rem 0;
-  background: white;
+  padding: 6rem 0;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  position: relative;
+  margin-top: 0;
+}
+
+.projects::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #e5e7eb 20%,
+    #e5e7eb 80%,
+    transparent
+  );
 }
 
 .project-filters {
@@ -787,8 +848,10 @@ html {
 
 /* Skills 섹션 */
 .skills {
-  padding: 5rem 0;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  padding: 6rem 0;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-bottom: 1px solid #e5e7eb;
+  position: relative;
 }
 
 .skills-grid {
@@ -852,8 +915,10 @@ html {
 
 /* Contact 섹션 */
 .contact {
-  padding: 5rem 0;
-  background: white;
+  padding: 6rem 0;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  position: relative;
 }
 
 .contact-content {
@@ -1005,8 +1070,28 @@ html {
 
 /* 반응형 추가 */
 @media (max-width: 768px) {
+  /* 섹션 패딩 조정 */
+  .about,
+  .experience,
+  .projects,
+  .skills,
+  .contact {
+    padding: 4rem 0;
+  }
+
+  .section-title {
+    font-size: 2rem;
+    margin-bottom: 3rem;
+  }
+
   .timeline::before {
     left: 20px;
+    height: calc(100% - 2rem);
+  }
+
+  .timeline-item:last-child::after {
+    left: 20px;
+    transform: none;
   }
 
   .timeline-item {

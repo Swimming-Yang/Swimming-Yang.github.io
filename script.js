@@ -1,10 +1,10 @@
 // 타이핑 애니메이션을 위한 텍스트 배열
 const typingTexts = [
-  "프론트엔드 개발자",
-  "웹 개발자",
+  "AIONE Alumni",
+  "SSAFY_14th",
   "소프트웨어 엔지니어",
   "풀스택 개발자",
-  "UI/UX에 관심 있는 개발자",
+  "동료와 함께하는 개발자",
 ];
 
 class TypingAnimation {
@@ -332,13 +332,48 @@ class ProjectFilter {
   }
 }
 
-// 스킬 바 애니메이션
-class SkillBarAnimation {
+// 스킬 탭 및 바 애니메이션
+class SkillTabs {
   constructor() {
     this.init();
   }
 
   init() {
+    this.setupTabSwitching();
+    this.setupSkillBarAnimation();
+  }
+
+  setupTabSwitching() {
+    const filterBtns = document.querySelectorAll(".skill-filter-btn");
+    const skillTabs = document.querySelectorAll(".skill-tab");
+
+    filterBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const filter = btn.getAttribute("data-filter");
+
+        // 버튼 활성화 상태 변경
+        filterBtns.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+
+        // 탭 전환
+        skillTabs.forEach((tab) => {
+          const category = tab.getAttribute("data-category");
+
+          if (category === filter) {
+            tab.classList.add("active");
+            // 해당 탭이 활성화될 때 스킬 바 애니메이션 실행
+            setTimeout(() => {
+              this.animateSkillBars(tab);
+            }, 500);
+          } else {
+            tab.classList.remove("active");
+          }
+        });
+      });
+    });
+  }
+
+  setupSkillBarAnimation() {
     const observerOptions = {
       threshold: 0.3,
       rootMargin: "0px 0px -100px 0px",
@@ -347,26 +382,38 @@ class SkillBarAnimation {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          this.animateSkillBars(entry.target);
+          // 현재 활성화된 탭의 스킬 바만 애니메이션
+          const activeTab = document.querySelector(".skill-tab.active");
+          if (activeTab) {
+            this.animateSkillBars(activeTab);
+          }
         }
       });
     }, observerOptions);
 
-    const skillSections = document.querySelectorAll(".skill-category");
-    skillSections.forEach((section) => {
-      observer.observe(section);
-    });
+    const skillsSection = document.querySelector(".skills");
+    if (skillsSection) {
+      observer.observe(skillsSection);
+    }
   }
 
-  animateSkillBars(skillSection) {
-    const skillBars = skillSection.querySelectorAll(".skill-progress");
+  animateSkillBars(skillTab) {
+    const skillCards = skillTab.querySelectorAll(".skill-card");
 
-    skillBars.forEach((bar, index) => {
-      const width = bar.getAttribute("data-width");
+    skillCards.forEach((card, cardIndex) => {
+      const levelBars = card.querySelectorAll(".level-bar.active");
 
-      setTimeout(() => {
-        bar.style.width = width + "%";
-      }, index * 200);
+      // 모든 active 바를 비활성화
+      levelBars.forEach((bar) => {
+        bar.classList.remove("active");
+      });
+
+      // 순차적으로 활성화
+      levelBars.forEach((bar, barIndex) => {
+        setTimeout(() => {
+          bar.classList.add("active");
+        }, cardIndex * 200 + barIndex * 100);
+      });
     });
   }
 }
@@ -432,8 +479,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // 프로젝트 필터 초기화
   new ProjectFilter();
 
-  // 스킬 바 애니메이션 초기화
-  new SkillBarAnimation();
+  // 스킬 탭 및 바 애니메이션 초기화
+  new SkillTabs();
 
   // 연락처 폼 초기화
   new ContactForm();

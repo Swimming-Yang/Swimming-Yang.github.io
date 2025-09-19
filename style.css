@@ -6,8 +6,8 @@
 }
 
 body {
-  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui,
-    sans-serif;
+  font-family: "LINESeedSansKR", "Pretendard", -apple-system, BlinkMacSystemFont,
+    system-ui, sans-serif;
   line-height: 1.6;
   color: #333;
   overflow-x: hidden;
@@ -53,6 +53,7 @@ html {
 .nav-logo span {
   font-size: 1.5rem;
   font-weight: 700;
+  font-family: "LINESeedSansKR", sans-serif;
   background: linear-gradient(135deg, #3b82f6, #1e40af);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -158,6 +159,7 @@ html {
 .name {
   font-size: 3rem;
   font-weight: 800;
+  font-family: "LINESeedSansKR", sans-serif;
   margin-bottom: 1.5rem;
   background: linear-gradient(135deg, #3b82f6, #1e40af);
   -webkit-background-clip: text;
@@ -188,6 +190,7 @@ html {
   color: #3b82f6;
   font-weight: 800;
   font-size: 1.1em;
+  font-family: "LINESeedSansKR", sans-serif;
   min-width: auto;
   text-align: center;
   display: inline-block;
@@ -336,14 +339,15 @@ html {
 .section-title {
   font-size: 2.5rem;
   font-weight: 700;
+  font-family: "LINESeedSansKR", sans-serif;
   text-align: center;
-  margin-bottom: 4rem;
+  margin-bottom: 2rem;
   background: linear-gradient(135deg, #3b82f6, #1e40af);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   position: relative;
-  padding-top: 2rem;
+  padding-top: 1rem;
 }
 
 .section-title::before {
@@ -542,6 +546,11 @@ html {
 
   .about-stats {
     gap: 1rem;
+  }
+
+  .certificate-card {
+    padding: 1rem;
+    min-height: 160px;
   }
 }
 
@@ -854,63 +863,191 @@ html {
   position: relative;
 }
 
-.skills-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 3rem;
-  margin-top: 2rem;
+.skill-filters {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
 }
 
-.skill-category {
+.skill-filter-btn {
+  padding: 0.8rem 1.5rem;
+  border: 2px solid #e5e7eb;
+  background: white;
+  color: #6b7280;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  font-family: "LINESeedSansKR", sans-serif;
+}
+
+.skill-filter-btn:hover,
+.skill-filter-btn.active {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
+.skills-content {
+  position: relative;
+  min-height: 350px;
+}
+
+.skill-tab {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+  transition: all 0.5s ease;
+}
+
+.skill-tab.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.skill-items {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.skill-card {
+  background: white;
+  border-radius: 15px;
+  padding: 1.3rem 1rem;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  min-height: 145px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.skill-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  border-color: #3b82f6;
+}
+
+.skill-icon {
+  font-size: 2.2rem;
+  margin-bottom: 0.7rem;
+  display: block;
+}
+
+.skill-name {
+  font-family: "LINESeedSansKR", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.skill-level {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.level-text {
+  font-weight: 700;
+  color: #3b82f6;
+  font-size: 0.85rem;
+  letter-spacing: 0.3px;
+}
+
+.level-bars {
+  display: flex;
+  gap: 0.25rem;
+  justify-content: center;
+}
+
+.level-bar {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  transition: all 0.5s ease;
+  border: 1px solid #e5e7eb;
+}
+
+.level-bar.active {
+  background: linear-gradient(135deg, #3b82f6, #1e40af);
+  border-color: #3b82f6;
+  box-shadow: 0 0 6px rgba(59, 130, 246, 0.3);
+  transform: scale(1.05);
+}
+
+/* 자격증 카드 스타일 */
+.certificates-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
   background: white;
   padding: 2rem;
   border-radius: 20px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
-.skill-category h3 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #3b82f6;
+.certificate-card {
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  padding: 1.5rem 1rem;
+  border-radius: 15px;
   text-align: center;
-  margin-bottom: 2rem;
-}
-
-.skill-item {
-  margin-bottom: 2rem;
-}
-
-.skill-info {
+  transition: all 0.3s ease;
+  border: 1px solid #e5e7eb;
+  min-height: 200px;
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.5rem;
 }
 
-.skill-name {
-  font-weight: 500;
-  color: #374151;
+.certificate-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
 }
 
-.skill-percentage {
+.certificate-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.8rem;
+}
+
+.certificate-card h3 {
+  font-size: 1rem;
   font-weight: 600;
-  color: #3b82f6;
+  color: #374151;
+  margin-bottom: 0.4rem;
+  font-family: "LINESeedSansKR", sans-serif;
+  line-height: 1.3;
 }
 
-.skill-bar {
-  width: 100%;
-  height: 8px;
-  background: #e5e7eb;
-  border-radius: 10px;
-  overflow: hidden;
+.certificate-card p {
+  color: #6b7280;
+  font-size: 0.8rem;
+  margin-bottom: 0.8rem;
+  line-height: 1.3;
 }
 
-.skill-progress {
-  height: 100%;
+.certificate-date {
+  display: inline-block;
   background: linear-gradient(135deg, #3b82f6, #1e40af);
-  border-radius: 10px;
-  width: 0;
-  transition: width 2s ease;
+  color: white;
+  padding: 0.25rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
 }
 
 /* Contact 섹션 */
@@ -1111,8 +1248,61 @@ html {
     grid-template-columns: 1fr;
   }
 
-  .skills-grid {
+  .skill-items {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-top: 0.3rem;
+  }
+
+  .skill-card {
+    padding: 1rem 0.8rem;
+    min-height: 130px;
+  }
+
+  .skill-icon {
+    font-size: 2rem;
+  }
+
+  .skill-name {
+    font-size: 0.9rem;
+  }
+
+  .certificates-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .certificate-card {
+    padding: 1.2rem 0.8rem;
+    min-height: 180px;
+  }
+
+  .certificate-icon {
+    font-size: 2rem;
+  }
+
+  .skill-items {
     grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-top: 0.3rem;
+  }
+
+  .skill-card {
+    padding: 1rem 0.8rem;
+    min-height: 120px;
+  }
+
+  .skill-icon {
+    font-size: 1.8rem;
+  }
+
+  .skill-name {
+    font-size: 0.85rem;
+  }
+
+  .certificates-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
 
   .contact-content {

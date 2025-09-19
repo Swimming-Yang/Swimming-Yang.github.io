@@ -1,418 +1,460 @@
-// 페이지 로딩 관리 클래스
-class LoadingManager {
-  constructor() {
-    this.overlay = null;
-    this.init();
-  }
+// 타이핑 애니메이션을 위한 텍스트 배열
+const typingTexts = [
+  "프론트엔드 개발자",
+  "웹 개발자",
+  "소프트웨어 엔지니어",
+  "풀스택 개발자",
+  "UI/UX에 관심 있는 개발자",
+];
 
-  init() {
-    // 페이지 로드 시 로딩 즉시 숨기기 (첫 진입 시 로딩창 방지)
-    this.hideLoading();
+class TypingAnimation {
+  constructor(
+    element,
+    texts,
+    typeSpeed = 100,
+    deleteSpeed = 50,
+    delayBetween = 2000
+  ) {
+    this.element = element;
+    this.texts = texts;
+    this.typeSpeed = typeSpeed;
+    this.deleteSpeed = deleteSpeed;
+    this.delayBetween = delayBetween;
+    this.currentTextIndex = 0;
+    this.currentCharIndex = 0;
+    this.isDeleting = false;
 
-    // 이벤트 위임 방식으로 문서 전체에 클릭 이벤트 설정
-    this.setupEventDelegation();
-
-    // 추가적으로 직접 바인딩도 시도
-    this.addLoadingToLinks();
-  }
-
-  setupEventDelegation() {
-    // 더 이상 외부 페이지 이동이 없으므로 단순화
-    // 외부 링크들은 attachLoadingEvents에서 처리
-  }
-
-  addLoadingToLinks() {
-    // 즉시 한 번 시도
-    this.attachLoadingEvents();
-
-    // 그리고 여러 타이밍에서 재시도 (DOM 완전 로드 대기)
-    setTimeout(() => this.attachLoadingEvents(), 100);
-    setTimeout(() => this.attachLoadingEvents(), 500);
-    setTimeout(() => this.attachLoadingEvents(), 1000);
-  }
-
-  attachLoadingEvents() {
-    // 외부 링크들만 처리 (GitHub, LinkedIn 등)
-    const externalLinks = document.querySelectorAll(
-      'a[href^="http"]:not([href^="#"])'
-    );
-
-    externalLinks.forEach((link) => {
-      const href = link.getAttribute("href");
-      const hasListener = link.hasAttribute("data-loading-added");
-
-      if (href && !hasListener) {
-        link.setAttribute("data-loading-added", "true");
-        link.addEventListener("click", (e) => {
-          // 외부 링크는 새 탭에서 열기
-          link.setAttribute("target", "_blank");
-          link.setAttribute("rel", "noopener noreferrer");
-        });
-      }
-    });
-  }
-
-  showLoadingAndNavigate(url) {
-    this.showLoading();
-
-    // 0.5초에서 1초 사이의 랜덤 시간
-    const randomDelay = Math.random() * 500 + 500; // 500-1000ms
-
-    setTimeout(() => {
-      window.location.href = url;
-    }, randomDelay);
-  }
-
-  getOverlay() {
-    if (!this.overlay) {
-      this.overlay = document.getElementById("loadingOverlay");
-    }
-    return this.overlay;
-  }
-
-  showLoading() {
-    const overlay = this.getOverlay();
-    if (!overlay) {
-      // 동적으로 오버레이 생성 시도
-      this.createOverlay();
-      return;
-    }
-
-    // 초기 상태 (투명하게 시작)
-    overlay.style.cssText = `
-      position: fixed !important;
-      top: 0 !important;
-      left: 0 !important;
-      width: 100vw !important;
-      height: 100vh !important;
-      background: rgb(255, 255, 255) !important;
-      z-index: 99999 !important;
-      display: flex !important;
-      justify-content: center !important;
-      align-items: center !important;
-      visibility: visible !important;
-      pointer-events: auto !important;
-      opacity: 0 !important;
-      transition: opacity 0.3s ease-in-out !important;
-    `;
-
-    overlay.className = "loading-overlay";
-
-    // 로딩 비디오 재생 시작
-    const video = overlay.querySelector(".loading-video");
-    if (video) {
-      video.currentTime = 0;
-      video.style.display = "block";
-      video.play().catch(() => {});
-    }
-
-    // 페이드인 효과 (브라우저 렌더링 후)
-    requestAnimationFrame(() => {
-      overlay.style.opacity = "1 !important";
-      overlay.classList.add("show");
-    });
-  }
-
-  createOverlay() {
-    // 오버레이 생성
-    const overlay = document.createElement("div");
-    overlay.id = "loadingOverlay";
-    overlay.className = "loading-overlay";
-
-    // 컨텐츠 컨테이너 생성
-    const content = document.createElement("div");
-    content.className = "loading-content";
-
-    // 비디오 생성
-    const video = document.createElement("video");
-    video.className = "loading-video";
-    video.autoplay = true;
-    video.muted = true;
-    video.loop = true;
-    video.setAttribute("playsinline", "");
-
-    // 비디오 소스 생성
-    const source = document.createElement("source");
-    source.src = "asserts/videos/loading_frieren.mp4";
-    source.type = "video/mp4";
-
-    // 요소들 조립
-    video.appendChild(source);
-    content.appendChild(video);
-    overlay.appendChild(content);
-
-    // DOM에 추가
-    document.body.appendChild(overlay);
-
-    // 캐시 업데이트
-    this.overlay = overlay;
-
-    // 다시 showLoading 호출
-    this.showLoading();
-  }
-
-  hideLoading() {
-    const overlay = this.getOverlay();
-    if (overlay) {
-      // 페이드아웃 효과 시작
-      overlay.style.transition = "opacity 0.3s ease-in-out !important";
-      overlay.style.opacity = "0 !important";
-      overlay.classList.remove("show");
-
-      // 페이드아웃 완료 후 완전히 숨기기
-      setTimeout(() => {
-        overlay.style.display = "none !important";
-        overlay.style.visibility = "hidden !important";
-      }, 300); // 0.3초 후
-    }
-  }
-}
-
-class VideoBackgroundManager {
-  constructor() {
-    this.videos = document.querySelectorAll(".background-video");
-    this.indicators = document.querySelectorAll(".indicator");
-    this.currentIndex = 0;
-    this.isTransitioning = false;
+    // 컨테이너 요소 찾기
+    this.container = element.closest(".role-container");
 
     this.init();
   }
 
   init() {
-    // 첫 번째 비디오 재생 시작
-    this.playVideo(0);
+    // 초기 텍스트 설정
+    this.element.textContent = "";
+    this.type();
+  }
 
-    // 각 비디오에 이벤트 리스너 추가
-    this.videos.forEach((video, index) => {
-      // 비디오 끝날 때 다음 비디오로 전환
-      video.addEventListener("ended", () => {
-        if (index === this.currentIndex) {
-          this.nextVideo();
-        }
-      });
+  type() {
+    const currentText = this.texts[this.currentTextIndex];
 
-      // 비디오 로드 에러 처리
-      video.addEventListener("error", (e) => {
-        console.error(`비디오 ${index} 로드 실패:`, e);
-        if (index === this.currentIndex) {
-          this.nextVideo();
-        }
-      });
+    if (this.isDeleting) {
+      // 삭제 중
+      const displayText = currentText.substring(0, this.currentCharIndex - 1);
+      this.element.textContent = displayText;
+      this.currentCharIndex--;
 
-      // 비디오 로드 완료
-      video.addEventListener("loadeddata", () => {
-        console.log(`비디오 ${index} 로드 완료`);
-      });
-    });
-
-    // 인디케이터 클릭 이벤트
-    this.indicators.forEach((indicator, index) => {
-      indicator.addEventListener("click", () => {
-        this.goToVideo(index);
-      });
-    });
-
-    // 키보드 이벤트 (선택사항)
-    document.addEventListener("keydown", (e) => {
-      switch (e.key) {
-        case "ArrowRight":
-          this.nextVideo();
-          break;
-        case "ArrowLeft":
-          this.prevVideo();
-          break;
+      if (this.currentCharIndex === 0) {
+        this.isDeleting = false;
+        this.currentTextIndex = (this.currentTextIndex + 1) % this.texts.length;
+        setTimeout(() => this.type(), 500);
+        return;
       }
-    });
-  }
 
-  playVideo(index) {
-    const video = this.videos[index];
-    if (video) {
-      video.currentTime = 0;
-
-      // 모바일에서 비디오 재생을 위한 추가 속성 설정
-      video.setAttribute("playsinline", "");
-      video.setAttribute("webkit-playsinline", "");
-      video.muted = true;
-
-      video.play().catch((e) => {
-        console.error(`비디오 ${index} 재생 실패:`, e);
-        // 모바일에서 자동재생 실패 시 사용자 상호작용 후 재시도
-        document.addEventListener(
-          "touchstart",
-          () => {
-            video.play().catch(console.error);
-          },
-          { once: true }
-        );
-      });
-    }
-  }
-
-  nextVideo() {
-    if (this.isTransitioning) return;
-
-    const nextIndex = (this.currentIndex + 1) % this.videos.length;
-    this.transitionToVideo(nextIndex);
-  }
-
-  prevVideo() {
-    if (this.isTransitioning) return;
-
-    const prevIndex =
-      (this.currentIndex - 1 + this.videos.length) % this.videos.length;
-    this.transitionToVideo(prevIndex);
-  }
-
-  goToVideo(index) {
-    if (
-      this.isTransitioning ||
-      index === this.currentIndex ||
-      index >= this.videos.length
-    )
-      return;
-
-    this.transitionToVideo(index);
-  }
-
-  transitionToVideo(nextIndex) {
-    this.isTransitioning = true;
-
-    const currentVideo = this.videos[this.currentIndex];
-    const nextVideo = this.videos[nextIndex];
-
-    // 현재 비디오 페이드 아웃
-    currentVideo.classList.remove("active");
-
-    // 페이드 아웃 시간 후 다음 비디오 시작
-    setTimeout(() => {
-      // 다음 비디오 준비 및 페이드 인
-      nextVideo.currentTime = 0;
-      nextVideo.classList.add("active");
-      this.playVideo(nextIndex);
-
-      // 현재 비디오 정지
-      currentVideo.pause();
-
-      // 인덱스 및 인디케이터 업데이트
-      this.currentIndex = nextIndex;
-      this.updateIndicators();
-
-      // 전환 완료
-      setTimeout(() => {
-        this.isTransitioning = false;
-      }, 100);
-    }, 500); // 페이드 아웃 시간의 절반
-  }
-
-  updateIndicators() {
-    this.indicators.forEach((indicator, index) => {
-      if (index === this.currentIndex) {
-        indicator.classList.add("active");
-      } else {
-        indicator.classList.remove("active");
-      }
-    });
-  }
-
-  // 모든 비디오 일시정지
-  pauseAllVideos() {
-    this.videos.forEach((video) => {
-      video.pause();
-    });
-  }
-
-  // 현재 비디오 재생/일시정지 토글
-  toggleCurrentVideo() {
-    const currentVideo = this.videos[this.currentIndex];
-    if (currentVideo.paused) {
-      currentVideo.play();
+      setTimeout(() => this.type(), this.deleteSpeed);
     } else {
-      currentVideo.pause();
+      // 타이핑 중
+      const displayText = currentText.substring(0, this.currentCharIndex + 1);
+      this.element.textContent = displayText;
+      this.currentCharIndex++;
+
+      if (this.currentCharIndex === currentText.length) {
+        this.isDeleting = true;
+        setTimeout(() => this.type(), this.delayBetween);
+        return;
+      }
+
+      setTimeout(() => this.type(), this.typeSpeed);
     }
   }
 }
 
-// 모바일 네비게이션 기능 제거됨 (헤더 제거로 인해)
+// 네비게이션 관련 기능
+class Navigation {
+  constructor() {
+    this.navbar = document.getElementById("navbar");
+    this.navMenu = document.getElementById("nav-menu");
+    this.hamburger = document.getElementById("hamburger");
+    this.navLinks = document.querySelectorAll(".nav-link");
+
+    this.init();
+  }
+
+  init() {
+    this.setupScrollEffect();
+    this.setupMobileMenu();
+    this.setupSmoothScroll();
+    this.setupActiveSection();
+  }
+
+  setupScrollEffect() {
+    window.addEventListener("scroll", () => {
+      if (window.scrollY > 100) {
+        this.navbar.classList.add("scrolled");
+      } else {
+        this.navbar.classList.remove("scrolled");
+      }
+    });
+  }
+
+  setupMobileMenu() {
+    this.hamburger.addEventListener("click", () => {
+      this.hamburger.classList.toggle("active");
+      this.navMenu.classList.toggle("active");
+    });
+
+    // 메뉴 링크 클릭시 모바일 메뉴 닫기
+    this.navLinks.forEach((link) => {
+      link.addEventListener("click", () => {
+        this.hamburger.classList.remove("active");
+        this.navMenu.classList.remove("active");
+      });
+    });
+  }
+
+  setupSmoothScroll() {
+    this.navLinks.forEach((link) => {
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
+        const targetId = link.getAttribute("href");
+        const targetSection = document.querySelector(targetId);
+
+        if (targetSection) {
+          const offsetTop = targetSection.offsetTop - 80;
+          window.scrollTo({
+            top: offsetTop,
+            behavior: "smooth",
+          });
+        }
+      });
+    });
+
+    // 히어로 버튼도 스무스 스크롤
+    const heroBtn = document.querySelector(".btn-primary");
+    if (heroBtn && heroBtn.getAttribute("href") === "#about") {
+      heroBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        const aboutSection = document.querySelector("#about");
+        if (aboutSection) {
+          const offsetTop = aboutSection.offsetTop - 80;
+          window.scrollTo({
+            top: offsetTop,
+            behavior: "smooth",
+          });
+        }
+      });
+    }
+  }
+
+  setupActiveSection() {
+    const sections = document.querySelectorAll("section[id]");
+
+    window.addEventListener("scroll", () => {
+      const scrollPos = window.scrollY + 100;
+
+      sections.forEach((section) => {
+        const sectionTop = section.offsetTop;
+        const sectionHeight = section.offsetHeight;
+        const sectionId = section.getAttribute("id");
+
+        if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
+          this.navLinks.forEach((link) => {
+            link.classList.remove("active");
+            if (link.getAttribute("href") === `#${sectionId}`) {
+              link.classList.add("active");
+            }
+          });
+        }
+      });
+    });
+  }
+}
+
+// 스크롤 애니메이션
+class ScrollAnimations {
+  constructor() {
+    this.init();
+  }
+
+  init() {
+    // AOS 초기화
+    if (typeof AOS !== "undefined") {
+      AOS.init({
+        duration: 1000,
+        easing: "ease-in-out",
+        once: true,
+        mirror: false,
+      });
+    }
+
+    this.setupCustomAnimations();
+  }
+
+  setupCustomAnimations() {
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: "0px 0px -100px 0px",
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("animate-in");
+        }
+      });
+    }, observerOptions);
+
+    // 애니메이션 대상 요소들
+    const animateElements = document.querySelectorAll(
+      ".about-stats .stat-item"
+    );
+    animateElements.forEach((el) => {
+      observer.observe(el);
+    });
+  }
+}
+
+// 유틸리티 함수들
+class Utils {
+  static smoothScrollTo(target, duration = 1000) {
+    const targetPosition = target.offsetTop - 80;
+    const startPosition = window.pageYOffset;
+    const distance = targetPosition - startPosition;
+    let startTime = null;
+
+    function animation(currentTime) {
+      if (startTime === null) startTime = currentTime;
+      const timeElapsed = currentTime - startTime;
+      const run = Utils.ease(timeElapsed, startPosition, distance, duration);
+      window.scrollTo(0, run);
+      if (timeElapsed < duration) requestAnimationFrame(animation);
+    }
+
+    requestAnimationFrame(animation);
+  }
+
+  static ease(t, b, c, d) {
+    t /= d / 2;
+    if (t < 1) return (c / 2) * t * t + b;
+    t--;
+    return (-c / 2) * (t * (t - 2) - 1) + b;
+  }
+
+  static debounce(func, wait, immediate) {
+    let timeout;
+    return function executedFunction() {
+      const context = this;
+      const args = arguments;
+      const later = function () {
+        timeout = null;
+        if (!immediate) func.apply(context, args);
+      };
+      const callNow = immediate && !timeout;
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+      if (callNow) func.apply(context, args);
+    };
+  }
+}
+
+// 성능 최적화
+class PerformanceOptimizer {
+  constructor() {
+    this.init();
+  }
+
+  init() {
+    this.setupLazyLoading();
+    this.optimizeScrollEvents();
+  }
+
+  setupLazyLoading() {
+    const images = document.querySelectorAll("img[data-src]");
+    const imageObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          img.src = img.dataset.src;
+          img.classList.remove("lazy");
+          imageObserver.unobserve(img);
+        }
+      });
+    });
+
+    images.forEach((img) => imageObserver.observe(img));
+  }
+
+  optimizeScrollEvents() {
+    const scrollEvents = ["scroll", "resize"];
+    scrollEvents.forEach((eventType) => {
+      window.addEventListener(
+        eventType,
+        Utils.debounce(() => {
+          // 스크롤 이벤트 최적화된 핸들러
+        }, 10)
+      );
+    });
+  }
+}
+
+// 프로젝트 필터링 기능
+class ProjectFilter {
+  constructor() {
+    this.init();
+  }
+
+  init() {
+    const filterBtns = document.querySelectorAll(".filter-btn");
+    const projectCards = document.querySelectorAll(".project-card");
+
+    filterBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const filter = btn.getAttribute("data-filter");
+
+        // 버튼 활성화 상태 변경
+        filterBtns.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+
+        // 프로젝트 카드 필터링
+        projectCards.forEach((card) => {
+          const category = card.getAttribute("data-category");
+
+          if (filter === "all" || category === filter) {
+            card.style.display = "block";
+            card.style.animation = "fadeInUp 0.5s ease";
+          } else {
+            card.style.display = "none";
+          }
+        });
+      });
+    });
+  }
+}
+
+// 스킬 바 애니메이션
+class SkillBarAnimation {
+  constructor() {
+    this.init();
+  }
+
+  init() {
+    const observerOptions = {
+      threshold: 0.3,
+      rootMargin: "0px 0px -100px 0px",
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          this.animateSkillBars(entry.target);
+        }
+      });
+    }, observerOptions);
+
+    const skillSections = document.querySelectorAll(".skill-category");
+    skillSections.forEach((section) => {
+      observer.observe(section);
+    });
+  }
+
+  animateSkillBars(skillSection) {
+    const skillBars = skillSection.querySelectorAll(".skill-progress");
+
+    skillBars.forEach((bar, index) => {
+      const width = bar.getAttribute("data-width");
+
+      setTimeout(() => {
+        bar.style.width = width + "%";
+      }, index * 200);
+    });
+  }
+}
+
+// 폼 처리
+class ContactForm {
+  constructor() {
+    this.init();
+  }
+
+  init() {
+    const form = document.querySelector(".contact-form");
+    if (form) {
+      form.addEventListener("submit", this.handleSubmit.bind(this));
+    }
+  }
+
+  handleSubmit(e) {
+    e.preventDefault();
+
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData);
+
+    // 여기에서 실제 폼 전송 처리
+    console.log("폼 데이터:", data);
+
+    // 성공 메시지 표시
+    this.showMessage("메시지가 성공적으로 전송되었습니다!", "success");
+
+    // 폼 초기화
+    e.target.reset();
+  }
+
+  showMessage(message, type) {
+    const messageDiv = document.createElement("div");
+    messageDiv.className = `form-message ${type}`;
+    messageDiv.textContent = message;
+
+    const form = document.querySelector(".contact-form");
+    form.appendChild(messageDiv);
+
+    // 3초 후 메시지 제거
+    setTimeout(() => {
+      messageDiv.remove();
+    }, 3000);
+  }
+}
 
 // 페이지 로드 완료 후 초기화
 document.addEventListener("DOMContentLoaded", () => {
-  // 로딩 매니저를 먼저 초기화 (가장 중요!)
-  const loadingManager = new LoadingManager();
+  // 타이핑 애니메이션 시작
+  const typingElement = document.getElementById("typing-text");
+  if (typingElement) {
+    new TypingAnimation(typingElement, typingTexts, 120, 60, 2500);
+  }
 
-  // 비디오 매니저 초기화
-  const videoManager = new VideoBackgroundManager();
+  // 네비게이션 초기화
+  new Navigation();
 
-  // 전역에서 접근 가능하도록 설정 (디버깅용)
-  window.loadingManager = loadingManager;
-  window.videoManager = videoManager;
+  // 스크롤 애니메이션 초기화
+  new ScrollAnimations();
 
-  // 페이지 가시성 변경 시 비디오 제어
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) {
-      videoManager.pauseAllVideos();
-    } else {
-      videoManager.playVideo(videoManager.currentIndex);
-    }
-  });
+  // 프로젝트 필터 초기화
+  new ProjectFilter();
 
-  // 네비게이션 링크 스무스 스크롤
-  const navLinks = document.querySelectorAll('.nav-link[href^="#"]');
-  navLinks.forEach((link) => {
-    link.addEventListener("click", (e) => {
-      e.preventDefault();
-      const targetId = link.getAttribute("href");
-      const targetElement = document.querySelector(targetId);
+  // 스킬 바 애니메이션 초기화
+  new SkillBarAnimation();
 
-      if (targetElement) {
-        targetElement.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }
-    });
-  });
+  // 연락처 폼 초기화
+  new ContactForm();
 
-  // 히어로 버튼 스무스 스크롤
-  const heroButtons = document.querySelectorAll(
-    '.btn-primary[href^="#"], .btn-secondary[href^="#"]'
-  );
-  heroButtons.forEach((button) => {
-    button.addEventListener("click", (e) => {
-      e.preventDefault();
-      const targetId = button.getAttribute("href");
-      const targetElement = document.querySelector(targetId);
+  // 성능 최적화 초기화
+  new PerformanceOptimizer();
 
-      if (targetElement) {
-        targetElement.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }
-    });
-  });
+  // 페이지 로드 애니메이션
+  setTimeout(() => {
+    document.body.classList.add("loaded");
+  }, 100);
+});
 
-  // 연락처 폼 처리
-  const contactForm = document.querySelector(".form");
-  if (contactForm) {
-    contactForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-
-      const formData = new FormData(contactForm);
-      const name = contactForm.querySelector('input[type="text"]').value;
-      const email = contactForm.querySelector('input[type="email"]').value;
-      const message = contactForm.querySelector("textarea").value;
-
-      if (name && email && message) {
-        // 여기서 실제 폼 제출 로직을 구현할 수 있습니다
-        alert(
-          `메시지가 전송되었습니다!\n\n이름: ${name}\n이메일: ${email}\n메시지: ${message}`
-        );
-        contactForm.reset();
-      } else {
-        alert("모든 필드를 입력해주세요.");
-      }
-    });
+// 페이지 가시성 변경 처리
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    // 페이지가 숨겨졌을 때
+    console.log("페이지가 숨겨짐");
+  } else {
+    // 페이지가 다시 보일 때
+    console.log("페이지가 다시 보임");
   }
 });
 
@@ -421,31 +463,38 @@ window.addEventListener("error", (e) => {
   console.error("페이지 에러:", e.error);
 });
 
-// 사용자 상호작용 감지 (자동재생 정책 대응)
-let userInteracted = false;
-const enableAutoplay = () => {
-  if (!userInteracted) {
-    userInteracted = true;
-    console.log("사용자 상호작용 감지됨 - 비디오 재생 시도");
-    // 사용자가 상호작용한 후 모든 비디오 재생 보장
-    if (window.videoManager) {
-      // 모든 비디오에 대해 재생 시도
-      window.videoManager.videos.forEach((video, index) => {
-        video.muted = true;
-        video.setAttribute("playsinline", "");
-        if (index === window.videoManager.currentIndex) {
-          video
-            .play()
-            .catch((e) => console.error(`비디오 ${index} 재생 실패:`, e));
-        }
-      });
-    }
-  }
-};
+// 모던 브라우저 기능 감지
+const supportsIntersectionObserver = "IntersectionObserver" in window;
+const supportsCustomProperties = CSS.supports("(--custom: property)");
 
-// 다양한 사용자 상호작용 이벤트 리스닝
-document.addEventListener("click", enableAutoplay);
-document.addEventListener("keydown", enableAutoplay);
-document.addEventListener("touchstart", enableAutoplay);
-document.addEventListener("touchend", enableAutoplay);
-document.addEventListener("mousedown", enableAutoplay);
+if (!supportsIntersectionObserver) {
+  console.warn("IntersectionObserver가 지원되지 않습니다.");
+}
+
+if (!supportsCustomProperties) {
+  console.warn("CSS Custom Properties가 지원되지 않습니다.");
+}
+
+// 개발 환경에서만 실행되는 코드
+if (
+  window.location.hostname === "localhost" ||
+  window.location.hostname === "127.0.0.1"
+) {
+  console.log("개발 모드로 실행 중");
+
+  // 개발용 유틸리티
+  window.portfolio = {
+    scrollToSection: (sectionId) => {
+      const section = document.querySelector(`#${sectionId}`);
+      if (section) {
+        Utils.smoothScrollTo(section);
+      }
+    },
+    toggleMobileMenu: () => {
+      const hamburger = document.getElementById("hamburger");
+      const navMenu = document.getElementById("nav-menu");
+      hamburger.classList.toggle("active");
+      navMenu.classList.toggle("active");
+    },
+  };
+}

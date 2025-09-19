@@ -1,102 +1,433 @@
 <!DOCTYPE html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Swimming Yang - Portfolio</title>
-    <link rel="stylesheet" href="style.css?v=13.0" />
-  </head>
-  <body>
-    <!-- 로딩 오버레이 -->
-    <div id="loadingOverlay" class="loading-overlay">
-      <div class="loading-content">
-        <video 
-          class="loading-video" 
-          autoplay 
-          muted 
-          loop 
-          playsinline
-        >
-          <source src="asserts/videos/loading_frieren.mp4" type="video/mp4" />
-        </video>
-      </div>
-    </div>
-
-    <!-- 배경 영상들 -->
-    <div class="video-background">
-      <video
-        class="background-video active"
-        autoplay
-        muted
-        loop
-        playsinline
-        preload="auto"
-        data-index="0"
-      >
-        <source src="asserts/videos/background00.mp4" type="video/mp4" />
-      </video>
-      <video class="background-video" autoplay muted loop playsinline preload="auto" data-index="1">
-        <source src="asserts/videos/background01.mp4" type="video/mp4" />
-      </video>
-      <video class="background-video" autoplay muted loop playsinline preload="auto" data-index="2">
-        <source src="asserts/videos/background02.mp4" type="video/mp4" />
-      </video>
-      <video class="background-video" autoplay muted loop playsinline preload="auto" data-index="3">
-        <source src="asserts/videos/background03.mp4" type="video/mp4" />
-      </video>
-      <video class="background-video" autoplay muted loop playsinline preload="auto" data-index="4">
-        <source src="asserts/videos/background04.mp4" type="video/mp4" />
-      </video>
-    </div>
-
-    <!-- 오버레이 -->
-    <div class="video-overlay"></div>
-
-
-
-    <!-- 메인 콘텐츠 -->
-    <div class="main-content">
-      <div class="content-wrapper">
-        <h1>Swimming Yang</h1>
-        <p>웹 개발자 포트폴리오</p>
-        <div class="board-grid">
-          <a href="pages/portfolio.html" class="grid-btn btn-red">
-            <div class="btn-icon">👨‍💻</div>
-            <div class="btn-label">포트폴리오</div>
-          </a>
-          <a href="boards/algorithm.html" class="grid-btn btn-orange">
-            <div class="btn-icon">🧮</div>
-            <div class="btn-label">알고리즘</div>
-          </a>
-          <a href="boards/coding-test.html" class="grid-btn btn-yellow">
-            <div class="btn-icon">💻</div>
-            <div class="btn-label">코딩테스트</div>
-          </a>
-          <a href="boards/cs.html" class="grid-btn btn-green">
-            <div class="btn-icon">🖥️</div>
-            <div class="btn-label">CS</div>
-          </a>
-          <a href="pages/guestbook.html" class="grid-btn btn-blue">
-            <div class="btn-icon">📚</div>
-            <div class="btn-label">방명록</div>
-          </a>
-          <div class="grid-btn btn-purple btn-disabled">
-            <div class="btn-icon">🚧</div>
-            <div class="btn-label">준비중</div>
-          </div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="좋은길빛 - 프론트엔드 개발자 포트폴리오">
+    <title>좋은길빛 - 프론트엔드 개발자</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- AOS (Animate On Scroll) -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 네비게이션 -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span>좋은길빛</span>
+            </div>
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="#home" class="nav-link">홈</a></li>
+                <li><a href="#about" class="nav-link">소개</a></li>
+                <li><a href="#experience" class="nav-link">경험</a></li>
+                <li><a href="#projects" class="nav-link">프로젝트</a></li>
+                <li><a href="#skills" class="nav-link">기술</a></li>
+                <li><a href="#contact" class="nav-link">연락처</a></li>
+            </ul>
+            <div class="hamburger" id="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
         </div>
-      </div>
-    </div>
+    </nav>
 
-    <!-- 비디오 인디케이터 -->
-    <div class="video-indicators">
-      <div class="indicator active" data-video="0"></div>
-      <div class="indicator" data-video="1"></div>
-      <div class="indicator" data-video="2"></div>
-      <div class="indicator" data-video="3"></div>
-      <div class="indicator" data-video="4"></div>
-    </div>
+    <!-- 메인 히어로 섹션 -->
+    <section id="home" class="hero">
+        <div class="hero-container">
+            <div class="hero-content" data-aos="fade-up" data-aos-duration="1000">
+                <div class="profile-image">
+                    <div class="profile-placeholder">👨‍💻</div>
+                </div>
+                <h1 class="greeting">안녕하세요!</h1>
+                <h2 class="name">좋은길빛입니다</h2>
+                <div class="role-container">
+                    <span class="role-text">저는&nbsp;</span>
+                    <span id="typing-text" class="typing-text"></span>
+                    <span class="cursor">|</span>
+                    &nbsp;<span class="role-text">입니다</span>
+                </div>
+                <p class="description">
+                    인생이 즐거운 일 경험을 만들고, 사회적인 학습으로 인간들이 있는 소프트웨어를 개발하는 것이 목표입니다
+                </p>
+                <div class="hero-buttons">
+                    <a href="#about" class="btn btn-primary">더 알아보기</a>
+                    <a href="#" class="btn btn-secondary">이력서 다운로드</a>
+                </div>
+                <div class="social-links">
+                    <a href="https://github.com" target="_blank" class="social-link">
+                        <i class="fab fa-github"></i>
+                    </a>
+                    <a href="https://linkedin.com" target="_blank" class="social-link">
+                        <i class="fab fa-linkedin"></i>
+                    </a>
+                    <a href="mailto:example@email.com" class="social-link">
+                        <i class="fas fa-envelope"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <span></span>
+        </div>
+    </section>
 
+    <!-- About Me 섹션 -->
+    <section id="about" class="about">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">About Me</h2>
+            <div class="about-content">
+                <div class="about-image" data-aos="fade-right">
+                    <div class="about-placeholder">💼</div>
+                </div>
+                <div class="about-text" data-aos="fade-left">
+                    <h3>개발자로서의 여정</h3>
+                    <p>
+                        안녕하세요! 저는 사용자 경험을 중시하는 프론트엔드 개발자입니다. 
+                        깔끔하고 직관적인 인터페이스를 통해 사용자에게 즐거운 경험을 제공하는 것을 목표로 합니다.
+                    </p>
+                    <p>
+                        새로운 기술을 배우는 것을 좋아하며, 팀워크를 통해 더 나은 결과물을 만들어내는 것에 보람을 느낍니다.
+                        현재는 React와 TypeScript를 주로 사용하여 웹 애플리케이션을 개발하고 있습니다.
+                    </p>
+                    <div class="about-stats">
+                        <div class="stat-item">
+                            <span class="stat-number">2+</span>
+                            <span class="stat-label">년 경력</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">15+</span>
+                            <span class="stat-label">프로젝트</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">3+</span>
+                            <span class="stat-label">팀 프로젝트</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 경험 섹션 -->
+    <section id="experience" class="experience">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Experience</h2>
+            <div class="timeline">
+                <div class="timeline-item" data-aos="fade-up" data-aos-delay="100">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <h3>프론트엔드 개발자</h3>
+                        <h4>테크 컴퍼니</h4>
+                        <span class="timeline-date">2023.03 - 현재</span>
+                        <p>React와 TypeScript를 활용한 웹 애플리케이션 개발 및 유지보수를 담당했습니다.</p>
+                        <ul>
+                            <li>사용자 인터페이스 개선으로 사용자 만족도 20% 향상</li>
+                            <li>컴포넌트 라이브러리 구축으로 개발 효율성 30% 증대</li>
+                            <li>반응형 웹 디자인 적용으로 모바일 사용률 증가</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="timeline-item" data-aos="fade-up" data-aos-delay="200">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <h3>웹 개발자 인턴</h3>
+                        <h4>스타트업 ABC</h4>
+                        <span class="timeline-date">2022.09 - 2023.02</span>
+                        <p>웹 개발 전반에 대한 기초를 다지고 실무 경험을 쌓았습니다.</p>
+                        <ul>
+                            <li>HTML, CSS, JavaScript를 활용한 랜딩 페이지 제작</li>
+                            <li>REST API 연동 및 데이터 처리</li>
+                            <li>Git을 활용한 협업 및 버전 관리</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="timeline-item" data-aos="fade-up" data-aos-delay="300">
+                    <div class="timeline-marker"></div>
+
+    <!-- 프로젝트 섹션 -->
+    <section id="projects" class="projects">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Projects</h2>
+            <div class="project-filters" data-aos="fade-up" data-aos-delay="100">
+                <button class="filter-btn active" data-filter="all">전체</button>
+                <button class="filter-btn" data-filter="web">웹</button>
+                <button class="filter-btn" data-filter="mobile">모바일</button>
+                <button class="filter-btn" data-filter="etc">기타</button>
+            </div>
+            <div class="projects-grid">
+                <div class="project-card" data-category="web" data-aos="fade-up" data-aos-delay="100">
+                    <div class="project-image">
+                        <div class="project-placeholder">🚀</div>
+                        <div class="project-overlay">
+                            <a href="#" class="project-link"><i class="fas fa-external-link-alt"></i></a>
+                            <a href="#" class="project-link"><i class="fab fa-github"></i></a>
+                        </div>
+                    </div>
+                    <div class="project-content">
+                        <h3>E-Commerce 웹사이트</h3>
+                        <p>React와 Node.js를 활용한 온라인 쇼핑몰 플랫폼</p>
+                        <div class="project-tech">
+                            <span class="tech-tag">React</span>
+                            <span class="tech-tag">Node.js</span>
+                            <span class="tech-tag">MongoDB</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="project-card" data-category="web" data-aos="fade-up" data-aos-delay="200">
+                    <div class="project-image">
+                        <div class="project-placeholder">💼</div>
+                        <div class="project-overlay">
+                            <a href="#" class="project-link"><i class="fas fa-external-link-alt"></i></a>
+                            <a href="#" class="project-link"><i class="fab fa-github"></i></a>
+                        </div>
+                    </div>
+                    <div class="project-content">
+                        <h3>태스크 관리 시스템</h3>
+                        <p>팀 협업을 위한 프로젝트 관리 도구</p>
+                        <div class="project-tech">
+                            <span class="tech-tag">Vue.js</span>
+                            <span class="tech-tag">Express</span>
+                            <span class="tech-tag">MySQL</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="project-card" data-category="mobile" data-aos="fade-up" data-aos-delay="300">
+                    <div class="project-image">
+                        <div class="project-placeholder">🛒</div>
+                        <div class="project-overlay">
+                            <a href="#" class="project-link"><i class="fas fa-external-link-alt"></i></a>
+                            <a href="#" class="project-link"><i class="fab fa-github"></i></a>
+                        </div>
+                    </div>
+                    <div class="project-content">
+                        <h3>날씨 앱</h3>
+                        <p>실시간 날씨 정보를 제공하는 모바일 웹앱</p>
+                        <div class="project-tech">
+                            <span class="tech-tag">React Native</span>
+                            <span class="tech-tag">API</span>
+                            <span class="tech-tag">Redux</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+                    <div class="timeline-content">
+                        <h3>컴퓨터공학과 졸업</h3>
+                        <h4>OO대학교</h4>
+                        <span class="timeline-date">2018.03 - 2022.08</span>
+                        <p>컴퓨터공학 전공으로 프로그래밍 기초와 소프트웨어 공학을 학습했습니다.</p>
+                        <ul>
+                            <li>자료구조 및 알고리즘 학습</li>
+
+    <!-- 기술스택 섹션 -->
+    <section id="skills" class="skills">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Skills</h2>
+            <div class="skills-grid">
+                <div class="skill-category" data-aos="fade-up" data-aos-delay="100">
+                    <h3>Frontend</h3>
+                    <div class="skill-items">
+                        <div class="skill-item">
+                            <div class="skill-info">
+                                <span class="skill-name">HTML/CSS</span>
+                                <span class="skill-percentage">90%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" data-width="90"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-info">
+                                <span class="skill-name">JavaScript</span>
+                                <span class="skill-percentage">85%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" data-width="85"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-info">
+                                <span class="skill-name">React</span>
+                                <span class="skill-percentage">80%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" data-width="80"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-info">
+                                <span class="skill-name">TypeScript</span>
+                                <span class="skill-percentage">75%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" data-width="75"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="skill-category" data-aos="fade-up" data-aos-delay="200">
+                    <h3>Backend</h3>
+                    <div class="skill-items">
+                        <div class="skill-item">
+                            <div class="skill-info">
+                                <span class="skill-name">Node.js</span>
+                                <span class="skill-percentage">70%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" data-width="70"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-info">
+                                <span class="skill-name">Express</span>
+                                <span class="skill-percentage">68%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" data-width="68"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-info">
+                                <span class="skill-name">Python</span>
+                                <span class="skill-percentage">65%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" data-width="65"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="skill-category" data-aos="fade-up" data-aos-delay="300">
+                    <h3>Tools & Others</h3>
+                    <div class="skill-items">
+                        <div class="skill-item">
+                            <div class="skill-info">
+                                <span class="skill-name">Git</span>
+                                <span class="skill-percentage">85%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" data-width="85"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-info">
+                                <span class="skill-name">Figma</span>
+                                <span class="skill-percentage">75%</span>
+                            </div>
+
+    <!-- 연락처 섹션 -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Contact</h2>
+            <div class="contact-content">
+                <div class="contact-info" data-aos="fade-right">
+                    <h3>함께 일하고 싶으시다면</h3>
+                    <p>새로운 프로젝트나 협업 기회에 대해 언제든 연락 주세요!</p>
+                    
+                    <div class="contact-methods">
+                        <div class="contact-method">
+                            <i class="fas fa-envelope"></i>
+                            <div>
+                                <strong>이메일</strong>
+                                <p>example@email.com</p>
+                            </div>
+                        </div>
+                        <div class="contact-method">
+                            <i class="fas fa-phone"></i>
+                            <div>
+                                <strong>전화</strong>
+                                <p>010-1234-5678</p>
+                            </div>
+                        </div>
+                        <div class="contact-method">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <div>
+                                <strong>위치</strong>
+                                <p>서울, 대한민국</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <form class="contact-form" data-aos="fade-left">
+                    <div class="form-group">
+                        <input type="text" name="name" placeholder="이름" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" name="email" placeholder="이메일" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" name="subject" placeholder="제목" required>
+                    </div>
+                    <div class="form-group">
+                        <textarea name="message" placeholder="메시지를 입력해주세요" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">메시지 보내기</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- 푸터 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-text">
+                    <p>&copy; 2024 좋은길빛. All rights reserved.</p>
+                </div>
+                <div class="footer-social">
+                    <a href="https://github.com" target="_blank"><i class="fab fa-github"></i></a>
+                    <a href="https://linkedin.com" target="_blank"><i class="fab fa-linkedin"></i></a>
+                    <a href="mailto:example@email.com"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+                            <div class="skill-bar">
+                                <div class="skill-progress" data-width="75"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-info">
+                                <span class="skill-name">AWS</span>
+                                <span class="skill-percentage">60%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" data-width="60"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+                            <li>객체지향 프로그래밍 및 디자인 패턴</li>
+                            <li>팀 프로젝트를 통한 협업 경험</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 스크립트 -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="script.js"></script>
-  </body>
+</body>
 </html>

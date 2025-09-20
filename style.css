@@ -951,6 +951,13 @@ html {
   display: block;
 }
 
+.skill-icon img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
 .skill-name {
   font-family: "LINESeedSansKR", sans-serif;
   font-size: 0.95rem;
@@ -1269,6 +1276,11 @@ html {
     font-size: 2rem;
   }
 
+  .skill-icon img {
+    width: 40px;
+    height: 40px;
+  }
+
   .skill-name {
     font-size: 0.9rem;
   }
@@ -1300,6 +1312,11 @@ html {
 
   .skill-icon {
     font-size: 1.8rem;
+  }
+
+  .skill-icon img {
+    width: 36px;
+    height: 36px;
   }
 
   .skill-name {

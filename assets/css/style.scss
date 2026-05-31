@@ -2,16 +2,17 @@
 ---
 
 :root {
-  --bg: #f4f2ee;
+  --bg: #f5fbf7;
   --surface: #ffffff;
-  --text: #1d2424;
-  --muted: #66706d;
-  --line: #d9d7cf;
-  --accent: #1e6d58;
-  --accent-strong: #104a3b;
-  --accent-soft: #e4f1eb;
-  --warm: #c7624b;
-  --ink: #111716;
+  --text: #17221d;
+  --muted: #60736a;
+  --line: #d6eadf;
+  --accent: #03c75a;
+  --accent-strong: #008f47;
+  --accent-soft: #e8f8ef;
+  --line-green: #06c755;
+  --warm: #0fa37f;
+  --ink: #0e1f17;
   --code-bg: #111827;
   --code-text: #e5e7eb;
   --shadow: 0 18px 44px rgba(18, 23, 22, 0.12);
@@ -25,20 +26,20 @@
 html {
   color: var(--text);
   background: var(--bg);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: "Noto Sans KR", "Noto Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   line-height: 1.7;
 }
 
 body {
   margin: 0;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(244, 242, 238, 0) 320px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(245, 251, 247, 0) 320px),
     var(--bg);
 }
 
 a {
   color: inherit;
-  text-decoration-color: rgba(18, 113, 91, 0.35);
+  text-decoration-color: rgba(3, 199, 90, 0.36);
   text-underline-offset: 0.2em;
 }
 
@@ -433,11 +434,11 @@ a:hover {
   min-height: 520px;
   align-items: center;
   padding: 56px;
-  border: 1px solid rgba(59, 130, 246, 0.22);
+  border: 1px solid rgba(3, 199, 90, 0.22);
   border-radius: 8px;
   background:
-    radial-gradient(circle at top left, rgba(59, 130, 246, 0.2), transparent 34%),
-    linear-gradient(135deg, #f8fafc 0%, #e6edf6 100%);
+    radial-gradient(circle at top left, rgba(3, 199, 90, 0.2), transparent 34%),
+    linear-gradient(135deg, #f7fcf8 0%, #e8f8ef 100%);
   box-shadow: var(--shadow);
   text-align: center;
 }
@@ -455,16 +456,16 @@ a:hover {
   justify-content: center;
   margin-bottom: 28px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #1e40af);
+  background: linear-gradient(135deg, var(--accent), var(--line-green));
   color: #ffffff;
   font-size: 4rem;
   font-weight: 900;
-  box-shadow: 0 20px 42px rgba(59, 130, 246, 0.28);
+  box-shadow: 0 20px 42px rgba(3, 199, 90, 0.28);
 }
 
 .about-kicker {
   margin: 0 0 12px;
-  color: #2563eb;
+  color: var(--accent-strong);
   font-size: 0.82rem;
   font-weight: 900;
   letter-spacing: 0;
@@ -475,7 +476,7 @@ a:hover {
 .about-section__heading h2,
 .about-contact h2 {
   margin: 0;
-  color: #233044;
+  color: var(--ink);
   font-weight: 900;
   line-height: 1.12;
 }
@@ -487,7 +488,7 @@ a:hover {
 .about-hero__summary {
   max-width: 660px;
   margin: 22px auto 0;
-  color: #5d6978;
+  color: var(--muted);
   font-size: 1.12rem;
 }
 
@@ -505,16 +506,16 @@ a:hover {
   align-items: center;
   justify-content: center;
   padding: 0 18px;
-  border: 1px solid #3b82f6;
+  border: 1px solid var(--accent);
   border-radius: 999px;
-  color: #2563eb;
+  color: var(--accent-strong);
   font-weight: 800;
   text-decoration: none;
 }
 
 .about-button--primary,
 .about-button:hover {
-  background: linear-gradient(135deg, #3b82f6, #1e40af);
+  background: linear-gradient(135deg, var(--accent), var(--line-green));
   color: #ffffff;
   text-decoration: none;
 }
@@ -538,7 +539,7 @@ a:hover {
 
 .about-copy p {
   margin: 0 0 18px;
-  color: #5d6978;
+  color: var(--muted);
   font-size: 1.04rem;
 }
 
@@ -556,7 +557,7 @@ a:hover {
 .about-stat {
   min-height: 150px;
   padding: 24px;
-  border: 1px solid #d9e4f5;
+  border: 1px solid var(--line);
   border-radius: 8px;
   background: #ffffff;
   box-shadow: 0 12px 32px rgba(35, 48, 68, 0.07);
@@ -568,7 +569,7 @@ a:hover {
 }
 
 .about-stat strong {
-  color: #2563eb;
+  color: var(--accent-strong);
   font-size: 2rem;
   font-weight: 900;
   line-height: 1;
@@ -576,7 +577,7 @@ a:hover {
 
 .about-stat span {
   margin-top: 14px;
-  color: #5d6978;
+  color: var(--muted);
   font-weight: 700;
 }
 
@@ -593,7 +594,7 @@ a:hover {
   bottom: 6px;
   left: 10px;
   width: 2px;
-  background: linear-gradient(180deg, #3b82f6, #1e40af);
+  background: linear-gradient(180deg, var(--accent), var(--line-green));
 }
 
 .about-timeline__item {
@@ -610,8 +611,8 @@ a:hover {
   height: 18px;
   border: 4px solid #ffffff;
   border-radius: 50%;
-  background: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.35);
+  background: var(--accent);
+  box-shadow: 0 0 0 2px rgba(3, 199, 90, 0.35);
 }
 
 .about-timeline__date {
@@ -620,7 +621,7 @@ a:hover {
   align-items: center;
   padding: 0 10px;
   border-radius: 999px;
-  background: linear-gradient(135deg, #3b82f6, #1e40af);
+  background: linear-gradient(135deg, var(--accent), var(--line-green));
   color: #ffffff;
   font-size: 0.78rem;
   font-weight: 800;
@@ -628,14 +629,14 @@ a:hover {
 
 .about-timeline__item h3 {
   margin: 12px 0 6px;
-  color: #233044;
+  color: var(--ink);
   font-size: 1.22rem;
   line-height: 1.35;
 }
 
 .about-timeline__item p {
   margin: 0;
-  color: #5d6978;
+  color: var(--muted);
 }
 
 .about-skill-grid {
@@ -650,7 +651,7 @@ a:hover {
   align-content: start;
   gap: 12px;
   padding: 18px;
-  border: 1px solid #d9e4f5;
+  border: 1px solid var(--line);
   border-radius: 8px;
   background: #ffffff;
   color: inherit;
@@ -659,19 +660,19 @@ a:hover {
 }
 
 .about-skill:hover {
-  border-color: #3b82f6;
+  border-color: var(--accent);
   color: inherit;
   transform: translateY(-3px);
 }
 
 .about-skill strong {
-  color: #2563eb;
+  color: var(--accent-strong);
   font-size: 1.18rem;
   font-weight: 900;
 }
 
 .about-skill span {
-  color: #5d6978;
+  color: var(--muted);
   font-size: 0.9rem;
   line-height: 1.5;
 }
@@ -683,7 +684,7 @@ a:hover {
   align-items: center;
   padding: 52px;
   border-radius: 8px;
-  background: #233044;
+  background: var(--ink);
   color: #ffffff;
 }
 

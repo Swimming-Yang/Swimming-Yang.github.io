@@ -1,0 +1,34 @@
+---
+layout: page
+---
+
+{% assign posts = site.categories.coding | where: "topic", page.topic %}
+
+<div class="topic-page">
+  <nav class="topic-tabs" aria-label="코딩 세부 게시판">
+    <a href="{{ '/coding/' | relative_url }}">전체</a>
+    {% for topic in site.data.coding_topics %}
+      <a {% if topic.slug == page.topic %}class="is-active"{% endif %} href="{{ '/coding/' | append: topic.slug | append: '/' | relative_url }}">{{ topic.title }}</a>
+    {% endfor %}
+  </nav>
+
+  {% if page.description %}
+    <p class="topic-page__description">{{ page.description }}</p>
+  {% endif %}
+
+  <div class="post-list">
+    {% if posts.size > 0 %}
+      {% for post in posts %}
+        <article class="post-item">
+          <a class="post-item__title" href="{{ post.url | relative_url }}">{{ post.title }}</a>
+          <p class="post-item__meta">
+            <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y.%m.%d" }}</time>
+          </p>
+          <p class="post-item__excerpt">{{ post.excerpt | strip_html | truncate: 140 }}</p>
+        </article>
+      {% endfor %}
+    {% else %}
+      <p class="empty">아직 이 게시판에 글이 없습니다.</p>
+    {% endif %}
+  </div>
+</div>

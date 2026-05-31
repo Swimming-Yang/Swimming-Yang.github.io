@@ -338,6 +338,91 @@ a:hover {
   font-weight: 700;
 }
 
+.topic-board {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.topic-card {
+  display: grid;
+  min-height: 168px;
+  align-content: space-between;
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.topic-card:hover {
+  border-color: rgba(30, 109, 88, 0.45);
+  color: var(--text);
+  box-shadow: 0 12px 32px rgba(18, 23, 22, 0.08);
+}
+
+.topic-card__title,
+.topic-card__description,
+.topic-card__count {
+  display: block;
+}
+
+.topic-card__title {
+  color: var(--accent-strong);
+  font-size: 1.24rem;
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+.topic-card__description {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.topic-card__count {
+  color: var(--warm);
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.topic-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 22px;
+}
+
+.topic-tabs a {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 13px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.62);
+  color: var(--muted);
+  font-size: 0.92rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.topic-tabs a:hover,
+.topic-tabs a.is-active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
+.topic-page__description {
+  margin: -10px 0 24px;
+  color: var(--muted);
+}
+
 .post-list {
   display: grid;
   gap: 14px;
@@ -467,6 +552,10 @@ a:hover {
   .portfolio-note {
     grid-template-columns: 1fr;
     gap: 6px;
+  }
+
+  .topic-board {
+    grid-template-columns: 1fr;
   }
 
   .page__header h1,

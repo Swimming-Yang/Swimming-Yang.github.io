@@ -40,3 +40,18 @@ categories: coding
 tags: [jekyll, github-pages]
 ---
 ```
+
+코딩 글은 `categories: coding`을 유지하고, 세부 게시판은 `topic`으로 지정합니다.
+
+```yaml
+---
+layout: post
+title: "C# 기록 예시"
+date: 2026-06-01 10:00:00 +0900
+categories: coding
+topic: csharp
+tags: [csharp, dotnet]
+---
+```
+
+사용 가능한 코딩 세부 게시판은 `csharp`, `wpf`, `unity`, `cs`, `ps`입니다.

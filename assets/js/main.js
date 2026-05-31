@@ -107,5 +107,100 @@
     });
   }
 
-  document.addEventListener("DOMContentLoaded", enhanceCodeBlocks);
+  function getKoreanDayNumber(date) {
+    const parts = new Intl.DateTimeFormat("en", {
+      timeZone: "Asia/Seoul",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).formatToParts(date);
+
+    const values = parts.reduce((result, part) => {
+      result[part.type] = part.value;
+      return result;
+    }, {});
+
+    return Date.UTC(Number(values.year), Number(values.month) - 1, Number(values.day)) / 86400000;
+  }
+
+  function getStartDayNumber(value) {
+    const match = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+
+    if (!match) {
+      return null;
+    }
+
+    return Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3])) / 86400000;
+  }
+
+  function setText(selector, value) {
+    const element = document.querySelector(selector);
+
+    if (element) {
+      element.textContent = value;
+    }
+  }
+
+  function formatCount(value) {
+    const count = Number(value);
+
+    if (!Number.isFinite(count)) {
+      return null;
+    }
+
+    return new Intl.NumberFormat("ko-KR").format(count);
+  }
+
+  function enhanceBlogStats() {
+    const stats = document.querySelector("[data-blog-start]");
+
+    if (!stats) {
+      return;
+    }
+
+    const startDay = getStartDayNumber(stats.dataset.blogStart);
+    const today = getKoreanDayNumber(new Date());
+
+    if (startDay) {
+      setText("[data-blog-day]", String(Math.max(1, today - startDay + 1)));
+    }
+
+    if (!stats.dataset.visitorEndpoint) {
+      return;
+    }
+
+    fetch(stats.dataset.visitorEndpoint, {
+      cache: "no-store",
+      headers: {
+        Accept: "application/json",
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Visitor stats request failed");
+        }
+
+        return response.json();
+      })
+      .then((data) => {
+        const todayCount = formatCount(data.today ?? data.todayCount);
+        const totalCount = formatCount(data.total ?? data.totalCount);
+
+        if (todayCount) {
+          setText("[data-visitor-today]", todayCount);
+        }
+
+        if (totalCount) {
+          setText("[data-visitor-total]", totalCount);
+        }
+      })
+      .catch(() => {
+        stats.classList.add("is-visitor-offline");
+      });
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    enhanceCodeBlocks();
+    enhanceBlogStats();
+  });
 })();

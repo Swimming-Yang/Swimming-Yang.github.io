@@ -46,7 +46,11 @@ permalink: /about/
   </div>
   <div class="about-stat">
     <strong>SSAFY</strong>
-    <span>14기 과정 예정</span>
+    <span>14기 수료</span>
+  </div>
+  <div class="about-stat">
+    <strong>SOLTOP</strong>
+    <span>위성 회사 재직 중</span>
   </div>
 </section>
 
@@ -67,9 +71,14 @@ permalink: /about/
       <p>AI 연구실에서 실험과 구현을 경험하며 문제를 쪼개고 정리하는 습관을 익혔습니다.</p>
     </article>
     <article class="about-timeline__item">
-      <span class="about-timeline__date">2025.07 - 2026.06 예정</span>
+      <span class="about-timeline__date">2025.07 - 2026.03</span>
       <h3>삼성청년SW AI아카데미 14기</h3>
-      <p>알고리즘, 웹, 프로젝트 협업을 더 깊게 다루며 실전형 개발 역량을 쌓아갈 예정입니다.</p>
+      <p>알고리즘, 웹, 프로젝트 협업을 더 깊게 다루며 실전형 개발 역량을 쌓았습니다.</p>
+    </article>
+    <article class="about-timeline__item">
+      <span class="about-timeline__date">2026.04 - 현재</span>
+      <h3>솔탑</h3>
+      <p>세종에 있는 위성 분야 회사에서 실무 경험을 쌓으며 개발자로 일하고 있습니다.</p>
     </article>
   </div>
 </section>

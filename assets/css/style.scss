@@ -548,7 +548,7 @@ a:hover {
 
 .about-stats {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
   padding: 22px 0 0;
 }
@@ -796,6 +796,22 @@ a:hover {
 
 .site-footer p {
   margin: 0;
+}
+
+@media (max-width: 960px) {
+  .about-section,
+  .about-contact {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .about-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .about-skill-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 720px) {

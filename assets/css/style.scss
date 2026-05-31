@@ -122,6 +122,14 @@ a:hover {
   line-height: 0.95;
 }
 
+.portfolio-hero__alias {
+  margin: 12px 0 0;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 1.5rem;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
 .eyebrow {
   margin: 0 0 12px;
   color: rgba(255, 255, 255, 0.76);
@@ -836,6 +844,10 @@ a:hover {
 
   .portfolio-hero h1 {
     font-size: 3.2rem;
+  }
+
+  .portfolio-hero__alias {
+    font-size: 1.18rem;
   }
 
   .portfolio-hero__summary {

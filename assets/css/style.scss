@@ -765,17 +765,173 @@ a:hover {
   border-radius: 8px;
 }
 
+.content .highlighter-rouge {
+  margin: 1.8rem 0;
+  border-radius: 8px;
+  background: #0d1117;
+  color: var(--code-text);
+}
+
+.content .code-window {
+  overflow: hidden;
+  border: 1px solid rgba(3, 199, 90, 0.26);
+  border-radius: 8px;
+  background: #0d1117;
+  color: var(--code-text);
+  box-shadow: 0 18px 40px rgba(10, 18, 14, 0.18);
+}
+
+.code-window__toolbar {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) auto;
+  min-height: 44px;
+  align-items: center;
+  gap: 12px;
+  padding: 0 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: #111820;
+}
+
+.code-window__dots {
+  display: flex;
+  gap: 7px;
+}
+
+.code-window__dots i {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.code-window__dots i:nth-child(1) {
+  background: #ff5f57;
+}
+
+.code-window__dots i:nth-child(2) {
+  background: #ffbd2e;
+}
+
+.code-window__dots i:nth-child(3) {
+  background: var(--line-green);
+}
+
+.code-window__language {
+  color: #b7c7be;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.code-window__copy {
+  min-height: 30px;
+  padding: 0 11px;
+  border: 1px solid rgba(3, 199, 90, 0.38);
+  border-radius: 6px;
+  background: rgba(3, 199, 90, 0.12);
+  color: #d8ffe7;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.code-window__copy:hover,
+.code-window__copy.is-copied {
+  background: var(--accent);
+  color: #06120d;
+}
+
+.content .highlight {
+  margin: 0;
+  background: transparent;
+}
+
 .content pre {
   overflow-x: auto;
-  padding: 18px;
-  border-radius: 8px;
-  background: var(--code-bg);
+  margin: 0;
+  padding: 18px 20px 20px;
+  background: transparent;
   color: var(--code-text);
+  line-height: 1.68;
+  scrollbar-color: rgba(3, 199, 90, 0.56) #111820;
+  scrollbar-width: thin;
+}
+
+.content pre::-webkit-scrollbar {
+  height: 10px;
+}
+
+.content pre::-webkit-scrollbar-track {
+  background: #111820;
+}
+
+.content pre::-webkit-scrollbar-thumb {
+  border: 3px solid #111820;
+  border-radius: 999px;
+  background: rgba(3, 199, 90, 0.72);
 }
 
 .content code {
   font-family: "SFMono-Regular", Consolas, monospace;
   font-size: 0.92em;
+}
+
+.content .highlight .c,
+.content .highlight .c1,
+.content .highlight .cm {
+  color: #7d8f86;
+  font-style: italic;
+}
+
+.content .highlight .k,
+.content .highlight .kd,
+.content .highlight .kn,
+.content .highlight .kt {
+  color: #6ee7a8;
+}
+
+.content .highlight .n,
+.content .highlight .na,
+.content .highlight .nb,
+.content .highlight .nc,
+.content .highlight .nf,
+.content .highlight .nn {
+  color: #d8dee9;
+}
+
+.content .highlight .nf,
+.content .highlight .nc {
+  color: #8bd5ff;
+}
+
+.content .highlight .s,
+.content .highlight .s1,
+.content .highlight .s2,
+.content .highlight .se {
+  color: #d6c27a;
+}
+
+.content .highlight .m,
+.content .highlight .mi,
+.content .highlight .mf {
+  color: #f4a261;
+}
+
+.content .highlight .o,
+.content .highlight .p {
+  color: #b7c7be;
+}
+
+.content .highlight .nt {
+  color: #6ee7a8;
+}
+
+.content .highlight .na {
+  color: #8bd5ff;
 }
 
 .content :not(pre) > code {

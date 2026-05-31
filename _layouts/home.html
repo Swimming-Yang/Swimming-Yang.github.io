@@ -2,36 +2,71 @@
 layout: default
 ---
 
-<section class="hero">
-  <div class="hero__content">
-    <p class="eyebrow">Coding + Daily Log</p>
-    <h1>{{ site.title }}</h1>
-    <p class="hero__summary">{{ site.description }}</p>
-    <div class="hero__actions">
-      <a class="button" href="{{ '/blog/' | relative_url }}">최근 글 보기</a>
-      <a class="button button--ghost" href="{{ '/about/' | relative_url }}">소개</a>
+<section class="portfolio-hero" aria-label="홈">
+  <div class="portfolio-hero__content">
+    <div class="portfolio-hero__intro">
+      <p class="eyebrow">Developer Blog / Daily Archive</p>
+      <h1>{{ site.title }}</h1>
+      <p class="portfolio-hero__summary">
+        코딩하면서 배운 것과 일상에서 남기고 싶은 장면을 차분하게 기록합니다.
+      </p>
+      <div class="portfolio-hero__actions">
+        <a class="button" href="{{ '/coding/' | relative_url }}">코딩 기록</a>
+        <a class="button button--ghost" href="{{ '/life/' | relative_url }}">일상 기록</a>
+      </div>
     </div>
+
+    <nav class="board-nav" aria-label="게시판 바로가기">
+      <p class="board-nav__label">Boards</p>
+      <a class="board-nav__item" href="{{ '/coding/' | relative_url }}">
+        <span>
+          <strong>코딩</strong>
+          <small>프로젝트, 문제 해결, 공부 메모</small>
+        </span>
+        <em>{{ site.categories.coding.size | default: 0 }}</em>
+      </a>
+      <a class="board-nav__item" href="{{ '/life/' | relative_url }}">
+        <span>
+          <strong>일상</strong>
+          <small>하루의 조각과 개인적인 기록</small>
+        </span>
+        <em>{{ site.categories.life.size | default: 0 }}</em>
+      </a>
+      <a class="board-nav__item" href="{{ '/blog/' | relative_url }}">
+        <span>
+          <strong>전체 글</strong>
+          <small>모든 기록을 시간순으로 보기</small>
+        </span>
+        <em>{{ site.posts.size }}</em>
+      </a>
+      <a class="board-nav__item" href="{{ '/about/' | relative_url }}">
+        <span>
+          <strong>소개</strong>
+          <small>이 블로그와 사람에 관해</small>
+        </span>
+        <em>i</em>
+      </a>
+    </nav>
   </div>
 </section>
 
-<section class="section">
-  <div class="section__header">
-    <h2>최근 글</h2>
-    <a href="{{ '/blog/' | relative_url }}">전체 보기</a>
+<section class="portfolio-section" aria-label="소개">
+  <div class="portfolio-section__heading">
+    <p class="eyebrow eyebrow--dark">Profile</p>
+    <h2>작게 만들고, 꾸준히 기록합니다.</h2>
   </div>
-
-  <div class="post-list">
-    {% for post in site.posts limit:5 %}
-      <article class="post-item">
-        <a class="post-item__title" href="{{ post.url | relative_url }}">{{ post.title }}</a>
-        <p class="post-item__meta">
-          <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y.%m.%d" }}</time>
-          {% if post.categories.size > 0 %}
-            <span>{{ post.categories | join: ", " }}</span>
-          {% endif %}
-        </p>
-        <p class="post-item__excerpt">{{ post.excerpt | strip_html | truncate: 140 }}</p>
-      </article>
-    {% endfor %}
+  <div class="portfolio-notes">
+    <div class="portfolio-note">
+      <strong>Code</strong>
+      <p>배운 것, 막혔던 것, 다시 써먹을 수 있는 해결 과정을 남깁니다.</p>
+    </div>
+    <div class="portfolio-note">
+      <strong>Life</strong>
+      <p>일상에서 오래 기억하고 싶은 순간을 부담 없이 쌓아둡니다.</p>
+    </div>
+    <div class="portfolio-note">
+      <strong>Archive</strong>
+      <p>완성된 글보다 이어지는 기록에 가까운 개인 작업실입니다.</p>
+    </div>
   </div>
 </section>

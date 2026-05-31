@@ -245,9 +245,9 @@ a:hover {
 .portfolio-section {
   display: grid;
   grid-template-columns: minmax(220px, 0.8fr) minmax(0, 1.4fr);
-  gap: 48px;
-  margin-top: 56px;
-  padding-top: 36px;
+  gap: 40px;
+  margin-top: 36px;
+  padding-top: 24px;
   border-top: 1px solid var(--line);
 }
 

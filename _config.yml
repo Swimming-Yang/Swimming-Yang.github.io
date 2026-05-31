@@ -1,0 +1,33 @@
+title: Swimming Notes
+description: 코딩과 일상을 차분히 기록하는 개인 블로그
+lang: ko-KR
+timezone: Asia/Seoul
+
+url: ""
+# If this is a project page like https://username.github.io/repository,
+# set baseurl to "/repository". Keep it empty for username.github.io.
+baseurl: ""
+
+permalink: /:categories/:year/:month/:day/:title/
+
+markdown: kramdown
+highlighter: rouge
+
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: post
+      author: swimming
+
+exclude:
+  - .bundle
+  - Gemfile
+  - Gemfile.lock
+  - README.md
+  - vendor

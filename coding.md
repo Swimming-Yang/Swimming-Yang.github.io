@@ -2,6 +2,7 @@
 layout: page
 title: 코딩
 permalink: /coding/
+wide: true
 ---
 
 {% assign posts = site.categories.coding %}

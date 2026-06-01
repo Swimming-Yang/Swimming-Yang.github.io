@@ -1,6 +1,7 @@
 _site/
 .tools/
 .wrangler/
+node_modules/
 workers/visitor-counter/wrangler.toml
 .bundle/
 .sass-cache/

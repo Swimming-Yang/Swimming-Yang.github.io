@@ -1,0 +1,13 @@
+{
+  "name": "ysw-blog-visitor-counter",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "kv:create": "wrangler kv namespace create VISITOR_STATS"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}

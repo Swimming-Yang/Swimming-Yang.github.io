@@ -169,7 +169,10 @@
       return;
     }
 
-    fetch(stats.dataset.visitorEndpoint, {
+    const url = new URL(stats.dataset.visitorEndpoint, window.location.href);
+    url.searchParams.set("path", window.location.pathname);
+
+    fetch(url.toString(), {
       cache: "no-store",
       headers: {
         Accept: "application/json",

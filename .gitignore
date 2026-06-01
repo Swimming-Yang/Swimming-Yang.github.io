@@ -1,5 +1,7 @@
 _site/
 .tools/
+.wrangler/
+workers/visitor-counter/wrangler.toml
 .bundle/
 .sass-cache/
 .jekyll-cache/

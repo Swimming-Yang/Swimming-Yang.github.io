@@ -1,0 +1,11 @@
+name = "ysw-blog-visitor-counter"
+main = "src/index.js"
+compatibility_date = "2026-06-01"
+workers_dev = true
+
+[vars]
+ALLOWED_ORIGINS = "https://xn--9p4bn7dwj.com,https://양수영.com,http://127.0.0.1:4000,http://localhost:4000"
+
+[[kv_namespaces]]
+binding = "VISITOR_STATS"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"

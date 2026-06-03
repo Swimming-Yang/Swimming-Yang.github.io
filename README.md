@@ -23,10 +23,12 @@ baseurl: "/GitHubPages"
 
 ## 글 쓰기
 
-`_posts/` 아래에 날짜가 포함된 Markdown 파일을 추가합니다.
+`_posts/` 아래에 카테고리별 폴더를 만들고, 날짜가 포함된 Markdown 파일을 추가합니다.
 
 ```text
-_posts/2026-05-31-my-post.md
+_posts/life/2026-05-31-daily-note.md
+_posts/coding/csharp/2026-06-01-csharp-note.md
+_posts/coding/wpf/2026-06-01-wpf-note.md
 ```
 
 글 상단에는 Front Matter를 넣습니다.

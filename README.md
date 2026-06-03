@@ -57,3 +57,22 @@ tags: [csharp, dotnet]
 ```
 
 사용 가능한 코딩 세부 게시판은 `csharp`, `wpf`, `unity`, `cs`, `ps`입니다.
+
+## 이미지 넣기
+
+글에 사용하는 이미지는 `assets/images/posts/` 아래에 카테고리별로 보관합니다.
+
+```text
+assets/images/posts/life/
+assets/images/posts/coding/csharp/
+assets/images/posts/coding/wpf/
+assets/images/posts/coding/unity/
+assets/images/posts/coding/cs/
+assets/images/posts/coding/ps/
+```
+
+마크다운에서는 사이트 루트 기준 경로로 불러옵니다.
+
+```md
+![WPF 바인딩 예시](/assets/images/posts/coding/wpf/2026-06-03-binding-example.png)
+```

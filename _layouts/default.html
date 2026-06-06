@@ -17,5 +17,10 @@
     </main>
     {% include footer.html %}
     <script src="{{ '/assets/js/main.js' | relative_url }}" defer></script>
+    {% if page.extra_js %}
+      {% for script in page.extra_js %}
+        <script src="{{ script | relative_url }}" defer></script>
+      {% endfor %}
+    {% endif %}
   </body>
 </html>

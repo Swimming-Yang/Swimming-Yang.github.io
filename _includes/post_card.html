@@ -44,7 +44,7 @@
   {% endunless %}
 {% endif %}
 
-<article class="post-card" data-post-url="{{ card_post.url | relative_url }}">
+<article class="post-card">
   <a class="post-card__link" href="{{ card_post.url | relative_url }}">
     <span class="post-card__media{% unless has_card_image %} post-card__media--placeholder{% endunless %}">
       {% if has_card_image %}
@@ -60,15 +60,23 @@
         <span class="post-card__excerpt">{{ card_post.excerpt | strip_html | truncate: 96 }}</span>
       {% endif %}
       <span class="post-card__footer">
-        <span class="post-card__stat" aria-label="댓글">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path>
-          </svg>
+        <span class="post-card__stats">
+          <span class="post-card__icon" aria-label="comments">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path>
+            </svg>
+          </span>
+          <span class="post-card__icon" aria-label="views">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </span>
         </span>
-        <span class="post-card__stat" aria-label="조회">
+        <span class="post-card__icon post-card__icon--enter" aria-label="open post">
           <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"></path>
-            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M7 17 17 7"></path>
+            <path d="M9 7h8v8"></path>
           </svg>
         </span>
       </span>

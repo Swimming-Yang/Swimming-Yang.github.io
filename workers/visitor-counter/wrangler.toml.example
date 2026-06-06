@@ -4,7 +4,24 @@ compatibility_date = "2026-06-01"
 workers_dev = true
 
 [vars]
-ALLOWED_ORIGINS = "https://xn--9p4bn7dwj.com,https://양수영.com,http://127.0.0.1:4000,http://localhost:4000"
+ALLOWED_ORIGINS = "https://xn--9p4bn7dwj.com,https://swimming-yang.github.io,http://127.0.0.1:4000,http://localhost:4000"
+ADMIN_GITHUB_LOGIN = "Swimming-Yang"
+ADMIN_REDIRECT_URI = "https://xn--9p4bn7dwj.com/admin/"
+GITHUB_CLIENT_ID = "REPLACE_WITH_GITHUB_OAUTH_CLIENT_ID"
+GITHUB_OWNER = "Swimming-Yang"
+GITHUB_REPO = "Swimming-Yang.github.io"
+GITHUB_BRANCH = "main"
+GITHUB_COMMITTER_NAME = "Swimming-Yang"
+GITHUB_COMMITTER_EMAIL = "ysw1mst@naver.com"
+GITHUB_AUTHOR_NAME = "Swimming-Yang"
+GITHUB_AUTHOR_EMAIL = "ysw1mst@naver.com"
+ADMIN_SESSION_TTL_SECONDS = "43200"
+
+# Put these with `npx wrangler secret put ...`, not in this file:
+# GITHUB_CLIENT_SECRET
+# GITHUB_CONTENT_TOKEN
+# SESSION_SIGNING_SECRET
+# VISITOR_SALT
 
 [[kv_namespaces]]
 binding = "VISITOR_STATS"

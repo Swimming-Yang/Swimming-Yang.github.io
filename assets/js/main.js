@@ -202,8 +202,37 @@
       });
   }
 
+  function enhanceCategoryMenu() {
+    const menu = document.querySelector("[data-category-menu]");
+
+    if (!menu) {
+      return;
+    }
+
+    document.addEventListener("click", (event) => {
+      if (menu.open && !menu.contains(event.target)) {
+        menu.open = false;
+      }
+    });
+
+    menu.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape") {
+        return;
+      }
+
+      menu.open = false;
+
+      const summary = menu.querySelector("summary");
+
+      if (summary) {
+        summary.focus();
+      }
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     enhanceCodeBlocks();
     enhanceBlogStats();
+    enhanceCategoryMenu();
   });
 })();

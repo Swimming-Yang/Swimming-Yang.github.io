@@ -1,9 +1,19 @@
 <header class="site-header">
-  <a class="site-title" href="{{ '/' | relative_url }}">Ysw1mst</a>
-  <nav class="site-nav" aria-label="주요 메뉴">
-    <a href="{{ '/blog/' | relative_url }}">글</a>
-    <a href="{{ '/coding/' | relative_url }}">코딩</a>
-    <a href="{{ '/life/' | relative_url }}">일상</a>
-    <a href="{{ '/about/' | relative_url }}">소개</a>
-  </nav>
+  <a class="site-title" href="{{ '/' | relative_url }}">Swimming-Yang</a>
+
+  <details class="category-menu" data-category-menu>
+    <summary class="category-menu__button">카테고리</summary>
+    <div class="category-menu__panel">
+      <nav class="category-menu__nav" aria-label="카테고리">
+        <a class="category-menu__item {% if page.url == '/' %}is-active{% endif %}" href="{{ '/' | relative_url }}">홈</a>
+        <a class="category-menu__item {% if page.url == '/blog/' %}is-active{% endif %}" href="{{ '/blog/' | relative_url }}">전체 글</a>
+        <a class="category-menu__item {% if page.url == '/coding/' %}is-active{% endif %}" href="{{ '/coding/' | relative_url }}">코딩</a>
+        {% for topic in site.data.coding_topics %}
+          <a class="category-menu__item category-menu__item--sub {% if page.topic == topic.slug %}is-active{% endif %}" href="{{ '/coding/' | append: topic.slug | append: '/' | relative_url }}">{{ topic.title }}</a>
+        {% endfor %}
+        <a class="category-menu__item {% if page.url == '/life/' or page.categories contains 'life' %}is-active{% endif %}" href="{{ '/life/' | relative_url }}">일상</a>
+        <a class="category-menu__item {% if page.url == '/about/' %}is-active{% endif %}" href="{{ '/about/' | relative_url }}">소개</a>
+      </nav>
+    </div>
+  </details>
 </header>

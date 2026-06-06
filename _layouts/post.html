@@ -2,43 +2,37 @@
 layout: default
 ---
 
-<div class="post-layout">
-  {% include post_sidebar.html %}
-
-  <div class="post-layout__main">
-    <article class="post">
-      <header class="post__header">
-        <p class="post__meta">
-          <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%Y.%m.%d" }}</time>
-          {% if page.categories.size > 0 %}
-            <span>{{ page.categories | join: ", " }}</span>
+<article class="post">
+  <header class="post__header">
+    <p class="post__meta">
+      <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%Y.%m.%d" }}</time>
+      {% if page.categories.size > 0 %}
+        <span>{{ page.categories | join: ", " }}</span>
+      {% endif %}
+      {% if page.topic %}
+        {% assign topic_title = page.topic %}
+        {% for topic in site.data.coding_topics %}
+          {% if topic.slug == page.topic %}
+            {% assign topic_title = topic.title %}
           {% endif %}
-          {% if page.topic %}
-            {% assign topic_title = page.topic %}
-            {% for topic in site.data.coding_topics %}
-              {% if topic.slug == page.topic %}
-                {% assign topic_title = topic.title %}
-              {% endif %}
-            {% endfor %}
-            <span>{{ topic_title }}</span>
-          {% endif %}
-        </p>
-        <h1>{{ page.title }}</h1>
-        {% if page.tags.size > 0 %}
-          <div class="tags">
-            {% for tag in page.tags %}
-              <span>{{ tag }}</span>
-            {% endfor %}
-          </div>
-        {% endif %}
-      </header>
-
-      <div class="content">
-        {{ content }}
+        {% endfor %}
+        <span>{{ topic_title }}</span>
+      {% endif %}
+    </p>
+    <h1>{{ page.title }}</h1>
+    {% if page.tags.size > 0 %}
+      <div class="tags">
+        {% for tag in page.tags %}
+          <span>{{ tag }}</span>
+        {% endfor %}
       </div>
-    </article>
+    {% endif %}
+  </header>
 
-    {% include related_posts.html %}
-    {% include comments.html %}
+  <div class="content">
+    {{ content }}
   </div>
-</div>
+</article>
+
+{% include related_posts.html %}
+{% include comments.html %}

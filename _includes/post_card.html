@@ -1,0 +1,75 @@
+{% assign card_post = include.post %}
+{% assign card_image = card_post.image | default: card_post.thumbnail %}
+
+{% if card_image == nil or card_image == "" %}
+  {% assign html_image_parts = card_post.content | split: '<img ' %}
+  {% if html_image_parts.size > 1 %}
+    {% assign html_src_parts = html_image_parts[1] | split: 'src="' %}
+    {% if html_src_parts.size > 1 %}
+      {% assign card_image = html_src_parts[1] | split: '"' | first %}
+    {% else %}
+      {% assign html_src_parts = html_image_parts[1] | split: "src='" %}
+      {% if html_src_parts.size > 1 %}
+        {% assign card_image = html_src_parts[1] | split: "'" | first %}
+      {% endif %}
+    {% endif %}
+  {% endif %}
+{% endif %}
+
+{% if card_image == nil or card_image == "" %}
+  {% assign markdown_image_parts = card_post.content | split: '![' %}
+  {% if markdown_image_parts.size > 1 %}
+    {% assign markdown_src_parts = markdown_image_parts[1] | split: '](' %}
+    {% if markdown_src_parts.size > 1 %}
+      {% assign card_image = markdown_src_parts[1] | split: ')' | first | split: ' ' | first %}
+    {% endif %}
+  {% endif %}
+{% endif %}
+
+{% if card_image == nil or card_image == "" %}
+  {% if site.default_post_image and site.default_post_image != "" %}
+    {% assign card_image = site.default_post_image %}
+  {% endif %}
+{% endif %}
+
+{% assign has_card_image = false %}
+{% if card_image and card_image != "" %}
+  {% assign has_card_image = true %}
+{% endif %}
+
+{% if has_card_image %}
+  {% assign card_image_url = card_image %}
+  {% unless card_image contains '://' %}
+    {% assign card_image_url = card_image | relative_url %}
+  {% endunless %}
+{% endif %}
+
+<article class="post-card">
+  <a class="post-card__link" href="{{ card_post.url | relative_url }}">
+    <span class="post-card__media{% unless has_card_image %} post-card__media--placeholder{% endunless %}">
+      {% if has_card_image %}
+        <img src="{{ card_image_url }}" alt="" loading="lazy">
+      {% else %}
+        <span>Swimming-Yang</span>
+      {% endif %}
+    </span>
+    <span class="post-card__body">
+      <span class="post-card__title">{{ card_post.title }}</span>
+      <span class="post-card__meta">
+        <time datetime="{{ card_post.date | date_to_xmlschema }}">{{ card_post.date | date: "%Y.%m.%d" }}</time>
+        {% if card_post.topic %}
+          {% for topic in site.data.coding_topics %}
+            {% if topic.slug == card_post.topic %}
+              <span>{{ topic.title }}</span>
+            {% endif %}
+          {% endfor %}
+        {% elsif card_post.categories.size > 0 %}
+          <span>{{ card_post.categories | join: ", " }}</span>
+        {% endif %}
+      </span>
+      {% if card_post.excerpt %}
+        <span class="post-card__excerpt">{{ card_post.excerpt | strip_html | truncate: 96 }}</span>
+      {% endif %}
+    </span>
+  </a>
+</article>

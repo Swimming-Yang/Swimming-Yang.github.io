@@ -4,6 +4,7 @@ lang: ko-KR
 timezone: Asia/Seoul
 blog_start_date: "2026-05-31"
 visitor_api_endpoint: "https://ysw-blog-visitor-counter.ysw1mst.workers.dev/visit"
+default_post_image: ""
 
 comments:
   enabled: true

@@ -1,0 +1,37 @@
+{% assign coding_posts = site.categories.coding %}
+{% assign life_posts = site.categories.life %}
+
+<aside class="post-sidebar" aria-label="게시판 및 주제 이동">
+  <div class="post-sidebar__inner">
+    <section class="post-sidebar__section" aria-labelledby="post-board-nav-title">
+      <h2 id="post-board-nav-title">게시판</h2>
+      <nav class="post-nav" aria-label="게시판">
+        <a class="post-nav__item" href="{{ '/blog/' | relative_url }}">
+          <span>전체 글</span>
+          <em>{{ site.posts.size | default: 0 }}</em>
+        </a>
+        <a class="post-nav__item {% if page.categories contains 'coding' %}is-active{% endif %}" href="{{ '/coding/' | relative_url }}">
+          <span>코딩</span>
+          <em>{{ coding_posts.size | default: 0 }}</em>
+        </a>
+        <a class="post-nav__item {% if page.categories contains 'life' %}is-active{% endif %}" href="{{ '/life/' | relative_url }}">
+          <span>일상</span>
+          <em>{{ life_posts.size | default: 0 }}</em>
+        </a>
+      </nav>
+    </section>
+
+    <section class="post-sidebar__section" aria-labelledby="post-topic-nav-title">
+      <h2 id="post-topic-nav-title">코딩 주제</h2>
+      <nav class="post-nav" aria-label="코딩 주제">
+        {% for topic in site.data.coding_topics %}
+          {% assign topic_posts = site.categories.coding | where: "topic", topic.slug %}
+          <a class="post-nav__item {% if page.topic == topic.slug %}is-active{% endif %}" href="{{ '/coding/' | append: topic.slug | append: '/' | relative_url }}">
+            <span>{{ topic.title }}</span>
+            <em>{{ topic_posts.size | default: 0 }}</em>
+          </a>
+        {% endfor %}
+      </nav>
+    </section>
+  </div>
+</aside>

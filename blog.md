@@ -4,8 +4,4 @@ title: 글
 permalink: /blog/
 ---
 
-<div class="post-grid">
-  {% for post in site.posts %}
-    {% include post_card.html post=post %}
-  {% endfor %}
-</div>
+{% include post_grid.html posts=site.posts empty_message="아직 글이 없습니다." %}

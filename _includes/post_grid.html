@@ -1,0 +1,22 @@
+{% assign grid_posts = include.posts %}
+{% assign post_count = grid_posts.size | default: 0 %}
+
+<div class="post-grid{% if include.board %} post-grid--board{% endif %}">
+  {% if post_count > 0 %}
+    {% for post in grid_posts %}
+      {% include post_card.html post=post %}
+    {% endfor %}
+
+    {% assign remainder = post_count | modulo: 3 %}
+    {% if remainder != 0 %}
+      {% assign placeholder_count = 3 | minus: remainder %}
+      {% for i in (1..placeholder_count) %}
+        <article class="post-card post-card--empty" aria-hidden="true">
+          <span class="post-card__empty-mark">빈 자리</span>
+        </article>
+      {% endfor %}
+    {% endif %}
+  {% else %}
+    <p class="empty">{{ include.empty_message }}</p>
+  {% endif %}
+</div>

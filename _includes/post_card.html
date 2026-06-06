@@ -55,21 +55,10 @@
     </span>
     <span class="post-card__body">
       <span class="post-card__title">{{ card_post.title }}</span>
-      <span class="post-card__meta">
-        <time datetime="{{ card_post.date | date_to_xmlschema }}">{{ card_post.date | date: "%Y.%m.%d" }}</time>
-        {% if card_post.topic %}
-          {% for topic in site.data.coding_topics %}
-            {% if topic.slug == card_post.topic %}
-              <span>{{ topic.title }}</span>
-            {% endif %}
-          {% endfor %}
-        {% elsif card_post.categories.size > 0 %}
-          <span>{{ card_post.categories | join: ", " }}</span>
-        {% endif %}
-      </span>
       {% if card_post.excerpt %}
         <span class="post-card__excerpt">{{ card_post.excerpt | strip_html | truncate: 96 }}</span>
       {% endif %}
+      <span class="post-card__action" aria-hidden="true">↗</span>
     </span>
   </a>
 </article>

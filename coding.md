@@ -16,13 +16,5 @@ wide: true
     <span>{{ posts.size | default: 0 }} posts</span>
   </header>
 
-  <div class="post-grid post-grid--board">
-    {% if posts.size > 0 %}
-      {% for post in posts %}
-        {% include post_card.html post=post %}
-      {% endfor %}
-    {% else %}
-      <p class="empty">아직 코딩 글이 없습니다.</p>
-    {% endif %}
-  </div>
+  {% include post_grid.html posts=posts board=true empty_message="아직 코딩 글이 없습니다." %}
 </section>

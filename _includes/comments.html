@@ -1,8 +1,11 @@
 {% if site.comments.enabled and site.comments.provider == "giscus" and page.comments != false %}
   <section class="comments" aria-labelledby="comments-title">
     <div class="comments__header">
-      <h2 id="comments-title">댓글</h2>
-      <p>GitHub 계정으로 남길 수 있어요.</p>
+      <div>
+        <span class="comments__eyebrow">Discussion</span>
+        <h2 id="comments-title">댓글</h2>
+      </div>
+      <p>GitHub 계정으로 편하게 남겨주세요.</p>
     </div>
     <script src="https://giscus.app/client.js"
             data-repo="{{ site.comments.giscus.repo }}"

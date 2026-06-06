@@ -5,6 +5,22 @@ timezone: Asia/Seoul
 blog_start_date: "2026-05-31"
 visitor_api_endpoint: "https://ysw-blog-visitor-counter.ysw1mst.workers.dev/visit"
 
+comments:
+  enabled: true
+  provider: giscus
+  giscus:
+    repo: "Swimming-Yang/Swimming-Yang.github.io"
+    repo_id: "R_kgDOPXaCGA"
+    category: "General"
+    category_id: "DIC_kwDOPXaCGM4C-oVJ"
+    mapping: "pathname"
+    strict: "0"
+    reactions_enabled: "1"
+    emit_metadata: "0"
+    input_position: "bottom"
+    theme: "preferred_color_scheme"
+    lang: "ko"
+
 url: ""
 # If this is a project page like https://username.github.io/repository,
 # set baseurl to "/repository". Keep it empty for username.github.io.

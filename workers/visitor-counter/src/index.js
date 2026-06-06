@@ -131,8 +131,6 @@ async function handleAuthStart(request, env) {
   }
 
   const state = randomToken();
-  const codeVerifier = randomToken(64);
-  const codeChallenge = await getPkceChallenge(codeVerifier);
   const callbackUrl = new URL("/admin/auth/callback", request.url).toString();
 
   await env.VISITOR_STATS.put(
@@ -140,7 +138,6 @@ async function handleAuthStart(request, env) {
     JSON.stringify({
       redirectUri,
       callbackUrl,
-      codeVerifier,
       createdAt: new Date().toISOString(),
     }),
     { expirationTtl: 600 }
@@ -149,12 +146,8 @@ async function handleAuthStart(request, env) {
   const authorizeUrl = new URL("https://github.com/login/oauth/authorize");
   authorizeUrl.searchParams.set("client_id", env.GITHUB_CLIENT_ID);
   authorizeUrl.searchParams.set("redirect_uri", callbackUrl);
-  authorizeUrl.searchParams.set("scope", "read:user");
   authorizeUrl.searchParams.set("state", state);
-  authorizeUrl.searchParams.set("code_challenge", codeChallenge);
-  authorizeUrl.searchParams.set("code_challenge_method", "S256");
   authorizeUrl.searchParams.set("allow_signup", "false");
-  authorizeUrl.searchParams.set("login", getPrimaryAdminLogin(env));
 
   return Response.redirect(authorizeUrl.toString(), 302);
 }
@@ -192,7 +185,6 @@ async function handleAuthCallback(request, env) {
         client_secret: env.GITHUB_CLIENT_SECRET,
         code,
         redirect_uri: stateValue.callbackUrl,
-        code_verifier: stateValue.codeVerifier,
       }),
     });
     const tokenData = await tokenResponse.json();
@@ -699,12 +691,6 @@ function randomToken(size = 32) {
   crypto.getRandomValues(bytes);
 
   return base64Url(bytes);
-}
-
-async function getPkceChallenge(codeVerifier) {
-  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(codeVerifier));
-
-  return base64Url(new Uint8Array(digest));
 }
 
 async function hashSessionToken(token, env) {

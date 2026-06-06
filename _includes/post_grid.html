@@ -12,7 +12,17 @@
       {% assign placeholder_count = 3 | minus: remainder %}
       {% for i in (1..placeholder_count) %}
         <article class="post-card post-card--empty" aria-hidden="true">
-          <span class="post-card__empty-mark">빈 자리</span>
+          <span class="post-card__empty-media"></span>
+          <span class="post-card__empty-body">
+            <span class="post-card__empty-line post-card__empty-line--title"></span>
+            <span class="post-card__empty-line post-card__empty-line--date"></span>
+            <span class="post-card__empty-line"></span>
+            <span class="post-card__empty-line post-card__empty-line--short"></span>
+            <span class="post-card__empty-footer">
+              <span></span>
+              <span></span>
+            </span>
+          </span>
         </article>
       {% endfor %}
     {% endif %}

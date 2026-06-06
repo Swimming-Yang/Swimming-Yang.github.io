@@ -44,7 +44,7 @@
   {% endunless %}
 {% endif %}
 
-<article class="post-card">
+<article class="post-card" data-post-url="{{ card_post.url | relative_url }}">
   <a class="post-card__link" href="{{ card_post.url | relative_url }}">
     <span class="post-card__media{% unless has_card_image %} post-card__media--placeholder{% endunless %}">
       {% if has_card_image %}
@@ -55,10 +55,23 @@
     </span>
     <span class="post-card__body">
       <span class="post-card__title">{{ card_post.title }}</span>
+      <time class="post-card__date" datetime="{{ card_post.date | date_to_xmlschema }}">{{ card_post.date | date: "%Y.%m.%d" }}</time>
       {% if card_post.excerpt %}
         <span class="post-card__excerpt">{{ card_post.excerpt | strip_html | truncate: 96 }}</span>
       {% endif %}
-      <span class="post-card__action" aria-hidden="true">↗</span>
+      <span class="post-card__footer">
+        <span class="post-card__stat" aria-label="댓글">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path>
+          </svg>
+        </span>
+        <span class="post-card__stat" aria-label="조회">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </span>
+      </span>
     </span>
   </a>
 </article>

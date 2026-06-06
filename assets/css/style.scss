@@ -1056,7 +1056,7 @@ a:hover {
   grid-template-rows: auto 1fr;
   height: 360px;
   overflow: hidden;
-  border: 1px solid var(--line);
+  border: 2px solid var(--line);
   border-radius: 8px;
   background: var(--surface);
   color: var(--text);
@@ -1087,7 +1087,7 @@ a:hover {
 .post-card__media--placeholder {
   display: grid;
   place-items: center;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 2px solid var(--line);
   background: var(--accent-soft);
   color: var(--accent-strong);
   font-size: 0.9rem;
@@ -1114,6 +1114,12 @@ a:hover {
   -webkit-line-clamp: 2;
 }
 
+.post-card__date {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
 .post-card__link:hover .post-card__title {
   color: var(--accent);
 }
@@ -1128,10 +1134,15 @@ a:hover {
   -webkit-line-clamp: 3;
 }
 
-.post-card__action {
+.post-card__footer {
   position: absolute;
   bottom: 16px;
   left: 16px;
+  display: flex;
+  gap: 8px;
+}
+
+.post-card__stat {
   display: inline-flex;
   width: 32px;
   height: 32px;
@@ -1140,11 +1151,19 @@ a:hover {
   border: 1px solid rgba(3, 199, 90, 0.28);
   border-radius: 50%;
   color: var(--accent-strong);
-  font-size: 0.95rem;
-  font-weight: 900;
 }
 
-.post-card__link:hover .post-card__action {
+.post-card__stat svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.post-card__link:hover .post-card__stat {
   border-color: var(--accent);
   background: var(--accent-soft);
   color: var(--accent);
@@ -1152,18 +1171,65 @@ a:hover {
 
 .post-card--empty {
   display: grid;
+  grid-template-rows: auto 1fr;
   height: 360px;
-  place-items: center;
-  border: 1px dashed rgba(3, 199, 90, 0.36);
+  overflow: hidden;
+  border: 2px dashed rgba(3, 199, 90, 0.38);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.42);
-  color: var(--muted);
 }
 
-.post-card__empty-mark {
-  color: rgba(96, 115, 106, 0.72);
-  font-size: 0.9rem;
-  font-weight: 900;
+.post-card__empty-media {
+  display: block;
+  aspect-ratio: 16 / 10;
+  border-bottom: 2px dashed rgba(3, 199, 90, 0.28);
+  background: rgba(232, 248, 239, 0.46);
+}
+
+.post-card__empty-body {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 16px 16px 58px;
+}
+
+.post-card__empty-line {
+  display: block;
+  width: 100%;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(96, 115, 106, 0.14);
+}
+
+.post-card__empty-line--title {
+  width: 74%;
+  height: 14px;
+}
+
+.post-card__empty-line--date {
+  width: 34%;
+  height: 8px;
+}
+
+.post-card__empty-line--short {
+  width: 58%;
+}
+
+.post-card__empty-footer {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  display: flex;
+  gap: 8px;
+}
+
+.post-card__empty-footer span {
+  width: 32px;
+  height: 32px;
+  border: 1px dashed rgba(3, 199, 90, 0.28);
+  border-radius: 50%;
+  background: rgba(232, 248, 239, 0.32);
 }
 
 .post-grid .empty {

@@ -1,5 +1,20 @@
 {% if site.comments.enabled and site.comments.provider == "giscus" and page.comments != false %}
-  <section class="comments" aria-labelledby="comments-title">
+  <section
+    class="comments"
+    aria-labelledby="comments-title"
+    data-giscus-comments
+    data-repo="{{ site.comments.giscus.repo }}"
+    data-repo-id="{{ site.comments.giscus.repo_id }}"
+    data-category="{{ site.comments.giscus.category }}"
+    data-category-id="{{ site.comments.giscus.category_id }}"
+    data-mapping="{{ site.comments.giscus.mapping | default: 'pathname' }}"
+    data-strict="{{ site.comments.giscus.strict | default: '0' }}"
+    data-reactions-enabled="{{ site.comments.giscus.reactions_enabled | default: '1' }}"
+    data-emit-metadata="{{ site.comments.giscus.emit_metadata | default: '0' }}"
+    data-input-position="{{ site.comments.giscus.input_position | default: 'bottom' }}"
+    data-theme="{{ site.comments.giscus.theme | default: 'preferred_color_scheme' }}"
+    data-lang="{{ site.comments.giscus.lang | default: site.lang | default: 'ko' }}"
+  >
     <div class="comments__header">
       <div>
         <span class="comments__eyebrow">Discussion</span>
@@ -7,20 +22,8 @@
       </div>
       <p>GitHub 계정으로 편하게 남겨주세요.</p>
     </div>
-    <script src="https://giscus.app/client.js"
-            data-repo="{{ site.comments.giscus.repo }}"
-            data-repo-id="{{ site.comments.giscus.repo_id }}"
-            data-category="{{ site.comments.giscus.category }}"
-            data-category-id="{{ site.comments.giscus.category_id }}"
-            data-mapping="{{ site.comments.giscus.mapping | default: 'pathname' }}"
-            data-strict="{{ site.comments.giscus.strict | default: '0' }}"
-            data-reactions-enabled="{{ site.comments.giscus.reactions_enabled | default: '1' }}"
-            data-emit-metadata="{{ site.comments.giscus.emit_metadata | default: '0' }}"
-            data-input-position="{{ site.comments.giscus.input_position | default: 'bottom' }}"
-            data-theme="{{ site.comments.giscus.theme | default: 'preferred_color_scheme' }}"
-            data-lang="{{ site.comments.giscus.lang | default: site.lang | default: 'ko' }}"
-            crossorigin="anonymous"
-            async>
-    </script>
+    <div class="comments__loader" data-giscus-loader>
+      <button class="comments__load-button" type="button" data-giscus-load>댓글 불러오기</button>
+    </div>
   </section>
 {% endif %}

@@ -12,10 +12,10 @@ GITHUB_OWNER = "Swimming-Yang"
 GITHUB_REPO = "Swimming-Yang.github.io"
 GITHUB_BRANCH = "main"
 GITHUB_COMMITTER_NAME = "Swimming-Yang"
-GITHUB_COMMITTER_EMAIL = "ysw1mst@naver.com"
+GITHUB_COMMITTER_EMAIL = "ysw1mst@gmail.com"
 GITHUB_AUTHOR_NAME = "Swimming-Yang"
-GITHUB_AUTHOR_EMAIL = "ysw1mst@naver.com"
-ADMIN_SESSION_TTL_SECONDS = "43200"
+GITHUB_AUTHOR_EMAIL = "ysw1mst@gmail.com"
+ADMIN_SESSION_TTL_SECONDS = "14400"
 
 # Put these with `npx wrangler secret put ...`, not in this file:
 # GITHUB_CLIENT_SECRET

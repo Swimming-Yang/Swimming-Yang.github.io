@@ -12,6 +12,8 @@ Cloudflare Worker + KV로 블로그 방문자 카운터와 관리자 글쓰기 A
 - `POST /admin/posts`: `_posts` 아래에 새 Markdown 글을 commit합니다.
 - `POST /admin/auth/logout`: 관리자 세션을 만료합니다.
 
+방문자 수는 KV에 저장된 고유 visitor key 개수를 기준으로 계산합니다. 단순 숫자 값을 `get -> +1 -> put`으로 갱신하지 않기 때문에 동시에 요청이 들어와도 카운터 값이 덜 어긋납니다.
+
 ## 배포 순서
 
 1. Worker 폴더로 이동합니다.
@@ -61,7 +63,8 @@ Cloudflare Worker + KV로 블로그 방문자 카운터와 관리자 글쓰기 A
    npx wrangler secret put VISITOR_SALT
    ```
 
-   `SESSION_SIGNING_SECRET`와 `VISITOR_SALT`는 긴 랜덤 문자열이면 됩니다.
+   `SESSION_SIGNING_SECRET`와 `VISITOR_SALT`는 긴 랜덤 문자열이면 됩니다. 운영 환경에서 두 값은 필수이며, 누락되면 Worker가 기본 문자열로 대체하지 않고 실패합니다.
+   관리자 세션 기본 유지 시간은 4시간입니다.
 
 10. Worker를 배포합니다.
 

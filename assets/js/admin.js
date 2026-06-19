@@ -8,6 +8,7 @@
   const apiBase = String(root.dataset.adminApi || "").replace(/\/+$/, "");
   const tokenKey = "swimming-yang.admin.token";
   const draftKey = "swimming-yang.admin.draft";
+  const tokenStorage = window.sessionStorage;
   const authPanel = root.querySelector("[data-admin-auth]");
   const workspace = root.querySelector("[data-admin-workspace]");
   const userBadge = root.querySelector("[data-admin-user]");
@@ -18,8 +19,10 @@
   const form = root.querySelector("[data-admin-form]");
   const topicField = root.querySelector("[data-admin-topic-field]");
   const fields = {};
-  let token = window.localStorage.getItem(tokenKey) || "";
+  let token = tokenStorage.getItem(tokenKey) || window.localStorage.getItem(tokenKey) || "";
   let slugTouched = false;
+
+  window.localStorage.removeItem(tokenKey);
 
   root.querySelectorAll("[data-admin-field]").forEach((field) => {
     fields[field.dataset.adminField] = field;
@@ -51,7 +54,7 @@
       const link = document.createElement("a");
       link.href = data.htmlUrl;
       link.target = "_blank";
-      link.rel = "noopener";
+      link.rel = "noopener noreferrer";
       link.textContent = "GitHub에서 보기";
       status.append(document.createTextNode(" "));
       status.append(link);
@@ -62,10 +65,12 @@
     token = value || "";
 
     if (token) {
-      window.localStorage.setItem(tokenKey, token);
+      tokenStorage.setItem(tokenKey, token);
+      window.localStorage.removeItem(tokenKey);
       return;
     }
 
+    tokenStorage.removeItem(tokenKey);
     window.localStorage.removeItem(tokenKey);
   }
 
@@ -334,7 +339,8 @@
     const html = [];
     const paragraph = [];
     let inCode = false;
-    let inList = false;
+    let listType = "";
+    let tableRows = [];
 
     function flushParagraph() {
       if (!paragraph.length) {
@@ -346,21 +352,60 @@
     }
 
     function closeList() {
-      if (!inList) {
+      if (!listType) {
         return;
       }
 
-      html.push("</ul>");
-      inList = false;
+      html.push(`</${listType}>`);
+      listType = "";
+    }
+
+    function parseTableRow(line) {
+      return line
+        .trim()
+        .replace(/^\|/, "")
+        .replace(/\|$/, "")
+        .split("|")
+        .map((cell) => formatInline(cell.trim()));
+    }
+
+    function isTableSeparator(line) {
+      return /^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$/.test(line);
+    }
+
+    function flushTable() {
+      if (!tableRows.length) {
+        return;
+      }
+
+      const [head, ...body] = tableRows;
+      html.push("<table><thead><tr>");
+      head.forEach((cell) => html.push(`<th>${cell}</th>`));
+      html.push("</tr></thead>");
+
+      if (body.length) {
+        html.push("<tbody>");
+        body.forEach((row) => {
+          html.push("<tr>");
+          row.forEach((cell) => html.push(`<td>${cell}</td>`));
+          html.push("</tr>");
+        });
+        html.push("</tbody>");
+      }
+
+      html.push("</table>");
+      tableRows = [];
     }
 
     lines.forEach((line) => {
-      const fence = line.match(/^```/);
+      const fence = line.match(/^```([a-zA-Z0-9#+._-]*)\s*$/);
 
       if (fence && !inCode) {
         flushParagraph();
         closeList();
-        html.push("<pre><code>");
+        flushTable();
+        const language = fence[1] ? ` class="language-${escapeAttribute(fence[1])}"` : "";
+        html.push(`<pre><code${language}>`);
         inCode = true;
         return;
       }
@@ -379,13 +424,29 @@
       if (!line.trim()) {
         flushParagraph();
         closeList();
+        flushTable();
         return;
       }
 
       const heading = line.match(/^(#{1,3})\s+(.+)$/);
       const image = line.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
       const listItem = line.match(/^[-*]\s+(.+)$/);
+      const orderedListItem = line.match(/^\d+\.\s+(.+)$/);
       const quote = line.match(/^>\s+(.+)$/);
+      const table = line.includes("|") && line.trim().startsWith("|");
+
+      if (table) {
+        flushParagraph();
+        closeList();
+
+        if (!isTableSeparator(line)) {
+          tableRows.push(parseTableRow(line));
+        }
+
+        return;
+      }
+
+      flushTable();
 
       if (heading) {
         flushParagraph();
@@ -404,12 +465,32 @@
       if (listItem) {
         flushParagraph();
 
-        if (!inList) {
+        if (listType && listType !== "ul") {
+          closeList();
+        }
+
+        if (!listType) {
           html.push("<ul>");
-          inList = true;
+          listType = "ul";
         }
 
         html.push(`<li>${formatInline(listItem[1])}</li>`);
+        return;
+      }
+
+      if (orderedListItem) {
+        flushParagraph();
+
+        if (listType && listType !== "ol") {
+          closeList();
+        }
+
+        if (!listType) {
+          html.push("<ol>");
+          listType = "ol";
+        }
+
+        html.push(`<li>${formatInline(orderedListItem[1])}</li>`);
         return;
       }
 
@@ -425,6 +506,7 @@
 
     flushParagraph();
     closeList();
+    flushTable();
 
     if (inCode) {
       html.push("</code></pre>");
@@ -437,7 +519,7 @@
     return escapeHtml(value)
       .replace(/`([^`]+)`/g, "<code>$1</code>")
       .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-      .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+|\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+      .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+|\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
   }
 
   function escapeHtml(value) {

@@ -39,6 +39,8 @@ layout: post
 title: "글 제목"
 date: 2026-05-31 10:00:00 +0900
 categories: coding
+image: /assets/images/posts/coding/wpf/example.png
+image_alt: "글 카드와 공유 미리보기에 사용할 이미지 설명"
 tags: [jekyll, github-pages]
 ---
 ```
@@ -76,3 +78,5 @@ assets/images/posts/coding/ps/
 ```md
 ![WPF 바인딩 예시](/assets/images/posts/coding/wpf/2026-06-03-binding-example.png)
 ```
+
+글 목록 카드에 보여줄 대표 이미지는 본문 첫 이미지에 의존하지 않고 Front Matter의 `image`와 `image_alt`에 명시하는 것을 권장합니다.

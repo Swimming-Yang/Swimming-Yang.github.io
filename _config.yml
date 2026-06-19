@@ -5,7 +5,7 @@ timezone: Asia/Seoul
 blog_start_date: "2026-05-31"
 visitor_api_endpoint: "https://ysw-blog-visitor-counter.ysw1mst.workers.dev/visit"
 admin_api_endpoint: "https://ysw-blog-visitor-counter.ysw1mst.workers.dev"
-default_post_image: ""
+default_post_image: "/assets/images/home-workspace-768.jpg"
 
 comments:
   enabled: true
@@ -23,7 +23,7 @@ comments:
     theme: "https://xn--9p4bn7dwj.com/assets/css/giscus-theme.css"
     lang: "ko"
 
-url: ""
+url: "https://xn--9p4bn7dwj.com"
 # If this is a project page like https://username.github.io/repository,
 # set baseurl to "/repository". Keep it empty for username.github.io.
 baseurl: ""

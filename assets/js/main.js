@@ -88,7 +88,10 @@
       const dots = document.createElement("span");
       dots.className = "code-window__dots";
       dots.setAttribute("aria-hidden", "true");
-      dots.innerHTML = "<i></i><i></i><i></i>";
+
+      for (let index = 0; index < 3; index += 1) {
+        dots.append(document.createElement("i"));
+      }
 
       const language = document.createElement("span");
       language.className = "code-window__language";
@@ -172,8 +175,12 @@
     const url = new URL(stats.dataset.visitorEndpoint, window.location.href);
     url.searchParams.set("path", window.location.pathname);
 
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 5000);
+
     fetch(url.toString(), {
       cache: "no-store",
+      signal: controller.signal,
       headers: {
         Accept: "application/json",
       },
@@ -186,6 +193,8 @@
         return response.json();
       })
       .then((data) => {
+        window.clearTimeout(timeout);
+
         const todayCount = formatCount(data.today ?? data.todayCount);
         const totalCount = formatCount(data.total ?? data.totalCount);
 
@@ -198,6 +207,7 @@
         }
       })
       .catch(() => {
+        window.clearTimeout(timeout);
         stats.classList.add("is-visitor-offline");
       });
   }
@@ -230,9 +240,100 @@
     });
   }
 
+  function loadGiscus(section) {
+    if (!section || section.dataset.giscusLoaded === "true") {
+      return;
+    }
+
+    section.dataset.giscusLoaded = "true";
+
+    const loader = section.querySelector("[data-giscus-loader]");
+    const button = section.querySelector("[data-giscus-load]");
+
+    if (button) {
+      button.disabled = true;
+      button.textContent = "댓글 불러오는 중";
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://giscus.app/client.js";
+    script.async = true;
+    script.crossOrigin = "anonymous";
+
+    const dataAttributes = {
+      repo: "repo",
+      repoId: "repo-id",
+      category: "category",
+      categoryId: "category-id",
+      mapping: "mapping",
+      strict: "strict",
+      reactionsEnabled: "reactions-enabled",
+      emitMetadata: "emit-metadata",
+      inputPosition: "input-position",
+      theme: "theme",
+      lang: "lang",
+    };
+
+    Object.entries(dataAttributes).forEach(([key, attribute]) => {
+      if (section.dataset[key]) {
+        script.setAttribute(`data-${attribute}`, section.dataset[key]);
+      }
+    });
+
+    script.addEventListener("load", () => {
+      if (loader) {
+        loader.hidden = true;
+      }
+    });
+
+    script.addEventListener("error", () => {
+      section.dataset.giscusLoaded = "false";
+
+      if (button) {
+        button.disabled = false;
+        button.textContent = "댓글 다시 불러오기";
+      }
+    });
+
+    section.append(script);
+  }
+
+  function enhanceComments() {
+    const section = document.querySelector("[data-giscus-comments]");
+
+    if (!section) {
+      return;
+    }
+
+    const button = section.querySelector("[data-giscus-load]");
+
+    if (button) {
+      button.addEventListener("click", () => loadGiscus(section));
+    }
+
+    if (!("IntersectionObserver" in window)) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) {
+          return;
+        }
+
+        observer.disconnect();
+        loadGiscus(section);
+      },
+      { rootMargin: "420px 0px" }
+    );
+
+    observer.observe(section);
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     enhanceCodeBlocks();
     enhanceBlogStats();
     enhanceCategoryMenu();
+    enhanceComments();
   });
 })();

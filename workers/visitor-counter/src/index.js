@@ -9,7 +9,7 @@ const DEFAULT_GITHUB_OWNER = "Swimming-Yang";
 const DEFAULT_GITHUB_REPO = "Swimming-Yang.github.io";
 const DEFAULT_GITHUB_BRANCH = "main";
 const DEFAULT_ADMIN_LOGIN = "Swimming-Yang";
-const DEFAULT_SESSION_TTL_SECONDS = 60 * 60 * 12;
+const DEFAULT_SESSION_TTL_SECONDS = 60 * 60 * 4;
 const MAX_POST_BODY_BYTES = 1024 * 1024;
 const CODING_TOPICS = new Set(["csharp", "wpf", "unity", "cs", "ps"]);
 
@@ -119,9 +119,13 @@ async function handleAdmin(request, env, corsHeaders) {
 }
 
 async function handleAuthStart(request, env) {
-  if (!env.GITHUB_CLIENT_ID || !env.GITHUB_CLIENT_SECRET) {
+  const clientId = env.GITHUB_CLIENT_ID;
+
+  if (!clientId || !env.GITHUB_CLIENT_SECRET) {
     return text("GitHub OAuth is not configured.", 500);
   }
+
+  requireEnv(env, "SESSION_SIGNING_SECRET");
 
   const requestUrl = new URL(request.url);
   const redirectUri = getSafeAdminRedirectUri(requestUrl.searchParams.get("redirect_uri"), env);
@@ -144,7 +148,7 @@ async function handleAuthStart(request, env) {
   );
 
   const authorizeUrl = new URL("https://github.com/login/oauth/authorize");
-  authorizeUrl.searchParams.set("client_id", env.GITHUB_CLIENT_ID);
+  authorizeUrl.searchParams.set("client_id", clientId);
   authorizeUrl.searchParams.set("redirect_uri", callbackUrl);
   authorizeUrl.searchParams.set("state", state);
   authorizeUrl.searchParams.set("allow_signup", "false");
@@ -156,6 +160,11 @@ async function handleAuthCallback(request, env) {
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
   const state = url.searchParams.get("state");
+  const clientId = requireEnv(env, "GITHUB_CLIENT_ID");
+  const clientSecret = requireEnv(env, "GITHUB_CLIENT_SECRET");
+
+  requireEnv(env, "SESSION_SIGNING_SECRET");
+
   let redirectUri = getSafeAdminRedirectUri(env.ADMIN_REDIRECT_URI, env) || "https://xn--9p4bn7dwj.com/admin/";
 
   try {
@@ -181,8 +190,8 @@ async function handleAuthCallback(request, env) {
         "User-Agent": "Swimming-Yang-blog-admin",
       },
       body: JSON.stringify({
-        client_id: env.GITHUB_CLIENT_ID,
-        client_secret: env.GITHUB_CLIENT_SECRET,
+        client_id: clientId,
+        client_secret: clientSecret,
         code,
         redirect_uri: stateValue.callbackUrl,
       }),
@@ -244,9 +253,7 @@ async function fetchGitHubUser(accessToken) {
 }
 
 async function handleCreatePost(request, env, corsHeaders, user) {
-  if (!env.GITHUB_CONTENT_TOKEN) {
-    return json({ error: "GITHUB_CONTENT_TOKEN secret is missing" }, 500, corsHeaders);
-  }
+  requireEnv(env, "GITHUB_CONTENT_TOKEN");
 
   const input = await readJson(request);
   const post = normalizePostInput(input);
@@ -277,7 +284,7 @@ async function createGitHubFile(env, path, markdown, post, user) {
     method: "PUT",
     headers: {
       Accept: "application/vnd.github+json",
-      Authorization: `Bearer ${env.GITHUB_CONTENT_TOKEN}`,
+      Authorization: `Bearer ${requireEnv(env, "GITHUB_CONTENT_TOKEN")}`,
       "Content-Type": "application/json",
       "User-Agent": "Swimming-Yang-blog-admin",
       "X-GitHub-Api-Version": "2026-03-10",
@@ -288,11 +295,11 @@ async function createGitHubFile(env, path, markdown, post, user) {
       content: base64Encode(markdown),
       committer: {
         name: env.GITHUB_COMMITTER_NAME || user.name || user.login,
-        email: env.GITHUB_COMMITTER_EMAIL || "ysw1mst@naver.com",
+        email: env.GITHUB_COMMITTER_EMAIL || "ysw1mst@gmail.com",
       },
       author: {
         name: env.GITHUB_AUTHOR_NAME || user.name || user.login,
-        email: env.GITHUB_AUTHOR_EMAIL || env.GITHUB_COMMITTER_EMAIL || "ysw1mst@naver.com",
+        email: env.GITHUB_AUTHOR_EMAIL || env.GITHUB_COMMITTER_EMAIL || "ysw1mst@gmail.com",
       },
     }),
   });
@@ -420,20 +427,20 @@ async function handleVisit(request, env, corsHeaders) {
   const dailySeen = await env.VISITOR_STATS.get(dailyVisitorKey);
   const totalSeen = await env.VISITOR_STATS.get(totalVisitorKey);
 
-  let today = await getCount(env, `count:${todayKey}`);
-  let total = await getCount(env, "count:total");
-
   if (!dailySeen) {
-    today = await incrementCount(env, `count:${todayKey}`);
     await env.VISITOR_STATS.put(dailyVisitorKey, "1", {
       expirationTtl: 60 * 60 * 24 * 60,
     });
   }
 
   if (!totalSeen) {
-    total = await incrementCount(env, "count:total");
     await env.VISITOR_STATS.put(totalVisitorKey, "1");
   }
+
+  const [today, total] = await Promise.all([
+    countKeys(env, `visitor:${todayKey}:`),
+    countKeys(env, "visitor:all:"),
+  ]);
 
   return json(
     {
@@ -453,8 +460,8 @@ async function handleStats(env, corsHeaders) {
 
   return json(
     {
-      today: await getCount(env, `count:${todayKey}`),
-      total: await getCount(env, "count:total"),
+      today: await countKeys(env, `visitor:${todayKey}:`),
+      total: await countKeys(env, "visitor:all:"),
       date: todayKey,
     },
     200,
@@ -469,7 +476,7 @@ async function getVisitorHash(request, env) {
     "local";
   const userAgent = request.headers.get("User-Agent") || "unknown";
   const language = request.headers.get("Accept-Language") || "";
-  const salt = env.VISITOR_SALT || "ysw1mst-blog-visitor-counter";
+  const salt = requireEnv(env, "VISITOR_SALT");
   const source = `${salt}|${ip}|${userAgent}|${language}`;
   const bytes = new TextEncoder().encode(source);
   const digest = await crypto.subtle.digest("SHA-256", bytes);
@@ -503,6 +510,16 @@ function getSessionTtl(env) {
   const ttl = Number(env.ADMIN_SESSION_TTL_SECONDS);
 
   return Number.isFinite(ttl) && ttl > 0 ? ttl : DEFAULT_SESSION_TTL_SECONDS;
+}
+
+function requireEnv(env, name) {
+  const value = env[name];
+
+  if (!value) {
+    throw new HttpError(`${name} environment variable is missing`, 500);
+  }
+
+  return value;
 }
 
 function getSafeAdminRedirectUri(value, env) {
@@ -572,17 +589,21 @@ function getKoreanDateKey() {
   return `${values.year}-${values.month}-${values.day}`;
 }
 
-async function getCount(env, key) {
-  const value = Number(await env.VISITOR_STATS.get(key));
+async function countKeys(env, prefix) {
+  let cursor;
+  let count = 0;
 
-  return Number.isFinite(value) ? value : 0;
-}
+  do {
+    const result = await env.VISITOR_STATS.list({ prefix, cursor });
+    count += result.keys.length;
+    cursor = result.cursor;
 
-async function incrementCount(env, key) {
-  const next = (await getCount(env, key)) + 1;
+    if (result.list_complete) {
+      cursor = undefined;
+    }
+  } while (cursor);
 
-  await env.VISITOR_STATS.put(key, String(next));
-  return next;
+  return count;
 }
 
 async function readJson(request) {
@@ -694,7 +715,7 @@ function randomToken(size = 32) {
 }
 
 async function hashSessionToken(token, env) {
-  const secret = env.SESSION_SIGNING_SECRET || env.VISITOR_SALT || "ysw1mst-blog-admin-session";
+  const secret = requireEnv(env, "SESSION_SIGNING_SECRET");
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(`${secret}:${token}`));
 
   return hex(digest);

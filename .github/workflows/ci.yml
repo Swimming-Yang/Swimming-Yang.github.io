@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  jekyll:
+    name: Jekyll build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - name: Build site
+        run: bundle exec jekyll build
+
+  worker:
+    name: Worker dry run
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: workers/visitor-counter
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: workers/visitor-counter/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate Worker bundle
+        run: npx wrangler deploy --dry-run --config wrangler.ci.toml

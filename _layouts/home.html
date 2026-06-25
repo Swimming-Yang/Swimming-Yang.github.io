@@ -3,97 +3,124 @@ layout: default
 ---
 
 {% assign visitor_api_endpoint = site.visitor_api_endpoint | default: "" %}
+{% assign coding_posts = site.categories.coding %}
+{% assign life_posts = site.categories.life %}
 
-<section class="portfolio-hero" aria-label="홈">
-  <div class="portfolio-hero__content">
-    <div class="portfolio-hero__intro">
-      <p class="eyebrow">Developer Blog / Daily Archive</p>
-      <h1>{{ site.title }}</h1>
-      <p class="portfolio-hero__alias">ysw1mst</p>
-      <p class="portfolio-hero__summary">
-        코딩하면서 배운 것과 일상에서 남기고 싶은 장면을 차분하게 기록합니다.
-      </p>
-      <div class="portfolio-hero__actions">
-        <a class="button" href="{{ '/coding/' | relative_url }}">코딩 기록</a>
-        <a class="button button--ghost" href="{{ '/life/' | relative_url }}">일상 기록</a>
-      </div>
+<section class="home-hero" aria-labelledby="home-title">
+  <div class="home-hero__media" aria-hidden="true"></div>
+  <div class="home-hero__content">
+    <p class="section-kicker">Developer Archive</p>
+    <h1 id="home-title">Hello World.<br>배운 것을 다시 꺼내보기 쉽게.</h1>
+    <p class="home-hero__summary">
+      C#, WPF, Unity, CS, PS를 중심으로 공부한 내용과 시행착오를 정리합니다.
+      일상에서 오래 기억하고 싶은 장면도 함께 보관합니다.
+    </p>
+    <div class="home-hero__actions">
+      <a class="button button--primary" href="{{ '/coding/' | relative_url }}">코딩 글 보기</a>
+      <a class="button" href="{{ '/blog/' | relative_url }}">전체 글 보기</a>
     </div>
+  </div>
 
-    <div class="portfolio-hero__side">
-      <aside
-        class="hero-stats"
-        data-blog-start="{{ site.blog_start_date | default: '2026-05-31' }}"
-        {% if visitor_api_endpoint != "" %}data-visitor-endpoint="{{ visitor_api_endpoint }}"{% endif %}
-        aria-label="블로그 통계"
-      >
-        <p class="hero-stats__label">Archive Status</p>
-        <p class="hero-stats__headline">
-          <span data-blog-day>1</span>일째 {{ site.posts.size }}개의 글을 작성중입니다.
-        </p>
-        <div class="hero-stats__visitors" aria-label="방문자 통계">
-          <span class="hero-stats__metric">
-            <strong data-visitor-today aria-live="polite">--</strong>
-            <small>오늘 방문</small>
-          </span>
-          <span class="hero-stats__metric">
-            <strong data-visitor-total aria-live="polite">--</strong>
-            <small>전체 방문</small>
-          </span>
-        </div>
-      </aside>
+  <aside
+    class="home-stat-panel"
+    data-blog-start="{{ site.blog_start_date | default: '2026-05-31' }}"
+    {% if visitor_api_endpoint != "" %}data-visitor-endpoint="{{ visitor_api_endpoint }}"{% endif %}
+    aria-label="블로그 통계"
+  >
+    <span>
+      <strong data-blog-day>1</strong>
+      <small>days</small>
+    </span>
+    <span>
+      <strong>{{ site.posts.size }}</strong>
+      <small>posts</small>
+    </span>
+    <span>
+      <strong data-visitor-total aria-live="polite">--</strong>
+      <small>visits</small>
+    </span>
+  </aside>
+</section>
 
-      <nav class="board-nav" aria-label="게시판 바로가기">
-        <p class="board-nav__label">Boards</p>
-        <a class="board-nav__item" href="{{ '/coding/' | relative_url }}">
-          <span>
-            <strong>코딩</strong>
-            <small>프로젝트, 문제 해결, 공부 메모</small>
-          </span>
-          <em>{{ site.categories.coding.size | default: 0 }}</em>
-        </a>
-        <a class="board-nav__item" href="{{ '/life/' | relative_url }}">
-          <span>
-            <strong>일상</strong>
-            <small>하루의 조각과 개인적인 기록</small>
-          </span>
-          <em>{{ site.categories.life.size | default: 0 }}</em>
-        </a>
-        <a class="board-nav__item" href="{{ '/blog/' | relative_url }}">
-          <span>
-            <strong>전체 글</strong>
-            <small>모든 기록을 시간순으로 보기</small>
-          </span>
-          <em>{{ site.posts.size }}</em>
-        </a>
-        <a class="board-nav__item" href="{{ '/about/' | relative_url }}">
-          <span>
-            <strong>소개</strong>
-            <small>이 블로그와 사람에 관해</small>
-          </span>
-          <em>i</em>
-        </a>
-      </nav>
-    </div>
+<section class="home-section home-section--topics" aria-labelledby="topic-title">
+  <div class="section-heading">
+    <p class="section-kicker">Popular Boards</p>
+    <h2 id="topic-title">자주 꺼내보는 개발 주제</h2>
+    <a href="{{ '/coding/' | relative_url }}">전체 보기</a>
+  </div>
+
+  <div class="topic-grid">
+    {% for topic in site.data.coding_topics %}
+      {% assign topic_posts = site.categories.coding | where: "topic", topic.slug %}
+      <a class="topic-card topic-card--{{ topic.slug }}" href="{{ '/coding/' | append: topic.slug | append: '/' | relative_url }}">
+        <span class="topic-card__rank">#{{ forloop.index }}</span>
+        <strong>{{ topic.title }}</strong>
+        <p>{{ topic.description }}</p>
+        <em>{{ topic_posts.size }} posts</em>
+      </a>
+    {% endfor %}
+    <a class="topic-card topic-card--life" href="{{ '/life/' | relative_url }}">
+      <span class="topic-card__rank">#{{ site.data.coding_topics.size | plus: 1 }}</span>
+      <strong>Life</strong>
+      <p>개발 밖에서 남겨두고 싶은 일상 기록입니다.</p>
+      <em>{{ life_posts.size }} posts</em>
+    </a>
   </div>
 </section>
 
-<section class="portfolio-section" aria-label="소개">
-  <div class="portfolio-section__heading">
-    <p class="eyebrow eyebrow--dark">Profile</p>
-    <h2>작게 만들고, 꾸준히 기록합니다.</h2>
+<section class="home-section" aria-labelledby="latest-title">
+  <div class="section-heading">
+    <p class="section-kicker">Latest</p>
+    <h2 id="latest-title">최근에 쓴 글</h2>
+    <a href="{{ '/blog/' | relative_url }}">더 보기</a>
   </div>
-  <div class="portfolio-notes">
-    <div class="portfolio-note">
-      <strong>Code</strong>
-      <p>배운 것, 막혔던 것, 다시 써먹을 수 있는 해결 과정을 남깁니다.</p>
+  {% include post_grid.html posts=site.posts limit=6 empty_message="아직 작성된 글이 없습니다." %}
+</section>
+
+<section class="home-section home-section--split" aria-label="분야별 최신 글">
+  <div class="curation-board">
+    <div class="section-heading section-heading--compact">
+      <p class="section-kicker">Coding</p>
+      <h2>코딩 기록</h2>
+      <a href="{{ '/coding/' | relative_url }}">더 보기</a>
     </div>
-    <div class="portfolio-note">
-      <strong>Life</strong>
-      <p>일상에서 오래 기억하고 싶은 순간을 부담 없이 쌓아둡니다.</p>
+    <div class="curation-list">
+      {% for post in coding_posts limit:4 %}
+        <a class="curation-item" href="{{ post.url | relative_url }}">
+          <span>{{ post.date | date: "%Y.%m.%d" }}</span>
+          <strong>{{ post.title }}</strong>
+          {% if post.topic %}
+            {% for topic in site.data.coding_topics %}
+              {% if topic.slug == post.topic %}
+                <em>{{ topic.title }}</em>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        </a>
+      {% endfor %}
+      {% if coding_posts.size == 0 %}
+        <p class="empty">아직 코딩 글이 없습니다.</p>
+      {% endif %}
     </div>
-    <div class="portfolio-note">
-      <strong>Archive</strong>
-      <p>완성된 글보다 이어지는 기록에 가까운 개인 작업실입니다.</p>
+  </div>
+
+  <div class="curation-board">
+    <div class="section-heading section-heading--compact">
+      <p class="section-kicker">Life</p>
+      <h2>일상 기록</h2>
+      <a href="{{ '/life/' | relative_url }}">더 보기</a>
+    </div>
+    <div class="curation-list">
+      {% for post in life_posts limit:3 %}
+        <a class="curation-item" href="{{ post.url | relative_url }}">
+          <span>{{ post.date | date: "%Y.%m.%d" }}</span>
+          <strong>{{ post.title }}</strong>
+          <em>Life</em>
+        </a>
+      {% endfor %}
+      {% if life_posts.size == 0 %}
+        <p class="empty">아직 일상 글이 없습니다.</p>
+      {% endif %}
     </div>
   </div>
 </section>

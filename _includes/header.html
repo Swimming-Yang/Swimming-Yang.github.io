@@ -1,19 +1,105 @@
-<header class="site-header">
-  <a class="site-title" href="{{ '/' | relative_url }}">Swimming-Yang</a>
+{% assign visitor_api_endpoint = site.visitor_api_endpoint | default: "" %}
 
-  <details class="category-menu" data-category-menu>
-    <summary class="category-menu__button">카테고리</summary>
-    <div class="category-menu__panel">
-      <nav class="category-menu__nav" aria-label="카테고리">
-        <a class="category-menu__item {% if page.url == '/' %}is-active{% endif %}" href="{{ '/' | relative_url }}">홈</a>
-        <a class="category-menu__item {% if page.url == '/blog/' %}is-active{% endif %}" href="{{ '/blog/' | relative_url }}">전체 글</a>
-        <a class="category-menu__item {% if page.url == '/coding/' %}is-active{% endif %}" href="{{ '/coding/' | relative_url }}">코딩</a>
-        {% for topic in site.data.coding_topics %}
-          <a class="category-menu__item category-menu__item--sub {% if page.topic == topic.slug %}is-active{% endif %}" href="{{ '/coding/' | append: topic.slug | append: '/' | relative_url }}">{{ topic.title }}</a>
-        {% endfor %}
-        <a class="category-menu__item {% if page.url == '/life/' or page.categories contains 'life' %}is-active{% endif %}" href="{{ '/life/' | relative_url }}">일상</a>
-        <a class="category-menu__item {% if page.url == '/about/' %}is-active{% endif %}" href="{{ '/about/' | relative_url }}">소개</a>
-      </nav>
+<header class="site-header">
+  <a class="skip-link" href="#content">본문으로 이동</a>
+
+  <div class="site-header__inner">
+    <a class="site-brand" href="{{ '/' | relative_url }}" aria-label="홈으로 이동">
+      <span class="site-brand__mark">SY</span>
+      <span class="site-brand__text">
+        <strong>Swimming-Yang</strong>
+        <small>Dev Log</small>
+      </span>
+    </a>
+
+    <nav class="site-nav" aria-label="주요 메뉴">
+      <a class="{% if page.url == '/' %}is-active{% endif %}" href="{{ '/' | relative_url }}">홈</a>
+      <a class="{% if page.url == '/blog/' %}is-active{% endif %}" href="{{ '/blog/' | relative_url }}">전체 글</a>
+      <a class="{% if page.url == '/coding/' or page.categories contains 'coding' %}is-active{% endif %}" href="{{ '/coding/' | relative_url }}">코딩</a>
+      <a class="{% if page.url == '/life/' or page.categories contains 'life' %}is-active{% endif %}" href="{{ '/life/' | relative_url }}">일상</a>
+      <a class="{% if page.url == '/about/' %}is-active{% endif %}" href="{{ '/about/' | relative_url }}">소개</a>
+    </nav>
+
+    <div class="site-tools">
+      <details class="category-menu" data-category-menu>
+        <summary class="icon-button category-menu__button" aria-label="카테고리 열기">
+          <span aria-hidden="true"></span>
+        </summary>
+        <div class="category-menu__panel">
+          <div class="category-menu__header">
+            <strong>카테고리</strong>
+            <span>{{ site.posts.size }} posts</span>
+          </div>
+
+          <div class="category-menu__section">
+            <p>Develop</p>
+            <a href="{{ '/coding/' | relative_url }}">
+              <span>코딩 전체</span>
+              <em>{{ site.categories.coding.size | default: 0 }}</em>
+            </a>
+            {% for topic in site.data.coding_topics %}
+              {% assign topic_posts = site.categories.coding | where: "topic", topic.slug %}
+              <a class="{% if page.topic == topic.slug %}is-active{% endif %}" href="{{ '/coding/' | append: topic.slug | append: '/' | relative_url }}">
+                <span>{{ topic.title }}</span>
+                <em>{{ topic_posts.size }}</em>
+              </a>
+            {% endfor %}
+          </div>
+
+          <div class="category-menu__section">
+            <p>Archive</p>
+            <a href="{{ '/life/' | relative_url }}">
+              <span>일상</span>
+              <em>{{ site.categories.life.size | default: 0 }}</em>
+            </a>
+            <a href="{{ '/blog/' | relative_url }}">
+              <span>전체 글</span>
+              <em>{{ site.posts.size }}</em>
+            </a>
+          </div>
+        </div>
+      </details>
+
+      <button class="icon-button" type="button" data-search-open aria-label="검색 열기">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="m16.5 16.5 4 4"></path>
+        </svg>
+      </button>
+
+      <button class="icon-button" type="button" data-theme-toggle aria-label="테마 변경">
+        <svg class="theme-icon theme-icon--sun" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+        </svg>
+        <svg class="theme-icon theme-icon--moon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M21 13.2A8.5 8.5 0 1 1 10.8 3 6.8 6.8 0 0 0 21 13.2Z"></path>
+        </svg>
+      </button>
     </div>
-  </details>
+  </div>
 </header>
+
+<div class="search-panel" data-search-panel hidden>
+  <div class="search-panel__backdrop" data-search-close></div>
+  <section class="search-panel__dialog" role="dialog" aria-modal="true" aria-labelledby="search-title">
+    <div class="search-panel__header">
+      <div>
+        <p class="section-kicker">Search</p>
+        <h2 id="search-title">블로그 검색</h2>
+      </div>
+      <button class="icon-button" type="button" data-search-close aria-label="검색 닫기">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M18 6 6 18M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+    <label class="search-panel__field">
+      <span>검색어</span>
+      <input type="search" data-search-input placeholder="제목, 태그, 본문 키워드">
+    </label>
+    <div class="search-panel__results" data-search-results>
+      <p class="search-panel__empty">검색어를 입력하면 글을 찾아볼 수 있습니다.</p>
+    </div>
+  </section>
+</div>

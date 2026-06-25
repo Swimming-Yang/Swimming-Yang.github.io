@@ -29,6 +29,11 @@
     text: "Code",
   };
 
+  function getBaseUrl() {
+    const meta = document.querySelector("meta[name='site-baseurl']");
+    return meta ? meta.content.replace(/\/$/, "") : "";
+  }
+
   function getLanguage(container) {
     const className = container.className || "";
     const match = className.match(/language-([a-zA-Z0-9#+._-]+)/);
@@ -44,6 +49,12 @@
       button.classList.remove("is-copied");
     };
 
+    const finish = () => {
+      button.textContent = "완료";
+      button.classList.add("is-copied");
+      window.setTimeout(resetLabel, 1600);
+    };
+
     if (!navigator.clipboard) {
       const textarea = document.createElement("textarea");
       textarea.value = text;
@@ -54,17 +65,11 @@
       textarea.select();
       document.execCommand("copy");
       textarea.remove();
-      button.textContent = "완료";
-      button.classList.add("is-copied");
-      window.setTimeout(resetLabel, 1600);
+      finish();
       return;
     }
 
-    navigator.clipboard.writeText(text).then(() => {
-      button.textContent = "완료";
-      button.classList.add("is-copied");
-      window.setTimeout(resetLabel, 1600);
-    });
+    navigator.clipboard.writeText(text).then(finish);
   }
 
   function enhanceCodeBlocks() {
@@ -231,12 +236,175 @@
       }
 
       menu.open = false;
-
       const summary = menu.querySelector("summary");
 
       if (summary) {
         summary.focus();
       }
+    });
+  }
+
+  function enhanceThemeToggle() {
+    const button = document.querySelector("[data-theme-toggle]");
+
+    if (!button) {
+      return;
+    }
+
+    const setTheme = (theme) => {
+      document.documentElement.dataset.theme = theme;
+      button.setAttribute("aria-label", theme === "dark" ? "밝은 테마로 변경" : "어두운 테마로 변경");
+
+      try {
+        localStorage.setItem("site-theme", theme);
+      } catch (error) {
+        return;
+      }
+    };
+
+    setTheme(document.documentElement.dataset.theme || "light");
+
+    button.addEventListener("click", () => {
+      setTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
+    });
+  }
+
+  function escapeHtml(value) {
+    return String(value || "").replace(/[&<>"']/g, (char) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#039;",
+    })[char]);
+  }
+
+  function createSearchResult(post) {
+    const link = document.createElement("a");
+    link.className = "search-result";
+    link.href = post.url;
+    link.innerHTML = `
+      <span>${escapeHtml(post.topic)} · ${escapeHtml(post.date)}</span>
+      <strong>${escapeHtml(post.title)}</strong>
+      <em>${escapeHtml(post.excerpt)}</em>
+    `;
+    return link;
+  }
+
+  function enhanceSearch() {
+    const panel = document.querySelector("[data-search-panel]");
+    const input = document.querySelector("[data-search-input]");
+    const results = document.querySelector("[data-search-results]");
+    const openButtons = document.querySelectorAll("[data-search-open]");
+    const closeButtons = document.querySelectorAll("[data-search-close]");
+
+    if (!panel || !input || !results || openButtons.length === 0) {
+      return;
+    }
+
+    let posts = [];
+    let loaded = false;
+
+    const render = (query) => {
+      const keyword = query.trim().toLowerCase();
+      results.innerHTML = "";
+
+      if (!keyword) {
+        results.innerHTML = '<p class="search-panel__empty">검색어를 입력하면 글을 찾아볼 수 있습니다.</p>';
+        return;
+      }
+
+      const matches = posts
+        .filter((post) => `${post.title} ${post.excerpt} ${post.topic} ${post.tags}`.toLowerCase().includes(keyword))
+        .slice(0, 8);
+
+      if (matches.length === 0) {
+        results.innerHTML = '<p class="search-panel__empty">검색 결과가 없습니다.</p>';
+        return;
+      }
+
+      matches.forEach((post) => results.append(createSearchResult(post)));
+    };
+
+    const load = () => {
+      if (loaded) {
+        return Promise.resolve();
+      }
+
+      loaded = true;
+      return fetch(`${getBaseUrl()}/search.json`, { cache: "no-store" })
+        .then((response) => response.json())
+        .then((data) => {
+          posts = Array.isArray(data) ? data : [];
+        })
+        .catch(() => {
+          posts = [];
+          results.innerHTML = '<p class="search-panel__empty">검색 데이터를 불러오지 못했습니다.</p>';
+        });
+    };
+
+    const open = () => {
+      panel.hidden = false;
+      document.body.classList.add("is-search-open");
+      load().then(() => {
+        input.focus();
+        render(input.value);
+      });
+    };
+
+    const close = () => {
+      panel.hidden = true;
+      document.body.classList.remove("is-search-open");
+    };
+
+    openButtons.forEach((button) => button.addEventListener("click", open));
+    closeButtons.forEach((button) => button.addEventListener("click", close));
+    input.addEventListener("input", () => render(input.value));
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "/" && !panel.hidden && document.activeElement !== input) {
+        event.preventDefault();
+        input.focus();
+      }
+
+      if (event.key === "Escape" && !panel.hidden) {
+        close();
+      }
+    });
+  }
+
+  function slugify(value, index) {
+    const slug = String(value || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^\w가-힣]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+
+    return slug || `section-${index}`;
+  }
+
+  function enhanceToc() {
+    const toc = document.querySelector("[data-toc]");
+    const list = document.querySelector("[data-toc-list]");
+    const headings = Array.from(document.querySelectorAll(".post-content h2, .post-content h3"));
+
+    if (!toc || !list || headings.length === 0) {
+      if (toc) {
+        toc.hidden = true;
+      }
+      return;
+    }
+
+    headings.forEach((heading, index) => {
+      if (!heading.id) {
+        heading.id = slugify(heading.textContent, index);
+      }
+
+      const link = document.createElement("a");
+      link.href = `#${heading.id}`;
+      link.textContent = heading.textContent;
+      link.className = heading.tagName === "H3" ? "is-sub" : "";
+      list.append(link);
     });
   }
 
@@ -334,6 +502,9 @@
     enhanceCodeBlocks();
     enhanceBlogStats();
     enhanceCategoryMenu();
+    enhanceThemeToggle();
+    enhanceSearch();
+    enhanceToc();
     enhanceComments();
   });
 })();

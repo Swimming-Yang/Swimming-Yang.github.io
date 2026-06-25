@@ -1,34 +1,12 @@
 {% assign grid_posts = include.posts %}
 {% assign post_count = grid_posts.size | default: 0 %}
+{% assign grid_limit = include.limit | default: post_count %}
 
 <div class="post-grid{% if include.board %} post-grid--board{% endif %}">
   {% if post_count > 0 %}
-    {% for post in grid_posts %}
+    {% for post in grid_posts limit:grid_limit %}
       {% include post_card.html post=post %}
     {% endfor %}
-
-    {% assign remainder = post_count | modulo: 3 %}
-    {% if remainder != 0 %}
-      {% assign placeholder_count = 3 | minus: remainder %}
-      {% for i in (1..placeholder_count) %}
-        <article class="post-card post-card--empty" aria-hidden="true">
-          <span class="post-card__empty-media"></span>
-          <span class="post-card__empty-body">
-            <span class="post-card__empty-line post-card__empty-line--title"></span>
-            <span class="post-card__empty-line post-card__empty-line--date"></span>
-            <span class="post-card__empty-line"></span>
-            <span class="post-card__empty-line post-card__empty-line--short"></span>
-            <span class="post-card__empty-footer">
-              <span class="post-card__empty-icons">
-                <span></span>
-                <span></span>
-              </span>
-              <span></span>
-            </span>
-          </span>
-        </article>
-      {% endfor %}
-    {% endif %}
   {% else %}
     <p class="empty">{{ include.empty_message }}</p>
   {% endif %}

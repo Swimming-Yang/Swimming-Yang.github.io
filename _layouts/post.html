@@ -2,37 +2,55 @@
 layout: default
 ---
 
-<article class="post">
-  <header class="post__header">
-    <p class="post__meta">
-      <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%Y.%m.%d" }}</time>
-      {% if page.categories.size > 0 %}
-        <span>{{ page.categories | join: ", " }}</span>
-      {% endif %}
-      {% if page.topic %}
-        {% assign topic_title = page.topic %}
-        {% for topic in site.data.coding_topics %}
-          {% if topic.slug == page.topic %}
-            {% assign topic_title = topic.title %}
-          {% endif %}
-        {% endfor %}
-        <span>{{ topic_title }}</span>
-      {% endif %}
-    </p>
-    <h1>{{ page.title }}</h1>
-    {% if page.tags.size > 0 %}
-      <div class="tags">
-        {% for tag in page.tags %}
-          <span>{{ tag }}</span>
-        {% endfor %}
-      </div>
+{% assign topic_title = "" %}
+{% if page.topic %}
+  {% assign topic_title = page.topic %}
+  {% for topic in site.data.coding_topics %}
+    {% if topic.slug == page.topic %}
+      {% assign topic_title = topic.title %}
     {% endif %}
-  </header>
+  {% endfor %}
+{% endif %}
 
-  <div class="content">
-    {{ content }}
-  </div>
-</article>
+<div class="post-shell">
+  <aside class="post-sidebar" aria-label="글 탐색">
+    <a class="post-sidebar__back" href="{{ '/blog/' | relative_url }}">전체 글</a>
+    <div class="post-sidebar__toc" data-toc>
+      <p>On this page</p>
+      <div data-toc-list></div>
+    </div>
+  </aside>
 
-{% include related_posts.html %}
-{% include comments.html %}
+  <article class="post">
+    <header class="post__header">
+      <p class="post__meta">
+        <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%Y.%m.%d" }}</time>
+        {% if topic_title != "" %}
+          <span>{{ topic_title }}</span>
+        {% elsif page.categories.size > 0 %}
+          <span>{{ page.categories | join: ", " }}</span>
+        {% endif %}
+      </p>
+      <h1>{{ page.title }}</h1>
+      {% if page.description %}
+        <p class="post__description">{{ page.description }}</p>
+      {% endif %}
+      {% if page.tags.size > 0 %}
+        <div class="tags">
+          {% for tag in page.tags %}
+            <span>{{ tag }}</span>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </header>
+
+    <div class="content post-content">
+      {{ content }}
+    </div>
+  </article>
+</div>
+
+<div class="post-after">
+  {% include related_posts.html %}
+  {% include comments.html %}
+</div>

@@ -13,14 +13,6 @@ layout: default
 {% endif %}
 
 <div class="post-shell">
-  <aside class="post-sidebar" aria-label="글 탐색">
-    <a class="post-sidebar__back" href="{{ '/blog/' | relative_url }}">전체 글</a>
-    <div class="post-sidebar__toc" data-toc>
-      <p>On this page</p>
-      <div data-toc-list></div>
-    </div>
-  </aside>
-
   <article class="post">
     <header class="post__header">
       <p class="post__meta">
@@ -48,6 +40,14 @@ layout: default
       {{ content }}
     </div>
   </article>
+
+  <aside class="post-sidebar" aria-label="글 목차">
+    <a class="post-sidebar__back" href="{{ '/blog/' | relative_url }}">전체 글</a>
+    <div class="post-sidebar__toc" data-toc>
+      <p>On this page</p>
+      <div data-toc-list></div>
+    </div>
+  </aside>
 </div>
 
 <div class="post-after">

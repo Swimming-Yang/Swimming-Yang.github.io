@@ -25,9 +25,12 @@
   </head>
   <body class="layout-{{ page.layout | default: 'default' }}">
     {% include header.html %}
-    <main class="site-main" id="content">
-      {{ content }}
-    </main>
+    <div class="site-frame">
+      {% include sidebar.html %}
+      <main class="site-main" id="content">
+        {{ content }}
+      </main>
+    </div>
     {% include footer.html %}
     <script src="{{ '/assets/js/main.js' | relative_url }}" defer></script>
     {% if page.extra_js %}

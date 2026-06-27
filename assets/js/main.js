@@ -225,35 +225,19 @@
     }
 
     const titleElement = container.querySelector("[data-home-title-text]");
-    const languageElement = container.querySelector("[data-home-language]");
     const codeElement = container.querySelector("[data-home-code]");
 
-    if (!titleElement || !languageElement || !codeElement) {
+    if (!titleElement || !codeElement) {
       return;
     }
 
     const titleText = titleElement.dataset.homeTitleText || titleElement.textContent.trim();
     const examples = [
-      {
-        language: "C++",
-        code: 'std::cout << "Hello World!!" << std::endl;',
-      },
-      {
-        language: "C#",
-        code: 'Console.WriteLine("Hello World!!");',
-      },
-      {
-        language: "Java",
-        code: 'System.out.println("Hello World!!");',
-      },
-      {
-        language: "Python",
-        code: 'print("Hello World!!")',
-      },
-      {
-        language: "JS",
-        code: 'console.log("Hello World!!");',
-      },
+      'std::cout << "Hello World!!" << std::endl;',
+      'Console.WriteLine("Hello World!!");',
+      'System.out.println("Hello World!!");',
+      'print("Hello World!!")',
+      'console.log("Hello World!!");',
     ];
 
     const wait = (duration) => new Promise((resolve) => window.setTimeout(resolve, duration));
@@ -283,11 +267,10 @@
 
       while (document.body.contains(container)) {
         for (const example of examples) {
-          languageElement.textContent = example.language;
-          await typeText(codeElement, example.code, 38);
-          await wait(1450);
-          await eraseText(codeElement, 24);
-          await wait(220);
+          await typeText(codeElement, example, 58);
+          await wait(1700);
+          await eraseText(codeElement, 34);
+          await wait(340);
         }
       }
     };
@@ -296,8 +279,7 @@
     codeElement.textContent = "";
     run().catch(() => {
       titleElement.textContent = titleText;
-      languageElement.textContent = examples[0].language;
-      codeElement.textContent = examples[0].code;
+      codeElement.textContent = examples[0];
       container.classList.add("is-title-complete");
     });
   }

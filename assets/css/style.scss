@@ -843,7 +843,7 @@ body.layout-home .category-menu__panel {
   display: grid;
   justify-items: center;
   width: min(100%, 1050px);
-  gap: clamp(18px, 3vw, 30px);
+  gap: 22px;
 }
 
 .home-hero h1 {
@@ -878,47 +878,23 @@ body.layout-home .category-menu__panel {
 }
 
 .home-hero__code-line {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: center;
-  width: min(100%, 900px);
-  min-height: 70px;
+  width: min(100%, 920px);
+  min-height: 2.4em;
   margin: 0;
-  padding: 14px 18px;
-  gap: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  border-radius: var(--radius);
-  background: rgba(5, 12, 25, 0.62);
-  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.26);
-  color: rgba(255, 255, 255, 0.92);
+  color: rgba(255, 255, 255, 0.9);
   font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
-  text-align: left;
-  backdrop-filter: blur(10px);
-}
-
-.home-hero__code-prompt {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 64px;
-  height: 34px;
-  padding: 0 10px;
-  border: 1px solid rgba(141, 240, 189, 0.34);
-  border-radius: 6px;
-  background: rgba(141, 240, 189, 0.16);
-  color: #8df0bd;
-  font-size: 0.82rem;
-  font-weight: 800;
-  line-height: 1;
+  text-align: center;
+  text-shadow: 0 3px 20px rgba(0, 0, 0, 0.42);
 }
 
 .home-hero__code-line code {
-  display: block;
+  display: inline;
   min-width: 0;
-  color: #ffffff;
+  color: inherit;
   font: inherit;
-  font-size: 1.05rem;
-  line-height: 1.45;
+  font-size: 1.55rem;
+  font-weight: 700;
+  line-height: 1.55;
   overflow-wrap: anywhere;
 }
 
@@ -2556,12 +2532,11 @@ body.layout-home .home-section {
   }
 
   .home-hero__code-line {
-    min-height: 64px;
-    padding: 12px 14px;
+    min-height: 2.35em;
   }
 
   .home-hero__code-line code {
-    font-size: 0.94rem;
+    font-size: 1.18rem;
   }
 
   .home-stat-panel {
@@ -2685,17 +2660,11 @@ body.layout-home .home-section {
   }
 
   .home-hero__typing {
-    gap: 16px;
-  }
-
-  .home-hero__code-line {
-    grid-template-columns: 1fr;
-    justify-items: start;
-    gap: 9px;
+    gap: 18px;
   }
 
   .home-hero__code-line code {
-    font-size: 0.86rem;
+    font-size: 0.98rem;
   }
 
   .home-hero__summary {

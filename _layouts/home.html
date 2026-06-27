@@ -2,44 +2,17 @@
 layout: default
 ---
 
-{% assign visitor_api_endpoint = site.visitor_api_endpoint | default: "" %}
 {% assign coding_posts = site.categories.coding %}
 {% assign life_posts = site.categories.life %}
 
 <section class="home-hero" aria-labelledby="home-title">
-  <div class="home-hero__media" aria-hidden="true"></div>
+  <div class="home-hero__fallback" aria-hidden="true"></div>
+  <video class="home-hero__video" autoplay muted loop playsinline preload="auto" aria-hidden="true">
+    <source src="{{ '/assets/videos/home-hero.mp4' | relative_url }}" type="video/mp4">
+  </video>
   <div class="home-hero__content">
-    <p class="section-kicker">Developer Archive</p>
-    <h1 id="home-title">Hello World.<br>배운 것을 다시 꺼내보기 쉽게.</h1>
-    <p class="home-hero__summary">
-      C#, WPF, Unity, CS, PS를 중심으로 공부한 내용과 시행착오를 정리합니다.
-      일상에서 오래 기억하고 싶은 장면도 함께 보관합니다.
-    </p>
-    <div class="home-hero__actions">
-      <a class="button button--primary" href="{{ '/coding/' | relative_url }}">코딩 글 보기</a>
-      <a class="button" href="{{ '/blog/' | relative_url }}">전체 글 보기</a>
-    </div>
+    <h1 id="home-title">Swimming-Yang</h1>
   </div>
-
-  <aside
-    class="home-stat-panel"
-    data-blog-start="{{ site.blog_start_date | default: '2026-05-31' }}"
-    {% if visitor_api_endpoint != "" %}data-visitor-endpoint="{{ visitor_api_endpoint }}"{% endif %}
-    aria-label="블로그 통계"
-  >
-    <span>
-      <strong data-blog-day>1</strong>
-      <small>days</small>
-    </span>
-    <span>
-      <strong>{{ site.posts.size }}</strong>
-      <small>posts</small>
-    </span>
-    <span>
-      <strong data-visitor-total aria-live="polite">--</strong>
-      <small>visits</small>
-    </span>
-  </aside>
 </section>
 
 <section class="home-section home-section--topics" aria-labelledby="topic-title">

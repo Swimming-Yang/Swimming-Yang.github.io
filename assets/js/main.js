@@ -217,6 +217,96 @@
       });
   }
 
+  function enhanceHomeTyping() {
+    const container = document.querySelector("[data-home-typing]");
+
+    if (!container) {
+      return;
+    }
+
+    const titleElement = container.querySelector("[data-home-title-text]");
+    const languageElement = container.querySelector("[data-home-language]");
+    const codeElement = container.querySelector("[data-home-code]");
+
+    if (!titleElement || !languageElement || !codeElement) {
+      return;
+    }
+
+    const titleText = titleElement.dataset.homeTitleText || titleElement.textContent.trim();
+    const examples = [
+      {
+        language: "C++",
+        code: 'std::cout << "Hello World!!" << std::endl;',
+      },
+      {
+        language: "C#",
+        code: 'Console.WriteLine("Hello World!!");',
+      },
+      {
+        language: "Java",
+        code: 'System.out.println("Hello World!!");',
+      },
+      {
+        language: "Python",
+        code: 'print("Hello World!!")',
+      },
+      {
+        language: "JS",
+        code: 'console.log("Hello World!!");',
+      },
+    ];
+
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (prefersReducedMotion) {
+      titleElement.textContent = titleText;
+      languageElement.textContent = examples[0].language;
+      codeElement.textContent = examples[0].code;
+      container.classList.add("is-title-complete");
+      return;
+    }
+
+    const wait = (duration) => new Promise((resolve) => window.setTimeout(resolve, duration));
+
+    const typeText = async (element, text, delay) => {
+      element.textContent = "";
+
+      for (let index = 1; index <= text.length; index += 1) {
+        element.textContent = text.slice(0, index);
+        await wait(delay);
+      }
+    };
+
+    const eraseText = async (element, delay) => {
+      const text = element.textContent;
+
+      for (let index = text.length - 1; index >= 0; index -= 1) {
+        element.textContent = text.slice(0, index);
+        await wait(delay);
+      }
+    };
+
+    const run = async () => {
+      await typeText(titleElement, titleText, 78);
+      container.classList.add("is-title-complete");
+      await wait(260);
+
+      while (document.body.contains(container)) {
+        for (const example of examples) {
+          languageElement.textContent = example.language;
+          await typeText(codeElement, example.code, 38);
+          await wait(1450);
+          await eraseText(codeElement, 24);
+          await wait(220);
+        }
+      }
+    };
+
+    titleElement.textContent = "";
+    codeElement.textContent = "";
+    run();
+  }
+
   function enhanceCategoryMenu() {
     const menu = document.querySelector("[data-category-menu]");
 
@@ -501,6 +591,7 @@
   document.addEventListener("DOMContentLoaded", () => {
     enhanceCodeBlocks();
     enhanceBlogStats();
+    enhanceHomeTyping();
     enhanceCategoryMenu();
     enhanceThemeToggle();
     enhanceSearch();

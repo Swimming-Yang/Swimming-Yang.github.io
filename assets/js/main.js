@@ -337,121 +337,99 @@
     });
   }
 
-  function escapeHtml(value) {
-    return String(value || "").replace(/[&<>"']/g, (char) => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#039;",
-    })[char]);
-  }
+  function getSearchPageUrl(query) {
+    const keyword = String(query || "").trim();
+    const path = `${getBaseUrl()}/search/`;
 
-  function createSearchResult(post) {
-    const link = document.createElement("a");
-    link.className = "search-result";
-    link.href = post.url;
-    link.innerHTML = `
-      <span>${escapeHtml(post.topic)} · ${escapeHtml(post.date)}</span>
-      <strong>${escapeHtml(post.title)}</strong>
-      <em>${escapeHtml(post.excerpt)}</em>
-    `;
-    return link;
+    if (!keyword) {
+      return path;
+    }
+
+    return `${path}?q=${encodeURIComponent(keyword)}`;
   }
 
   function enhanceSearch() {
-    const panel = document.querySelector("[data-search-panel]");
-    const input = document.querySelector("[data-search-input]");
-    const results = document.querySelector("[data-search-results]");
     const openButtons = document.querySelectorAll("[data-search-open]");
-    const closeButtons = document.querySelectorAll("[data-search-close]");
     const homeSearchForm = document.querySelector("[data-home-search-form]");
     const homeSearchInput = document.querySelector("[data-home-search-input]");
 
-    if (!panel || !input || !results) {
-      return;
-    }
-
-    let posts = [];
-    let loaded = false;
-
-    const render = (query) => {
-      const keyword = query.trim().toLowerCase();
-      results.innerHTML = "";
-
-      if (!keyword) {
-        results.innerHTML = '<p class="search-panel__empty">검색어를 입력하면 글을 찾아볼 수 있습니다.</p>';
-        return;
-      }
-
-      const matches = posts
-        .filter((post) => `${post.title} ${post.excerpt} ${post.topic} ${post.tags}`.toLowerCase().includes(keyword))
-        .slice(0, 8);
-
-      if (matches.length === 0) {
-        results.innerHTML = '<p class="search-panel__empty">검색 결과가 없습니다.</p>';
-        return;
-      }
-
-      matches.forEach((post) => results.append(createSearchResult(post)));
+    const goToSearch = (query) => {
+      window.location.href = getSearchPageUrl(query);
     };
 
-    const load = () => {
-      if (loaded) {
-        return Promise.resolve();
-      }
-
-      loaded = true;
-      return fetch(`${getBaseUrl()}/search.json`, { cache: "no-store" })
-        .then((response) => response.json())
-        .then((data) => {
-          posts = Array.isArray(data) ? data : [];
-        })
-        .catch(() => {
-          posts = [];
-          results.innerHTML = '<p class="search-panel__empty">검색 데이터를 불러오지 못했습니다.</p>';
-        });
-    };
-
-    const open = (query) => {
-      if (typeof query === "string") {
-        input.value = query;
-      }
-
-      panel.hidden = false;
-      document.body.classList.add("is-search-open");
-      load().then(() => {
-        input.focus();
-        render(input.value);
+    openButtons.forEach((button) => {
+      button.addEventListener("click", (event) => {
+        event.preventDefault();
+        goToSearch("");
       });
-    };
-
-    const close = () => {
-      panel.hidden = true;
-      document.body.classList.remove("is-search-open");
-    };
-
-    openButtons.forEach((button) => button.addEventListener("click", open));
-    closeButtons.forEach((button) => button.addEventListener("click", close));
-    input.addEventListener("input", () => render(input.value));
+    });
 
     if (homeSearchForm && homeSearchInput) {
       homeSearchForm.addEventListener("submit", (event) => {
         event.preventDefault();
-        open(homeSearchInput.value);
+        goToSearch(homeSearchInput.value);
       });
     }
+  }
 
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "/" && !panel.hidden && document.activeElement !== input) {
-        event.preventDefault();
-        input.focus();
+  function enhanceSearchPage() {
+    const page = document.querySelector("[data-search-page]");
+
+    if (!page) {
+      return;
+    }
+
+    const form = page.querySelector("[data-search-page-form]");
+    const input = page.querySelector("[data-search-page-input]");
+    const cards = Array.from(page.querySelectorAll("[data-search-card]"));
+    const empty = page.querySelector("[data-search-page-empty]");
+    const summary = page.querySelector("[data-search-page-summary]");
+
+    if (!form || !input || cards.length === 0) {
+      return;
+    }
+
+    const render = (query) => {
+      const rawKeyword = String(query || "").trim();
+      const keyword = rawKeyword.toLowerCase();
+      let visibleCount = 0;
+
+      cards.forEach((card) => {
+        const haystack = String(card.dataset.searchText || "").toLowerCase();
+        const isMatch = !keyword || haystack.includes(keyword);
+        card.hidden = !isMatch;
+
+        if (isMatch) {
+          visibleCount += 1;
+        }
+      });
+
+      if (summary) {
+        summary.textContent = keyword ? `"${rawKeyword}" 검색 결과 ${visibleCount}개` : `전체 글 ${visibleCount}개`;
       }
 
-      if (event.key === "Escape" && !panel.hidden) {
-        close();
+      if (empty) {
+        empty.hidden = visibleCount !== 0;
       }
+    };
+
+    const syncFromUrl = () => {
+      const query = new URLSearchParams(window.location.search).get("q") || "";
+      input.value = query;
+      render(query);
+    };
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      const query = input.value.trim();
+      window.history.pushState({}, "", getSearchPageUrl(query));
+      render(query);
     });
+
+    input.addEventListener("input", () => render(input.value));
+    window.addEventListener("popstate", syncFromUrl);
+    syncFromUrl();
   }
 
   function slugify(value, index) {
@@ -586,6 +564,7 @@
     enhanceCategoryMenu();
     enhanceThemeToggle();
     enhanceSearch();
+    enhanceSearchPage();
     enhanceToc();
     enhanceComments();
   });

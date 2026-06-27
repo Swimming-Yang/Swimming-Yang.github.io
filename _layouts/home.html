@@ -11,13 +11,29 @@ layout: default
     <source src="{{ '/assets/videos/home-hero.mp4' | relative_url }}" type="video/mp4">
   </video>
   <div class="home-hero__content">
-    <div class="home-hero__typing" data-home-typing aria-label="Ysw1mst's Blog Hello World print examples">
-      <h1 id="home-title" class="home-hero__title">
-        <span class="home-hero__title-line" data-home-title-text="Ysw1mst's Blog"></span>
-      </h1>
-      <p class="home-hero__code-line" aria-live="polite" aria-atomic="true">
-        <code data-home-code></code>
-      </p>
+    <div class="home-hero__stage">
+      <div class="home-hero__typing" data-home-typing aria-label="Ysw1mst's Blog Hello World print examples">
+        <h1 id="home-title" class="home-hero__title">
+          <span class="home-hero__title-line" data-home-title-text="Ysw1mst's Blog"></span>
+        </h1>
+        <p class="home-hero__code-line" aria-live="polite" aria-atomic="true">
+          <code data-home-code></code>
+        </p>
+      </div>
+
+      <form class="home-hero__search" data-home-search-form role="search">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="m16.5 16.5 4 4"></path>
+        </svg>
+        <input type="search" data-home-search-input placeholder="게시글 검색" aria-label="게시글 검색">
+        <button type="submit" aria-label="검색">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 12h14"></path>
+            <path d="m13 6 6 6-6 6"></path>
+          </svg>
+        </button>
+      </form>
     </div>
   </div>
 </section>

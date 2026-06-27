@@ -238,6 +238,7 @@
       'System.out.println("Hello World!!");',
       'print("Hello World!!")',
       'console.log("Hello World!!");',
+      "어떻게~화이팅!Hello World!!~이 사람이름이냐ㅋㅋ",
     ];
 
     const wait = (duration) => new Promise((resolve) => window.setTimeout(resolve, duration));
@@ -364,8 +365,10 @@
     const results = document.querySelector("[data-search-results]");
     const openButtons = document.querySelectorAll("[data-search-open]");
     const closeButtons = document.querySelectorAll("[data-search-close]");
+    const homeSearchForm = document.querySelector("[data-home-search-form]");
+    const homeSearchInput = document.querySelector("[data-home-search-input]");
 
-    if (!panel || !input || !results || openButtons.length === 0) {
+    if (!panel || !input || !results) {
       return;
     }
 
@@ -410,7 +413,11 @@
         });
     };
 
-    const open = () => {
+    const open = (query) => {
+      if (typeof query === "string") {
+        input.value = query;
+      }
+
       panel.hidden = false;
       document.body.classList.add("is-search-open");
       load().then(() => {
@@ -427,6 +434,13 @@
     openButtons.forEach((button) => button.addEventListener("click", open));
     closeButtons.forEach((button) => button.addEventListener("click", close));
     input.addEventListener("input", () => render(input.value));
+
+    if (homeSearchForm && homeSearchInput) {
+      homeSearchForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        open(homeSearchInput.value);
+      });
+    }
 
     document.addEventListener("keydown", (event) => {
       if (event.key === "/" && !panel.hidden && document.activeElement !== input) {

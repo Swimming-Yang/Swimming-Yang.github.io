@@ -256,16 +256,6 @@
       },
     ];
 
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    if (prefersReducedMotion) {
-      titleElement.textContent = titleText;
-      languageElement.textContent = examples[0].language;
-      codeElement.textContent = examples[0].code;
-      container.classList.add("is-title-complete");
-      return;
-    }
-
     const wait = (duration) => new Promise((resolve) => window.setTimeout(resolve, duration));
 
     const typeText = async (element, text, delay) => {
@@ -304,7 +294,12 @@
 
     titleElement.textContent = "";
     codeElement.textContent = "";
-    run();
+    run().catch(() => {
+      titleElement.textContent = titleText;
+      languageElement.textContent = examples[0].language;
+      codeElement.textContent = examples[0].code;
+      container.classList.add("is-title-complete");
+    });
   }
 
   function enhanceCategoryMenu() {

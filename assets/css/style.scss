@@ -822,12 +822,6 @@ body.layout-home .category-menu__panel {
   .home-hero__video {
     display: none;
   }
-
-  .home-hero__title-line::after,
-  .home-hero__code-line code::after {
-    opacity: 0.6;
-    animation: none;
-  }
 }
 
 .home-hero__content {

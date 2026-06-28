@@ -1,0 +1,106 @@
+// Base reset and document defaults.
+
+* {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+html {
+  min-height: 100%;
+  color: var(--text);
+  background: var(--bg);
+  font-family: "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.7;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100%;
+  margin: 0;
+  background:
+    linear-gradient(180deg, var(--body-wash-primary), transparent 420px),
+    linear-gradient(120deg, var(--body-wash-secondary), transparent 340px),
+    var(--bg);
+}
+
+html.is-theme-switching,
+html.is-theme-switching *,
+html.is-theme-switching *::before,
+html.is-theme-switching *::after {
+  transition:
+    background-color 0.42s ease,
+    background 0.42s ease,
+    border-color 0.42s ease,
+    box-shadow 0.42s ease,
+    color 0.42s ease,
+    fill 0.42s ease,
+    opacity 0.42s ease,
+    stroke 0.42s ease,
+    text-decoration-color 0.42s ease !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.is-theme-switching,
+  html.is-theme-switching *,
+  html.is-theme-switching *::before,
+  html.is-theme-switching *::after {
+    transition: none !important;
+  }
+}
+
+body.is-search-open {
+  overflow: hidden;
+}
+
+body.is-page-transition-locked {
+  overflow: hidden;
+}
+
+img,
+svg {
+  display: block;
+}
+
+img {
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration-color: rgba(31, 63, 143, 0.42);
+  text-underline-offset: 0.22em;
+}
+
+a:hover {
+  color: var(--accent-strong);
+  text-decoration-color: currentColor;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.skip-link {
+  position: fixed;
+  z-index: 1000;
+  top: 12px;
+  left: 12px;
+  transform: translateY(-140%);
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  background: var(--text-strong);
+  color: var(--surface);
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+

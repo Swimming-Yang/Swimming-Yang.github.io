@@ -754,6 +754,20 @@
       }
     };
 
+    const resetProgress = () => {
+      if (progressElement) {
+        progressElement.classList.add("is-resetting");
+      }
+
+      setProgress(0);
+
+      window.requestAnimationFrame(() => {
+        if (progressElement) {
+          progressElement.classList.remove("is-resetting");
+        }
+      });
+    };
+
     const chooseTip = () => {
       const tip = tips[Math.floor(Math.random() * tips.length)] || tipElementDefaultText;
 
@@ -781,7 +795,7 @@
 
     const showOverlay = () => {
       chooseTip();
-      setProgress(0);
+      resetProgress();
       document.body.classList.add("is-page-transition-locked");
       overlay.classList.add("is-visible");
     };
@@ -930,7 +944,7 @@
     window.addEventListener("pageshow", (event) => {
       if (event.persisted) {
         stopProgress();
-        setProgress(0);
+        resetProgress();
         hideOverlay();
         isNavigating = false;
       }

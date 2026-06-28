@@ -685,11 +685,9 @@
       "모션은 짧고 일관될수록 인터페이스가 가볍게 느껴집니다.",
       "이미지는 크기와 포맷만 잘 잡아도 페이지가 빨라집니다.",
       "Lazy loading은 보이지 않는 리소스를 나중으로 미루는 예의입니다.",
-      "웹 폰트는 예쁘지만 렌더링 경로의 손님입니다.",
       "CSS 변수는 테마를 코드가 아니라 언어처럼 다루게 해줍니다.",
       "z-index 문제는 쌓임 맥락을 이해하면 절반은 풀립니다.",
       "Grid는 2차원 배치, Flex는 1차원 흐름에 강합니다.",
-      "버튼은 행동, 링크는 이동을 뜻하게 두면 사용자가 덜 헷갈립니다.",
       "폼 라벨은 시각 디자인보다 먼저 의미 구조입니다.",
       "키보드 포커스는 마우스가 없는 사용자만을 위한 것이 아닙니다.",
       "색상만으로 상태를 전달하면 누군가는 놓칩니다.",
@@ -722,15 +720,20 @@
       "백업은 복구 연습을 해보기 전까지 완성된 것이 아닙니다.",
       "마이그레이션은 되돌아가는 길까지 생각하면 마음이 편합니다.",
       "버전 관리는 코드뿐 아니라 결정의 기록입니다.",
-      "브랜치 이름은 작업의 의도를 짧게 남기는 표지판입니다.",
       "충돌 해결은 어느 쪽 코드가 맞는지가 아니라 새 문맥이 맞는지를 보는 일입니다.",
       "좋은 개발 환경은 프로젝트에 다시 들어오는 시간을 줄입니다.",
-      "자동 저장보다 중요한 건 잃어버리지 않는 작업 단위입니다.",
       "디버거는 시간을 멈추는 도구이고 로그는 시간을 되감는 단서입니다.",
       "문제를 작게 재현하면 해결책도 작아질 가능성이 커집니다.",
       "가장 좋은 최적화는 하지 않아도 되는 일을 없애는 것입니다.",
       "코드는 컴퓨터보다 사람에게 더 자주 읽힙니다.",
-      "오늘의 작은 정리는 내일의 큰 삽질을 줄입니다.",
+      {
+        text: "히든 : 페이지 주인장은 장송의 프리렌에 푹 빠져있습니다.",
+        hidden: true,
+      },
+      {
+        text: "히든 : 이 페이지에는 102개의 토막글 중 2개의 히든이 있습니다.",
+        hidden: true,
+      },
     ];
 
     const tipElementDefaultText = tipElement ? tipElement.textContent : "";
@@ -769,10 +772,12 @@
     };
 
     const chooseTip = () => {
-      const tip = tips[Math.floor(Math.random() * tips.length)] || tipElementDefaultText;
+      const item = tips[Math.floor(Math.random() * tips.length)] || tipElementDefaultText;
+      const tip = typeof item === "string" ? item : item.text;
 
       if (tipElement) {
         tipElement.textContent = tip;
+        tipElement.classList.toggle("is-hidden-tip", Boolean(item.hidden));
       }
 
       return tip;
@@ -781,9 +786,11 @@
     const applySavedTip = () => {
       try {
         const savedTip = sessionStorage.getItem("page-transition-tip");
+        const savedTipHidden = sessionStorage.getItem("page-transition-tip-hidden") === "true";
 
         if (savedTip && tipElement) {
           tipElement.textContent = savedTip;
+          tipElement.classList.toggle("is-hidden-tip", savedTipHidden);
           return;
         }
       } catch (error) {
@@ -808,6 +815,7 @@
       try {
         sessionStorage.removeItem("page-transition-active");
         sessionStorage.removeItem("page-transition-tip");
+        sessionStorage.removeItem("page-transition-tip-hidden");
       } catch (error) {
         return;
       }
@@ -896,6 +904,7 @@
       try {
         if (tipElement) {
           sessionStorage.setItem("page-transition-tip", tipElement.textContent);
+          sessionStorage.setItem("page-transition-tip-hidden", String(tipElement.classList.contains("is-hidden-tip")));
         }
       } catch (error) {
         // The overlay still works if storage is unavailable.

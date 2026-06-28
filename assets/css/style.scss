@@ -747,6 +747,18 @@ html.is-page-transition-arriving .page-transition__inner {
   text-align: center;
 }
 
+.page-transition__tip.is-hidden-tip {
+  border-color: transparent;
+  background:
+    linear-gradient(var(--transition-panel-bg), var(--transition-panel-bg)) padding-box,
+    linear-gradient(135deg, #d946ef, #f59e0b, #6e89f5) border-box;
+  box-shadow:
+    0 0 0 1px rgba(217, 70, 239, 0.24),
+    0 18px 44px rgba(217, 70, 239, 0.22),
+    var(--shadow-soft);
+  color: var(--text-strong);
+}
+
 .page-transition__progress {
   width: min(100%, 520px);
   display: grid;

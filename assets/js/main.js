@@ -232,13 +232,57 @@
     }
 
     const titleText = titleElement.dataset.homeTitleText || titleElement.textContent.trim();
+    const token = (text, tone = "plain") => ({ text, tone });
     const examples = [
-      'std::cout << "Hello World!!" << std::endl;',
-      'Console.WriteLine("Hello World!!");',
-      'System.out.println("Hello World!!");',
-      'print("Hello World!!")',
-      'console.log("Hello World!!");',
-      "어떻게~화이팅!Hello World!!~이 사람이름이냐ㅋㅋ",
+      [
+        token("std", "namespace"),
+        token("::", "operator"),
+        token("cout", "property"),
+        token(" << ", "operator"),
+        token('"Hello World!!"', "string"),
+        token(" << ", "operator"),
+        token("std", "namespace"),
+        token("::", "operator"),
+        token("endl", "property"),
+        token(";", "punctuation"),
+      ],
+      [
+        token("Console", "type"),
+        token(".", "punctuation"),
+        token("WriteLine", "method"),
+        token("(", "punctuation"),
+        token('"Hello World!!"', "string"),
+        token(");", "punctuation"),
+      ],
+      [
+        token("System", "type"),
+        token(".", "punctuation"),
+        token("out", "property"),
+        token(".", "punctuation"),
+        token("println", "method"),
+        token("(", "punctuation"),
+        token('"Hello World!!"', "string"),
+        token(");", "punctuation"),
+      ],
+      [
+        token("print", "function"),
+        token("(", "punctuation"),
+        token('"Hello World!!"', "string"),
+        token(")", "punctuation"),
+      ],
+      [
+        token("console", "namespace"),
+        token(".", "punctuation"),
+        token("log", "method"),
+        token("(", "punctuation"),
+        token('"Hello World!!"', "string"),
+        token(");", "punctuation"),
+      ],
+      [
+        token("어떻게~화이팅!", "comment"),
+        token("Hello World!!", "string"),
+        token("~이 사람이름이냐ㅋㅋ", "comment"),
+      ],
     ];
 
     const wait = (duration) => new Promise((resolve) => window.setTimeout(resolve, duration));
@@ -252,11 +296,50 @@
       }
     };
 
-    const eraseText = async (element, delay) => {
-      const text = element.textContent;
+    const getCodeText = (tokens) => tokens.map((part) => part.text).join("");
+
+    const renderCodeTokens = (element, tokens, visibleLength) => {
+      const fragment = document.createDocumentFragment();
+      let consumed = 0;
+
+      element.textContent = "";
+
+      tokens.forEach((part) => {
+        const remaining = visibleLength - consumed;
+
+        if (remaining <= 0) {
+          return;
+        }
+
+        const visibleText = part.text.slice(0, Math.min(part.text.length, remaining));
+
+        if (visibleText) {
+          const span = document.createElement("span");
+          span.className = `home-code-token home-code-token--${part.tone}`;
+          span.textContent = visibleText;
+          fragment.append(span);
+        }
+
+        consumed += part.text.length;
+      });
+
+      element.append(fragment);
+    };
+
+    const typeCode = async (element, tokens, delay) => {
+      const text = getCodeText(tokens);
+
+      for (let index = 1; index <= text.length; index += 1) {
+        renderCodeTokens(element, tokens, index);
+        await wait(delay);
+      }
+    };
+
+    const eraseCode = async (element, tokens, delay) => {
+      const text = getCodeText(tokens);
 
       for (let index = text.length - 1; index >= 0; index -= 1) {
-        element.textContent = text.slice(0, index);
+        renderCodeTokens(element, tokens, index);
         await wait(delay);
       }
     };
@@ -268,9 +351,9 @@
 
       while (document.body.contains(container)) {
         for (const example of examples) {
-          await typeText(codeElement, example, 58);
+          await typeCode(codeElement, example, 58);
           await wait(1700);
-          await eraseText(codeElement, 34);
+          await eraseCode(codeElement, example, 34);
           await wait(340);
         }
       }
@@ -280,7 +363,7 @@
     codeElement.textContent = "";
     run().catch(() => {
       titleElement.textContent = titleText;
-      codeElement.textContent = examples[0];
+      renderCodeTokens(codeElement, examples[0], getCodeText(examples[0]).length);
       container.classList.add("is-title-complete");
     });
   }

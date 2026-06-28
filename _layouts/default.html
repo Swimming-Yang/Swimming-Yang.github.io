@@ -30,29 +30,15 @@
     {% include header.html %}
     <div class="page-transition" data-page-transition role="status" aria-live="polite" aria-label="페이지 이동 중">
       <div class="page-transition__inner">
-        <svg class="page-transition__runner" viewBox="0 0 64 64" aria-hidden="true">
-          <g class="page-transition__runner-bob">
-            <rect x="27" y="4" width="12" height="12" rx="1"></rect>
-            <rect x="24" y="18" width="17" height="20" rx="1"></rect>
-            <g class="page-transition__runner-arm page-transition__runner-arm--front">
-              <rect x="39" y="20" width="7" height="17" rx="1"></rect>
-            </g>
-            <g class="page-transition__runner-arm page-transition__runner-arm--back">
-              <rect x="18" y="19" width="7" height="17" rx="1"></rect>
-            </g>
-            <g class="page-transition__runner-leg page-transition__runner-leg--front">
-              <rect x="35" y="36" width="8" height="20" rx="1"></rect>
-              <rect x="38" y="52" width="15" height="7" rx="1"></rect>
-            </g>
-            <g class="page-transition__runner-leg page-transition__runner-leg--back">
-              <rect x="22" y="36" width="8" height="20" rx="1"></rect>
-              <rect x="12" y="52" width="15" height="7" rx="1"></rect>
-            </g>
-          </g>
-        </svg>
+        <div class="page-transition__runner-frame" aria-hidden="true">
+          <img class="page-transition__runner" src="{{ '/assets/images/page-transition-runner.gif' | relative_url }}" alt="">
+        </div>
         <p class="page-transition__tip" data-page-transition-tip>코드는 미래의 나에게 쓰는 편지입니다.</p>
-        <div class="page-transition__bar" aria-hidden="true">
-          <span data-page-transition-progress></span>
+        <div class="page-transition__progress" aria-hidden="true">
+          <div class="page-transition__bar">
+            <span data-page-transition-progress></span>
+          </div>
+          <span class="page-transition__percent" data-page-transition-percent>0%</span>
         </div>
       </div>
     </div>

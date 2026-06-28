@@ -624,6 +624,7 @@
 
     const tipElement = overlay.querySelector("[data-page-transition-tip]");
     const progressElement = overlay.querySelector("[data-page-transition-progress]");
+    const percentElement = overlay.querySelector("[data-page-transition-percent]");
     const tips = [
       "함수는 한 가지 일을 잘할수록 오래 살아남습니다.",
       "좋은 이름은 주석보다 먼저 읽히는 문서입니다.",
@@ -746,6 +747,10 @@
 
       if (progressElement) {
         progressElement.style.width = `${currentProgress}%`;
+      }
+
+      if (percentElement) {
+        percentElement.textContent = `${Math.round(currentProgress)}%`;
       }
     };
 

@@ -771,6 +771,7 @@
 
     const tipElementDefaultText = tipElement ? tipElement.textContent : "";
     const minVisibleMs = 500;
+    const hiddenTipMinVisibleMs = 3000;
     const maxWaitMs = 4500;
     let progressFrame = 0;
     let currentProgress = 0;
@@ -943,7 +944,10 @@
         // The overlay still works if storage is unavailable.
       }
 
-      await Promise.all([wait(minVisibleMs), prepareNextPage(url)]);
+      const visibleMs =
+        tipElement && tipElement.classList.contains("is-hidden-tip") ? hiddenTipMinVisibleMs : minVisibleMs;
+
+      await Promise.all([wait(visibleMs), prepareNextPage(url)]);
       stopProgress();
       setProgress(100);
 

@@ -13,3 +13,6 @@
 - slug: ps
   title: "PS"
   description: "문제 해결, 코딩 테스트, 풀이 회고"
+- slug: database
+  title: "Database"
+  description: "SQL, 데이터 모델링, 성능 튜닝, 저장소 설계 메모"

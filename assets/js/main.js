@@ -115,6 +115,39 @@
     });
   }
 
+  function enhanceContentDividers() {
+    const content = document.querySelector(".post-content");
+
+    if (!content) {
+      return;
+    }
+
+    content.querySelectorAll("[data-content-divider]").forEach((divider) => divider.remove());
+    content.querySelectorAll(".has-content-divider").forEach((element) => {
+      element.classList.remove("has-content-divider");
+    });
+
+    const children = Array.from(content.children);
+    const isImageBlock = (element) =>
+      element.matches("img, figure") ||
+      (element.matches("p") && element.querySelector("img") && element.textContent.trim() === "");
+    const isSeparatedBlock = (element) => element.matches("blockquote, .highlighter-rouge") || isImageBlock(element);
+    const hasVisibleNext = (index) => children.slice(index + 1).some((element) => !element.hidden);
+
+    children.forEach((element, index) => {
+      if (!isSeparatedBlock(element) || !hasVisibleNext(index)) {
+        return;
+      }
+
+      const divider = document.createElement("div");
+      divider.className = "content-flow-divider";
+      divider.dataset.contentDivider = "true";
+      divider.setAttribute("aria-hidden", "true");
+      element.classList.add("has-content-divider");
+      element.insertAdjacentElement("afterend", divider);
+    });
+  }
+
   function getKoreanDayNumber(date) {
     const parts = new Intl.DateTimeFormat("en", {
       timeZone: "Asia/Seoul",
@@ -994,6 +1027,7 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     enhanceCodeBlocks();
+    enhanceContentDividers();
     enhanceBlogStats();
     enhanceHomeTyping();
     enhanceCategoryMenu();

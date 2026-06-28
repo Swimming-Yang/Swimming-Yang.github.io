@@ -16,6 +16,7 @@
       <a class="{% if page.url == '/' %}is-active{% endif %}" href="{{ '/' | relative_url }}">홈</a>
       <a class="{% if page.url == '/blog/' %}is-active{% endif %}" href="{{ '/blog/' | relative_url }}">전체 글</a>
       <a class="{% if page.url == '/coding/' or page.categories contains 'coding' %}is-active{% endif %}" href="{{ '/coding/' | relative_url }}">코딩</a>
+      <a class="{% if page.url == '/health/' or page.categories contains 'health' %}is-active{% endif %}" href="{{ '/health/' | relative_url }}">건강</a>
       <a class="{% if page.url == '/life/' or page.categories contains 'life' %}is-active{% endif %}" href="{{ '/life/' | relative_url }}">일상</a>
       <a class="{% if page.url == '/about/' %}is-active{% endif %}" href="{{ '/about/' | relative_url }}">소개</a>
     </nav>
@@ -48,6 +49,10 @@
 
           <div class="category-menu__section">
             <p>Archive</p>
+            <a class="{% if page.url == '/health/' or page.categories contains 'health' %}is-active{% endif %}" href="{{ '/health/' | relative_url }}">
+              <span>건강</span>
+              <em>{{ site.categories.health.size | default: 0 }}</em>
+            </a>
             <a href="{{ '/life/' | relative_url }}">
               <span>일상</span>
               <em>{{ site.categories.life.size | default: 0 }}</em>
@@ -67,14 +72,19 @@
         </svg>
       </button>
 
-      <button class="icon-button" type="button" data-theme-toggle aria-label="테마 변경">
-        <svg class="theme-icon theme-icon--sun" viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="12" cy="12" r="4"></circle>
-          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
-        </svg>
-        <svg class="theme-icon theme-icon--moon" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M21 13.2A8.5 8.5 0 1 1 10.8 3 6.8 6.8 0 0 0 21 13.2Z"></path>
-        </svg>
+      <button class="theme-switch" type="button" data-theme-toggle aria-label="테마 변경">
+        <span class="theme-switch__icon theme-switch__icon--sun" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+          </svg>
+        </span>
+        <span class="theme-switch__icon theme-switch__icon--moon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M21 13.2A8.5 8.5 0 1 1 10.8 3 6.8 6.8 0 0 0 21 13.2Z"></path>
+          </svg>
+        </span>
+        <span class="theme-switch__thumb" aria-hidden="true"></span>
       </button>
     </div>
   </div>

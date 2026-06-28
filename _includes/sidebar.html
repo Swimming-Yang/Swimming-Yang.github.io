@@ -36,6 +36,10 @@
       {% endfor %}
     </div>
 
+    <a class="{% if page.url == '/health/' or page.categories contains 'health' %}is-active{% endif %}" href="{{ '/health/' | relative_url }}">
+      <span>건강</span>
+      <em>{{ site.categories.health.size | default: 0 }}</em>
+    </a>
     <a class="{% if page.url == '/life/' or page.categories contains 'life' %}is-active{% endif %}" href="{{ '/life/' | relative_url }}">
       <span>일상</span>
       <em>{{ site.categories.life.size | default: 0 }}</em>
@@ -60,6 +64,8 @@
               {% assign post_topic = topic.title %}
             {% endif %}
           {% endfor %}
+        {% elsif post.categories contains "health" %}
+          {% assign post_topic = "Health" %}
         {% elsif post.categories contains "life" %}
           {% assign post_topic = "Life" %}
         {% endif %}

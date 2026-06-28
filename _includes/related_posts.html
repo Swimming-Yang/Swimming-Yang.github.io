@@ -12,6 +12,9 @@
 {% elsif page.categories contains "life" %}
   {% assign related_pool = site.categories.life %}
   {% assign related_title = "Life" %}
+{% elsif page.categories contains "health" %}
+  {% assign related_pool = site.categories.health %}
+  {% assign related_title = "Health" %}
 {% elsif page.categories contains "coding" %}
   {% assign related_pool = site.categories.coding %}
   {% assign related_title = "Coding" %}

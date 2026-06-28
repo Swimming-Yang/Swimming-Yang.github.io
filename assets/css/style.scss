@@ -1654,33 +1654,6 @@ body.layout-home .home-section {
     transform 0.18s ease;
 }
 
-.topic-card::before {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  padding: 3px;
-  border-radius: inherit;
-  background:
-    conic-gradient(
-      from 0deg,
-      transparent 0 20%,
-      var(--accent-border) 30%,
-      var(--accent) 42%,
-      var(--accent-strong) 50%,
-      var(--accent) 58%,
-      transparent 72% 100%
-    );
-  content: "";
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.18s ease;
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-}
-
 .topic-card::after {
   position: absolute;
   z-index: 0;
@@ -1692,6 +1665,10 @@ body.layout-home .home-section {
   font-weight: 900;
   line-height: 1;
   content: "</>";
+  transform-origin: 70% 70%;
+  transition:
+    opacity 0.18s ease,
+    transform 0.22s ease;
 }
 
 .topic-card > * {
@@ -1701,10 +1678,21 @@ body.layout-home .home-section {
 
 .topic-card--wpf::after {
   color: var(--blue-wash);
+  content: "XAML";
+  font-size: 5.2rem;
+}
+
+.topic-card--csharp::after {
+  content: "C#";
+}
+
+.topic-card--cs::after {
+  content: "CS";
 }
 
 .topic-card--unity::after {
   color: var(--amber-wash);
+  content: "U";
 }
 
 .topic-card--database::after {
@@ -1714,38 +1702,30 @@ body.layout-home .home-section {
 
 .topic-card--health::after {
   color: var(--rose-wash);
-  content: "+";
+  content: "HP";
 }
 
-.topic-card--ps::after,
+.topic-card--ps::after {
+  color: var(--rose-wash);
+  content: "PS";
+}
+
 .topic-card--life::after {
   color: var(--rose-wash);
+  content: "LIFE";
+  font-size: 5.2rem;
 }
 
 .topic-card:hover {
   border-color: var(--accent-border);
   color: var(--text);
-  box-shadow:
-    0 0 0 4px var(--accent-ring),
-    var(--shadow);
+  box-shadow: var(--shadow);
   transform: translateY(-3px);
 }
 
-.topic-card:hover::before {
-  animation: topicCardRingSpin 1.25s linear infinite;
-  opacity: 1;
-}
-
-@keyframes topicCardRingSpin {
-  to {
-    transform: rotate(1turn);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .topic-card:hover::before {
-    animation: none;
-  }
+.topic-card:hover::after {
+  opacity: 0.92;
+  transform: scale(1.16) rotate(-3deg);
 }
 
 .topic-card__rank {

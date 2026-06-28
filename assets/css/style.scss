@@ -283,30 +283,27 @@ html[data-theme="dark"] .site-brand__mark {
   align-items: center;
   padding: 0 12px;
   border-radius: var(--radius);
+  background: transparent;
   color: var(--muted-strong);
   font-size: 0.92rem;
   font-weight: 800;
   text-decoration: none;
   transition:
-    background-color 0.18s ease,
-    box-shadow 0.18s ease,
     color 0.18s ease,
     text-shadow 0.18s ease,
     transform 0.18s ease;
 }
 
 .site-nav a:hover {
-  background: var(--accent-soft);
+  background: transparent;
   color: var(--text-strong);
-  box-shadow: 0 0 0 1px var(--accent-ring), 0 10px 24px var(--accent-ring);
   text-shadow: 0 0 16px var(--accent-ring);
   transform: translateY(-1px) scale(1.055);
 }
 
 .site-nav a.is-active {
-  background: var(--accent-soft);
+  background: transparent;
   color: var(--text-strong);
-  box-shadow: 0 0 0 1px var(--accent-ring);
 }
 
 .site-tools {
@@ -411,7 +408,7 @@ html[data-theme="dark"] .site-brand__mark {
     0 0 0 1px rgba(255, 255, 255, 0.88) inset;
   transition:
     background-color 0.22s ease,
-    transform 0.22s ease;
+    transform 0.28s cubic-bezier(0.2, 0.82, 0.2, 1);
 }
 
 html[data-theme="dark"] .theme-switch {
@@ -422,6 +419,56 @@ html[data-theme="dark"] .theme-switch {
 html[data-theme="dark"] .theme-switch__thumb {
   background: #101012;
   transform: translateX(32px);
+}
+
+html.is-theme-switching .theme-switch__thumb {
+  animation: themeThumbToLight 0.42s cubic-bezier(0.2, 0.82, 0.2, 1) both;
+}
+
+html[data-theme="dark"].is-theme-switching .theme-switch__thumb {
+  animation-name: themeThumbToDark;
+}
+
+@keyframes themeThumbToDark {
+  0% {
+    transform: translateX(0) scale(1);
+  }
+
+  42% {
+    transform: translateX(20px) scale(0.84, 1.12);
+  }
+
+  76% {
+    transform: translateX(35px) scale(1.08, 0.92);
+  }
+
+  100% {
+    transform: translateX(32px) scale(1);
+  }
+}
+
+@keyframes themeThumbToLight {
+  0% {
+    transform: translateX(32px) scale(1);
+  }
+
+  42% {
+    transform: translateX(12px) scale(0.84, 1.12);
+  }
+
+  76% {
+    transform: translateX(-3px) scale(1.08, 0.92);
+  }
+
+  100% {
+    transform: translateX(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.is-theme-switching .theme-switch__thumb {
+    animation: none;
+  }
 }
 
 .category-menu {
@@ -517,18 +564,29 @@ html[data-theme="dark"] .theme-switch__thumb {
   font-weight: 800;
   text-decoration: none;
   transition:
-    background-color 0.18s ease,
-    box-shadow 0.18s ease,
     color 0.18s ease,
+    text-shadow 0.18s ease;
+}
+
+.category-menu__section a span,
+.category-menu__section a em {
+  transition:
+    color 0.18s ease,
+    text-shadow 0.18s ease,
     transform 0.18s ease;
 }
 
 .category-menu__section a:hover,
 .category-menu__section a.is-active {
-  background: var(--accent-soft);
+  background: transparent;
   color: var(--accent-strong);
-  box-shadow: 0 0 0 1px var(--accent-ring);
-  transform: translateX(2px);
+  box-shadow: none;
+}
+
+.category-menu__section a:hover span,
+.category-menu__section a:hover em {
+  text-shadow: 0 0 14px var(--accent-ring);
+  transform: scale(1.045);
 }
 
 .category-menu__section em {

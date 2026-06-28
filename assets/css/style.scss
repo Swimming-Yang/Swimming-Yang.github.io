@@ -914,10 +914,11 @@ body.layout-home .category-menu__panel {
 
 .home-hero {
   position: relative;
+  z-index: 1;
   display: grid;
   min-height: 100svh;
   align-items: center;
-  overflow: hidden;
+  overflow: visible;
   border: 0;
   border-radius: 0;
   background: var(--ink);
@@ -1179,7 +1180,7 @@ body.layout-home .category-menu__panel {
 .home-hero__scroll-cue::before {
   position: absolute;
   right: 0;
-  bottom: 28px;
+  bottom: -6px;
   left: 0;
   height: 12px;
   background: linear-gradient(90deg, var(--accent-strong), var(--accent), var(--accent-strong));
@@ -1192,7 +1193,7 @@ body.layout-home .category-menu__panel {
 .home-hero__scroll-circle {
   position: absolute;
   left: 50%;
-  bottom: 0;
+  bottom: -34px;
   display: grid;
   width: 68px;
   height: 68px;
@@ -2916,12 +2917,13 @@ body.layout-home .home-section {
   }
 
   .home-hero__scroll-cue::before {
-    bottom: 24px;
+    bottom: -6px;
   }
 
   .home-hero__scroll-circle {
     width: 60px;
     height: 60px;
+    bottom: -30px;
   }
 
   .home-hero__scroll-circle span {
@@ -3084,13 +3086,14 @@ body.layout-home .home-section {
   }
 
   .home-hero__scroll-cue::before {
-    bottom: 22px;
+    bottom: -5px;
     height: 10px;
   }
 
   .home-hero__scroll-circle {
     width: 54px;
     height: 54px;
+    bottom: -27px;
     border-width: 2px;
   }
 

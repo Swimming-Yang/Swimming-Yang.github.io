@@ -615,6 +615,323 @@
     section.append(script);
   }
 
+  function enhancePageTransitions() {
+    const overlay = document.querySelector("[data-page-transition]");
+
+    if (!overlay) {
+      return;
+    }
+
+    const tipElement = overlay.querySelector("[data-page-transition-tip]");
+    const progressElement = overlay.querySelector("[data-page-transition-progress]");
+    const tips = [
+      "함수는 한 가지 일을 잘할수록 오래 살아남습니다.",
+      "좋은 이름은 주석보다 먼저 읽히는 문서입니다.",
+      "버그를 줄이는 첫 단계는 상태를 줄이는 것입니다.",
+      "중복 제거보다 의도 보존이 먼저입니다.",
+      "빠른 코드는 측정 뒤에 만들어도 늦지 않습니다.",
+      "테스트 이름은 실패했을 때 읽는 문장입니다.",
+      "에러 메시지는 사용자를 위한 작은 UI입니다.",
+      "복잡한 조건문은 이름 붙인 변수로 숨을 쉽니다.",
+      "캐시는 빠르지만 무효화 전략이 없으면 빚이 됩니다.",
+      "비동기 코드는 취소와 실패 경로까지 설계해야 합니다.",
+      "로그는 미래의 디버깅 시간을 사는 메모입니다.",
+      "작은 커밋은 버그를 되돌릴 수 있는 손잡이입니다.",
+      "인터페이스는 구현보다 오래 남는 약속입니다.",
+      "널 처리는 코드의 가장 조용한 안전장치입니다.",
+      "마법 숫자는 의미 있는 상수로 바꾸면 덜 무섭습니다.",
+      "성능 문제는 대부분 추측보다 프로파일러가 빨리 찾습니다.",
+      "좋은 추상화는 이름을 줄이는 게 아니라 결정을 줄입니다.",
+      "CSS는 작은 규칙이 쌓여 레이아웃의 성격을 만듭니다.",
+      "접근성은 나중에 붙이는 기능이 아니라 기본 사용성입니다.",
+      "반응형 디자인은 화면 크기가 아니라 정보 우선순위의 문제입니다.",
+      "API 응답은 성공보다 실패 모양을 먼저 정하면 단단해집니다.",
+      "데이터 검증은 클라이언트와 서버 양쪽에서 서로 다른 이유로 필요합니다.",
+      "정규식은 짧을수록 읽기 어렵기 쉬우니 예시 테스트를 곁들이면 좋습니다.",
+      "시간대 처리는 저장, 표시, 계산의 기준을 분리하면 덜 꼬입니다.",
+      "날짜는 문자열보다 날짜 타입으로 오래 버팁니다.",
+      "동시성 버그는 재현보다 예방 설계가 싸게 먹힙니다.",
+      "락은 필요한 만큼만 좁게 잡는 것이 기본입니다.",
+      "불변 데이터는 추적할 시간을 줄여줍니다.",
+      "상태 변경은 한곳으로 모일수록 디버깅이 쉬워집니다.",
+      "사용하지 않는 코드는 읽는 사람에게도 비용을 청구합니다.",
+      "리팩터링은 동작을 바꾸지 않는 작은 이동입니다.",
+      "큰 변경은 먼저 동작을 고정하는 테스트가 있으면 편해집니다.",
+      "배포 자동화는 실수를 줄이는 팀의 기억입니다.",
+      "환경 변수는 코드와 비밀을 분리하는 약속입니다.",
+      "보안은 입력을 믿지 않는 습관에서 시작합니다.",
+      "권한은 필요한 만큼만 주는 것이 가장 덜 피곤합니다.",
+      "비밀번호는 저장하지 말고 검증 가능한 해시만 남깁니다.",
+      "HTTPS는 선택지가 아니라 기본 통신 예절입니다.",
+      "SQL 인젝션은 문자열 조립 대신 파라미터 바인딩으로 막습니다.",
+      "XSS는 출력 위치에 맞는 이스케이프가 핵심입니다.",
+      "CSRF는 사용자의 브라우저가 자동으로 보내는 신뢰를 의심하는 문제입니다.",
+      "의존성 업데이트는 보안 작업이면서 유지보수 작업입니다.",
+      "패키지는 적을수록 업데이트해야 할 약속도 적습니다.",
+      "빌드가 빠르면 개발자의 실험 횟수가 늘어납니다.",
+      "CI는 사람이 까먹기 쉬운 확인을 대신 반복합니다.",
+      "린터는 취향 싸움을 자동화로 바꾸는 도구입니다.",
+      "포매터는 코드 리뷰에서 소음을 덜어냅니다.",
+      "코드 리뷰는 사람 평가가 아니라 변경 위험 평가입니다.",
+      "좋은 리뷰 코멘트는 문제와 이유와 제안을 함께 줍니다.",
+      "문서는 완벽할 필요보다 최신일 필요가 큽니다.",
+      "README는 프로젝트의 첫 번째 온보딩 화면입니다.",
+      "예제 코드는 가장 빨리 낡는 문서라서 작게 유지하는 편이 좋습니다.",
+      "CLI 옵션은 기본값이 좋아야 오래 씁니다.",
+      "UX의 로딩 상태는 기다림을 덜 불안하게 만듭니다.",
+      "스켈레톤 UI는 실제 레이아웃과 비슷할수록 자연스럽습니다.",
+      "애니메이션은 방향과 원인을 알 수 있을 때 설득력이 생깁니다.",
+      "모션은 짧고 일관될수록 인터페이스가 가볍게 느껴집니다.",
+      "이미지는 크기와 포맷만 잘 잡아도 페이지가 빨라집니다.",
+      "Lazy loading은 보이지 않는 리소스를 나중으로 미루는 예의입니다.",
+      "웹 폰트는 예쁘지만 렌더링 경로의 손님입니다.",
+      "CSS 변수는 테마를 코드가 아니라 언어처럼 다루게 해줍니다.",
+      "z-index 문제는 쌓임 맥락을 이해하면 절반은 풀립니다.",
+      "Grid는 2차원 배치, Flex는 1차원 흐름에 강합니다.",
+      "버튼은 행동, 링크는 이동을 뜻하게 두면 사용자가 덜 헷갈립니다.",
+      "폼 라벨은 시각 디자인보다 먼저 의미 구조입니다.",
+      "키보드 포커스는 마우스가 없는 사용자만을 위한 것이 아닙니다.",
+      "색상만으로 상태를 전달하면 누군가는 놓칩니다.",
+      "HTTP 캐시는 빠른 웹의 오래된 비밀 무기입니다.",
+      "상태 코드는 서버가 클라이언트에게 보내는 짧은 문장입니다.",
+      "404는 실패 화면이 아니라 다음 행동을 안내하는 화면입니다.",
+      "리다이렉트는 임시와 영구를 구분해야 검색 엔진도 덜 헤맵니다.",
+      "JSON은 간단하지만 스키마가 없으면 약속이 흐려집니다.",
+      "타입은 런타임 전에 만나는 작은 경고등입니다.",
+      "제네릭은 반복되는 타입 관계에 이름을 붙이는 방법입니다.",
+      "객체지향은 상속보다 메시지와 책임이 먼저입니다.",
+      "상속은 강한 결합이고 합성은 교체 가능한 조립에 가깝습니다.",
+      "함수형 스타일은 데이터 흐름을 드러내는 데 강합니다.",
+      "순수 함수는 테스트와 캐싱이 편한 작은 섬입니다.",
+      "예외는 복구할 수 있는 곳까지 의미를 잃지 않고 가야 합니다.",
+      "도메인 용어를 코드에 남기면 비즈니스와 코드가 덜 멀어집니다.",
+      "서비스 경계는 배포 단위보다 데이터 소유권에서 먼저 보입니다.",
+      "마이크로서비스는 조직 문제까지 함께 가져옵니다.",
+      "모놀리스도 경계가 좋으면 오래 건강할 수 있습니다.",
+      "큐는 순간 부하를 시간으로 분산하는 장치입니다.",
+      "재시도는 지수 백오프와 한계가 있어야 친절합니다.",
+      "멱등성은 네트워크가 불안할 때 시스템을 덜 예민하게 만듭니다.",
+      "관측 가능성은 로그, 메트릭, 트레이스가 함께 있어야 선명합니다.",
+      "메트릭은 알람이 아니라 의사결정의 재료입니다.",
+      "알람은 행동 가능한 것만 남겨야 사람이 믿습니다.",
+      "데이터베이스 인덱스는 읽기를 빠르게 하지만 쓰기의 비용을 늘립니다.",
+      "쿼리 플랜은 데이터베이스가 실제로 한 생각입니다.",
+      "트랜잭션은 함께 성공하거나 함께 실패해야 할 약속입니다.",
+      "정규화는 중복을 줄이고, 역정규화는 조회 비용을 줄입니다.",
+      "백업은 복구 연습을 해보기 전까지 완성된 것이 아닙니다.",
+      "마이그레이션은 되돌아가는 길까지 생각하면 마음이 편합니다.",
+      "버전 관리는 코드뿐 아니라 결정의 기록입니다.",
+      "브랜치 이름은 작업의 의도를 짧게 남기는 표지판입니다.",
+      "충돌 해결은 어느 쪽 코드가 맞는지가 아니라 새 문맥이 맞는지를 보는 일입니다.",
+      "좋은 개발 환경은 프로젝트에 다시 들어오는 시간을 줄입니다.",
+      "자동 저장보다 중요한 건 잃어버리지 않는 작업 단위입니다.",
+      "디버거는 시간을 멈추는 도구이고 로그는 시간을 되감는 단서입니다.",
+      "문제를 작게 재현하면 해결책도 작아질 가능성이 커집니다.",
+      "가장 좋은 최적화는 하지 않아도 되는 일을 없애는 것입니다.",
+      "코드는 컴퓨터보다 사람에게 더 자주 읽힙니다.",
+      "오늘의 작은 정리는 내일의 큰 삽질을 줄입니다.",
+    ];
+
+    const tipElementDefaultText = tipElement ? tipElement.textContent : "";
+    const minVisibleMs = 500;
+    const maxWaitMs = 4500;
+    let progressFrame = 0;
+    let currentProgress = 0;
+    let isNavigating = false;
+
+    const wait = (duration) => new Promise((resolve) => window.setTimeout(resolve, duration));
+
+    const setProgress = (value) => {
+      currentProgress = Math.max(0, Math.min(100, value));
+
+      if (progressElement) {
+        progressElement.style.width = `${currentProgress}%`;
+      }
+    };
+
+    const chooseTip = () => {
+      const tip = tips[Math.floor(Math.random() * tips.length)] || tipElementDefaultText;
+
+      if (tipElement) {
+        tipElement.textContent = tip;
+      }
+
+      return tip;
+    };
+
+    const applySavedTip = () => {
+      try {
+        const savedTip = sessionStorage.getItem("page-transition-tip");
+
+        if (savedTip && tipElement) {
+          tipElement.textContent = savedTip;
+          return;
+        }
+      } catch (error) {
+        return;
+      }
+
+      chooseTip();
+    };
+
+    const showOverlay = () => {
+      chooseTip();
+      setProgress(0);
+      document.body.classList.add("is-page-transition-locked");
+      overlay.classList.add("is-visible");
+    };
+
+    const hideOverlay = () => {
+      overlay.classList.remove("is-visible");
+      document.documentElement.classList.remove("is-page-transition-arriving");
+      document.body.classList.remove("is-page-transition-locked");
+
+      try {
+        sessionStorage.removeItem("page-transition-active");
+        sessionStorage.removeItem("page-transition-tip");
+      } catch (error) {
+        return;
+      }
+    };
+
+    const startProgress = () => {
+      const startTime = window.performance.now();
+
+      const tick = () => {
+        const elapsed = window.performance.now() - startTime;
+        const softLimit = Math.min(92, 14 + elapsed / 42);
+
+        setProgress(currentProgress + (softLimit - currentProgress) * 0.12);
+        progressFrame = window.requestAnimationFrame(tick);
+      };
+
+      progressFrame = window.requestAnimationFrame(tick);
+    };
+
+    const stopProgress = () => {
+      if (progressFrame) {
+        window.cancelAnimationFrame(progressFrame);
+        progressFrame = 0;
+      }
+    };
+
+    const isTransitionableLink = (link, event) => {
+      if (
+        event.defaultPrevented ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey ||
+        link.hasAttribute("download") ||
+        link.dataset.noTransition === "true"
+      ) {
+        return false;
+      }
+
+      const target = link.getAttribute("target");
+
+      if (target && target !== "_self") {
+        return false;
+      }
+
+      const url = new URL(link.href, window.location.href);
+      const currentUrl = new URL(window.location.href);
+
+      if (!["http:", "https:"].includes(url.protocol) || url.origin !== currentUrl.origin) {
+        return false;
+      }
+
+      if (url.pathname === currentUrl.pathname && url.search === currentUrl.search) {
+        return !url.hash && url.href !== currentUrl.href;
+      }
+
+      return !/\.(?:avif|gif|jpe?g|json|pdf|png|svg|webp|xml|zip)$/i.test(url.pathname);
+    };
+
+    const prepareNextPage = (url) => {
+      if (!window.fetch || !window.AbortController) {
+        return Promise.resolve();
+      }
+
+      const controller = new AbortController();
+      const timeout = window.setTimeout(() => controller.abort(), maxWaitMs);
+
+      return fetch(url.href, {
+        cache: "force-cache",
+        credentials: "same-origin",
+        signal: controller.signal,
+      })
+        .catch(() => undefined)
+        .finally(() => window.clearTimeout(timeout));
+    };
+
+    const navigateWithOverlay = async (url) => {
+      if (isNavigating) {
+        return;
+      }
+
+      isNavigating = true;
+      showOverlay();
+      startProgress();
+
+      try {
+        if (tipElement) {
+          sessionStorage.setItem("page-transition-tip", tipElement.textContent);
+        }
+      } catch (error) {
+        // The overlay still works if storage is unavailable.
+      }
+
+      await Promise.all([wait(minVisibleMs), prepareNextPage(url)]);
+      stopProgress();
+      setProgress(100);
+
+      try {
+        sessionStorage.setItem("page-transition-active", "true");
+      } catch (error) {
+        // Navigation should not depend on session storage.
+      }
+
+      window.setTimeout(() => {
+        window.location.assign(url.href);
+      }, 170);
+    };
+
+    document.addEventListener("click", (event) => {
+      const link = event.target.closest("a[href]");
+
+      if (!link || !isTransitionableLink(link, event)) {
+        return;
+      }
+
+      event.preventDefault();
+      navigateWithOverlay(new URL(link.href, window.location.href));
+    });
+
+    if (document.documentElement.classList.contains("is-page-transition-arriving")) {
+      applySavedTip();
+      setProgress(100);
+      document.body.classList.add("is-page-transition-locked");
+
+      const fadeAfterLoad = () => window.setTimeout(hideOverlay, 260);
+
+      if (document.readyState === "complete") {
+        fadeAfterLoad();
+      } else {
+        window.addEventListener("load", fadeAfterLoad, { once: true });
+      }
+    }
+
+    window.addEventListener("pageshow", (event) => {
+      if (event.persisted) {
+        stopProgress();
+        setProgress(0);
+        hideOverlay();
+        isNavigating = false;
+      }
+    });
+  }
+
   function enhanceComments() {
     const section = document.querySelector("[data-giscus-comments]");
 
@@ -656,6 +973,7 @@
     enhanceSearch();
     enhanceSearchPage();
     enhanceToc();
+    enhancePageTransitions();
     enhanceComments();
   });
 })();

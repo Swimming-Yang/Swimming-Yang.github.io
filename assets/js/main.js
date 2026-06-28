@@ -402,6 +402,8 @@
       return;
     }
 
+    let transitionTimer;
+
     const setTheme = (theme) => {
       document.documentElement.dataset.theme = theme;
       button.setAttribute("aria-label", theme === "dark" ? "밝은 테마로 변경" : "어두운 테마로 변경");
@@ -416,7 +418,12 @@
     setTheme(document.documentElement.dataset.theme || "light");
 
     button.addEventListener("click", () => {
+      window.clearTimeout(transitionTimer);
+      document.documentElement.classList.add("is-theme-switching");
       setTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
+      transitionTimer = window.setTimeout(() => {
+        document.documentElement.classList.remove("is-theme-switching");
+      }, 460);
     });
   }
 

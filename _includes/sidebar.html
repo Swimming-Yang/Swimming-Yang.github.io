@@ -1,8 +1,15 @@
 <aside class="site-sidebar" aria-label="블로그 사이드 메뉴">
   <section class="site-sidebar__block site-sidebar__profile">
-    <p class="section-kicker">Blog Menu</p>
-    <strong>Swimming-Yang</strong>
-    <span>개발 기록과 일상 아카이브</span>
+    <div class="site-sidebar__profile-card">
+      <div class="site-sidebar__avatar">
+        <img src="{{ '/assets/images/profile-swimming-yang.jpg' | relative_url }}" alt="Swimming-Yang 프로필 사진" loading="lazy" decoding="async">
+      </div>
+      <div class="site-sidebar__profile-text">
+        <p class="section-kicker">Profile</p>
+        <strong>Swimming-Yang</strong>
+        <span>개발 기록과 일상 아카이브</span>
+      </div>
+    </div>
   </section>
 
   <nav class="site-sidebar__block site-sidebar__nav" aria-label="카테고리 메뉴">
@@ -89,4 +96,16 @@
       {% endunless %}
     </section>
   {% endif %}
+
+  <section class="site-sidebar__block site-sidebar__bio">
+    <div class="site-sidebar__heading">
+      <strong>간단 소개</strong>
+    </div>
+    <p>WPF, C#, 웹 개발을 공부하며 배운 내용을 정리하고, 일상에서 오래 기억하고 싶은 순간도 함께 남기는 개인 아카이브입니다.</p>
+    <div class="site-sidebar__chips" aria-label="관심 분야">
+      <span>C#</span>
+      <span>WPF</span>
+      <span>Web</span>
+    </div>
+  </section>
 </aside>

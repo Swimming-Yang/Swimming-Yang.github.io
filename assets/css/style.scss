@@ -914,6 +914,36 @@ body.layout-home .category-menu__panel {
   border-bottom: 0;
 }
 
+.site-sidebar__profile-card {
+  display: grid;
+  gap: 12px;
+}
+
+.site-sidebar__avatar {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 4 / 5;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--surface-strong);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.45) inset,
+    0 12px 24px rgba(15, 23, 42, 0.08);
+}
+
+.site-sidebar__avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 62%;
+}
+
+.site-sidebar__profile-text {
+  display: grid;
+  gap: 5px;
+}
+
 .site-sidebar__profile strong {
   color: var(--text-strong);
   font-size: 1.08rem;
@@ -1084,6 +1114,34 @@ body.layout-home .category-menu__panel {
   font-size: 0.86rem;
   font-weight: 900;
   line-height: 1.45;
+}
+
+.site-sidebar__bio p {
+  margin: 0;
+  color: var(--muted-strong);
+  font-size: 0.86rem;
+  font-weight: 800;
+  line-height: 1.62;
+}
+
+.site-sidebar__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.site-sidebar__chips span {
+  display: inline-flex;
+  min-height: 24px;
+  align-items: center;
+  padding: 0 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.72rem;
+  font-weight: 900;
 }
 
 .section-kicker {
@@ -1686,8 +1744,8 @@ body.layout-home .home-section {
 
 .post-card__link {
   position: relative;
-  display: grid;
-  grid-template-rows: auto 1fr;
+  display: flex;
+  flex-direction: column;
   aspect-ratio: 3 / 4;
   height: 100%;
   min-height: 0;
@@ -1714,6 +1772,9 @@ body.layout-home .home-section {
   position: relative;
   z-index: 1;
   display: block;
+  flex: 0 0 auto;
+  width: 100%;
+  margin: 0;
   aspect-ratio: 16 / 9;
   overflow: hidden;
   border-bottom: 1px solid var(--line);
@@ -1748,6 +1809,7 @@ body.layout-home .home-section {
   position: relative;
   z-index: 1;
   display: grid;
+  flex: 1 1 auto;
   grid-template-rows: auto auto minmax(0, 1fr) auto;
   align-content: start;
   gap: 10px;
@@ -3045,8 +3107,13 @@ html[data-theme="dark"] .code-window__copy {
     padding: 16px;
   }
 
-  .site-sidebar__profile {
-    display: none;
+  .site-sidebar__profile-card {
+    grid-template-columns: 96px minmax(0, 1fr);
+    align-items: center;
+  }
+
+  .site-sidebar__avatar {
+    aspect-ratio: 1;
   }
 
   .site-sidebar__nav {
@@ -3317,6 +3384,11 @@ html[data-theme="dark"] .code-window__copy {
 
   .site-sidebar__block {
     padding: 14px 0;
+  }
+
+  .site-sidebar__profile-card {
+    grid-template-columns: 78px minmax(0, 1fr);
+    gap: 10px;
   }
 
   .site-sidebar__nav,

@@ -41,33 +41,33 @@
   {% endunless %}
 {% endif %}
 
-<article class="post-card post-card--{{ card_topic | default: 'default' }}">
-  <a class="post-card__link" href="{{ card_post.url | relative_url }}">
-    <span class="post-card__media{% unless has_card_image %} post-card__media--placeholder{% endunless %}">
+<article class="article-card article-card--{{ card_topic | default: 'default' }}">
+  <a class="article-card__link" href="{{ card_post.url | relative_url }}">
+    <figure class="article-card__media{% unless has_card_image %} article-card__media--placeholder{% endunless %}">
       {% if has_card_image %}
         <img src="{{ card_image_url }}" alt="{{ card_image_alt | escape }}" loading="lazy" decoding="async">
       {% else %}
         <span>{{ card_topic_label }}</span>
       {% endif %}
-    </span>
-    <span class="post-card__body">
-      <span class="post-card__eyebrow">
-        <span>{{ card_topic_label }}</span>
+    </figure>
+    <div class="article-card__content">
+      <div class="article-card__meta">
+        <span class="article-card__badge">{{ card_topic_label }}</span>
         <time datetime="{{ card_post.date | date_to_xmlschema }}">{{ card_post.date | date: "%Y.%m.%d" }}</time>
-      </span>
-      <span class="post-card__title">{{ card_post.title }}</span>
+      </div>
+      <h3 class="article-card__title">{{ card_post.title }}</h3>
       {% if card_post.description %}
-        <span class="post-card__excerpt">{{ card_post.description | strip_html | truncate: 96 }}</span>
+        <p class="article-card__excerpt">{{ card_post.description | strip_html | truncate: 96 }}</p>
       {% elsif card_post.excerpt %}
-        <span class="post-card__excerpt">{{ card_post.excerpt | strip_html | truncate: 96 }}</span>
+        <p class="article-card__excerpt">{{ card_post.excerpt | strip_html | truncate: 96 }}</p>
       {% endif %}
-      <span class="post-card__footer">
+      <div class="article-card__footer">
         <span>Read article</span>
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M7 17 17 7"></path>
           <path d="M9 7h8v8"></path>
         </svg>
-      </span>
-    </span>
+      </div>
+    </div>
   </a>
 </article>

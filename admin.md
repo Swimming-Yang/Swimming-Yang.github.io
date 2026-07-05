@@ -120,11 +120,40 @@ extra_js:
             <div class="admin-editor-head">
               <span>본문</span>
               <div class="admin-toolbar" aria-label="글쓰기 도구">
-                <select class="admin-format-select" aria-label="글자 크기" data-admin-format>
+                <select class="admin-font-select" aria-label="글꼴" data-admin-font>
+                  <option value="">기본 글꼴</option>
+                  <option value="text-font-sans">Noto Sans</option>
+                  <option value="text-font-serif">Serif</option>
+                  <option value="text-font-mono">Mono</option>
+                </select>
+                <select class="admin-size-select" aria-label="글자 크기" data-admin-text-size>
+                  <option value="">기본 크기</option>
+                  <option value="text-size-small">작게</option>
+                  <option value="text-size-large">크게</option>
+                  <option value="text-size-xl">더 크게</option>
+                </select>
+                <select class="admin-format-select" aria-label="문단 형식" data-admin-format>
                   <option value="paragraph">문단</option>
                   <option value="h2">큰 제목</option>
                   <option value="h3">중간 제목</option>
                   <option value="h4">작은 제목</option>
+                </select>
+                <select class="admin-code-language-select" aria-label="코드 언어" data-admin-code-language>
+                  <option value="">자동</option>
+                  <option value="text">Text</option>
+                  <option value="csharp">C#</option>
+                  <option value="xaml">XAML</option>
+                  <option value="javascript">JavaScript</option>
+                  <option value="typescript">TypeScript</option>
+                  <option value="html">HTML</option>
+                  <option value="css">CSS</option>
+                  <option value="sql">SQL</option>
+                  <option value="python">Python</option>
+                  <option value="powershell">PowerShell</option>
+                  <option value="bash">Shell</option>
+                  <option value="json">JSON</option>
+                  <option value="yaml">YAML</option>
+                  <option value="markdown">Markdown</option>
                 </select>
                 <button class="admin-tool-button admin-tool-button--text" type="button" data-admin-command="bold" title="굵게" aria-label="굵게">B</button>
                 <button class="admin-tool-button admin-tool-button--text" type="button" data-admin-command="italic" title="기울임" aria-label="기울임"><em>I</em></button>
@@ -132,6 +161,11 @@ extra_js:
                   <svg viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M8 10h-4a4 4 0 0 1 4-4v2a2 2 0 0 0-2 2h2v6H4v-6"></path>
                     <path d="M20 10h-4a4 4 0 0 1 4-4v2a2 2 0 0 0-2 2h2v6h-4v-6"></path>
+                  </svg>
+                </button>
+                <button class="admin-tool-button" type="button" data-admin-command="divider" title="구분선" aria-label="구분선">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M4 12h16"></path>
                   </svg>
                 </button>
                 <button class="admin-tool-button" type="button" data-admin-command="bullet" title="글머리 목록" aria-label="글머리 목록">

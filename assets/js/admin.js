@@ -19,6 +19,9 @@
   const codingTopicField = root.querySelector("[data-admin-coding-topic-field]");
   const lifeTopicField = root.querySelector("[data-admin-life-topic-field]");
   const formatSelect = root.querySelector("[data-admin-format]");
+  const fontSelect = root.querySelector("[data-admin-font]");
+  const textSizeSelect = root.querySelector("[data-admin-text-size]");
+  const codeLanguageSelect = root.querySelector("[data-admin-code-language]");
   const imageUpload = root.querySelector("[data-admin-image-upload]");
   const writeView = root.querySelector("[data-admin-write-view]");
   const previewView = root.querySelector("[data-admin-preview-view]");
@@ -28,6 +31,14 @@
   const fields = {};
   let token = tokenStorage.getItem(tokenKey) || window.localStorage.getItem(tokenKey) || "";
   let savedVisualRange = null;
+  const allowedInlineClasses = new Set([
+    "text-font-sans",
+    "text-font-serif",
+    "text-font-mono",
+    "text-size-small",
+    "text-size-large",
+    "text-size-xl",
+  ]);
   const codeLanguageNames = {
     csharp: "C#",
     "c#": "C#",
@@ -374,6 +385,12 @@
         continue;
       }
 
+      if (/^(-{3,}|\*{3,}|_{3,})$/.test(line.trim())) {
+        visualEditor.append(document.createElement("hr"));
+        index += 1;
+        continue;
+      }
+
       if (fence) {
         const language = normalizeCodeLanguage(fence[1]);
         const codeLines = [];
@@ -509,6 +526,10 @@
       return serializeVisualImage(element);
     }
 
+    if (tagName === "hr") {
+      return "---";
+    }
+
     if (/^h[1-6]$/.test(tagName)) {
       const level = Math.max(2, Math.min(4, Number(tagName.slice(1))));
       return `${"#".repeat(level)} ${serializeVisualInline(element).trim()}`;
@@ -588,7 +609,21 @@
       return href ? `[${content}](${href})` : content;
     }
 
+    if (tagName === "span") {
+      const classes = getAllowedInlineClassList(element);
+
+      if (classes) {
+        return `<span class="${classes}">${content}</span>`;
+      }
+    }
+
     return content;
+  }
+
+  function getAllowedInlineClassList(element) {
+    return Array.from(element.classList || [])
+      .filter((className) => allowedInlineClasses.has(className))
+      .join(" ");
   }
 
   function serializeVisualFigure(figure) {
@@ -619,11 +654,7 @@
   }
 
   function renderInlineMarkdownToHtml(value) {
-    return escapeHtml(value)
-      .replace(/`([^`]+)`/g, "<code>$1</code>")
-      .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-      .replace(/\*([^*]+)\*/g, "<em>$1</em>")
-      .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+|\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+    return formatInline(value);
   }
 
   function updateVisualEditorEmptyState() {
@@ -788,11 +819,7 @@
     label.className = "code-window__language";
     label.textContent = getCodeLanguageLabel(safeLanguage);
 
-    const hint = document.createElement("span");
-    hint.className = "admin-code-block__hint";
-    hint.textContent = "직접 입력";
-
-    toolbar.append(dots, label, hint);
+    toolbar.append(dots, label);
 
     const highlight = document.createElement("div");
     highlight.className = "highlight";
@@ -826,8 +853,12 @@
 
   function insertVisualCodeBlock() {
     const selected = takeVisualSelectionText() || "code";
-    const block = createVisualCodeBlock(getDefaultCodeLanguage(), selected);
+    const block = createVisualCodeBlock(getPreferredCodeLanguage(), selected);
     insertVisualBlock(block, block.querySelector("[data-admin-code-content]"));
+  }
+
+  function insertVisualDivider() {
+    insertVisualBlock(document.createElement("hr"), null);
   }
 
   function insertVisualImage(src, alt) {
@@ -844,9 +875,28 @@
     touchBodyEditor();
   }
 
+  function applyVisualInlineClass(className, placeholder) {
+    if (!allowedInlineClasses.has(className)) {
+      return;
+    }
+
+    restoreVisualSelection();
+
+    const selection = window.getSelection();
+    const selected = selection && !selection.isCollapsed ? selection.toString() : placeholder;
+
+    document.execCommand("insertHTML", false, `<span class="${className}">${escapeHtml(selected || "텍스트")}</span>`);
+    touchBodyEditor();
+  }
+
   function applyVisualEditorCommand(command) {
     if (command === "code") {
       insertVisualCodeBlock();
+      return;
+    }
+
+    if (command === "divider") {
+      insertVisualDivider();
       return;
     }
 
@@ -901,6 +951,7 @@
   function handleVisualEditorInput() {
     syncSourceFromVisualEditor();
     saveVisualSelection();
+    updateCodeLanguageSelectFromSelection();
     renderPreview();
   }
 
@@ -1024,6 +1075,62 @@
     return "text";
   }
 
+  function getPreferredCodeLanguage() {
+    const selected = String(codeLanguageSelect?.value || "").trim();
+
+    return selected ? normalizeCodeLanguage(selected) : getDefaultCodeLanguage();
+  }
+
+  function getActiveVisualCodeBlock() {
+    const selection = window.getSelection();
+
+    if (!selection || !selection.rangeCount || !isInsideVisualEditor(selection.anchorNode)) {
+      return null;
+    }
+
+    const node = selection.anchorNode.nodeType === Node.TEXT_NODE ? selection.anchorNode.parentElement : selection.anchorNode;
+
+    return node?.closest?.("[data-admin-code-block]") || null;
+  }
+
+  function setVisualCodeBlockLanguage(block, language) {
+    if (!block) {
+      return;
+    }
+
+    const safeLanguage = normalizeCodeLanguage(language || getDefaultCodeLanguage());
+    const codeElement = block.querySelector("[data-admin-code-content]");
+    const label = block.querySelector(".code-window__language");
+
+    block.dataset.language = safeLanguage;
+    block.className = `language-${safeLanguage} highlighter-rouge code-window admin-code-block`;
+
+    if (codeElement) {
+      codeElement.className = `language-${safeLanguage}`;
+    }
+
+    if (label) {
+      label.textContent = getCodeLanguageLabel(safeLanguage);
+    }
+
+    syncSourceFromVisualEditor();
+    renderPreview();
+  }
+
+  function updateCodeLanguageSelectFromSelection() {
+    if (!codeLanguageSelect) {
+      return;
+    }
+
+    const block = getActiveVisualCodeBlock();
+
+    if (!block) {
+      return;
+    }
+
+    codeLanguageSelect.value = normalizeCodeLanguage(block.dataset.language || "");
+  }
+
   function applyEditorCommand(command) {
     if (visualEditor) {
       applyVisualEditorCommand(command);
@@ -1047,6 +1154,17 @@
 
     if (command === "code") {
       insertCodeBlock();
+      return;
+    }
+
+    if (command === "divider") {
+      const start = fields.body.selectionStart;
+      const end = fields.body.selectionEnd;
+      const before = start > 0 && fields.body.value[start - 1] !== "\n" ? "\n\n" : "";
+      const after = end < fields.body.value.length && fields.body.value[end] !== "\n" ? "\n\n" : "";
+      const divider = `${before}---${after}`;
+
+      replaceBodyRange(start, end, divider, start + divider.length, start + divider.length);
       return;
     }
 
@@ -1256,6 +1374,7 @@
       const listItem = line.match(/^[-*]\s+(.+)$/);
       const orderedListItem = line.match(/^\d+\.\s+(.+)$/);
       const quote = line.match(/^>\s+(.+)$/);
+      const divider = /^(-{3,}|\*{3,}|_{3,})$/.test(line.trim());
       const table = line.includes("|") && line.trim().startsWith("|");
 
       if (table) {
@@ -1270,6 +1389,13 @@
       }
 
       flushTable();
+
+      if (divider) {
+        flushParagraph();
+        closeList();
+        html.push("<hr>");
+        return;
+      }
 
       if (heading) {
         flushParagraph();
@@ -1339,11 +1465,31 @@
   }
 
   function formatInline(value) {
-    return escapeHtml(value)
+    const protectedSpans = [];
+    const source = String(value || "").replace(
+      /<span class="((?:text-font-(?:sans|serif|mono)|text-size-(?:small|large|xl))(?:\s+(?:text-font-(?:sans|serif|mono)|text-size-(?:small|large|xl)))*)">([\s\S]*?)<\/span>/g,
+      (_match, classList, content) => {
+        const token = `@@ADMIN_INLINE_SPAN_${protectedSpans.length}@@`;
+        const classes = String(classList)
+          .split(/\s+/)
+          .filter((className) => allowedInlineClasses.has(className))
+          .join(" ");
+
+        protectedSpans.push(`<span class="${escapeAttribute(classes)}">${formatInline(content)}</span>`);
+        return token;
+      }
+    );
+    let html = escapeHtml(source)
       .replace(/`([^`]+)`/g, "<code>$1</code>")
       .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
       .replace(/\*([^*]+)\*/g, "<em>$1</em>")
       .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+|\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+
+    protectedSpans.forEach((span, index) => {
+      html = html.replace(`@@ADMIN_INLINE_SPAN_${index}@@`, span);
+    });
+
+    return html;
   }
 
   function renderCodeBlockStart(language) {
@@ -1372,7 +1518,20 @@
       .toLowerCase()
       .replace(/[^a-z0-9#+._-]/g, "");
 
-    return language || "text";
+    const aliases = {
+      "c#": "csharp",
+      cs: "csharp",
+      js: "javascript",
+      ts: "typescript",
+      py: "python",
+      ps1: "powershell",
+      shell: "bash",
+      sh: "bash",
+      yml: "yaml",
+      plaintext: "text",
+    };
+
+    return aliases[language] || language || "text";
   }
 
   function getCodeLanguageLabel(language) {
@@ -1502,6 +1661,40 @@
       });
     }
 
+    if (fontSelect) {
+      fontSelect.addEventListener("change", () => {
+        if (visualEditor) {
+          applyVisualInlineClass(fontSelect.value, "글꼴");
+        } else if (fontSelect.value) {
+          wrapBodySelection(`<span class="${fontSelect.value}">`, "</span>", "글꼴");
+        }
+
+        fontSelect.value = "";
+      });
+    }
+
+    if (textSizeSelect) {
+      textSizeSelect.addEventListener("change", () => {
+        if (visualEditor) {
+          applyVisualInlineClass(textSizeSelect.value, "크기");
+        } else if (textSizeSelect.value) {
+          wrapBodySelection(`<span class="${textSizeSelect.value}">`, "</span>", "크기");
+        }
+
+        textSizeSelect.value = "";
+      });
+    }
+
+    if (codeLanguageSelect) {
+      codeLanguageSelect.addEventListener("change", () => {
+        const block = getActiveVisualCodeBlock();
+
+        if (block) {
+          setVisualCodeBlockLanguage(block, getPreferredCodeLanguage());
+        }
+      });
+    }
+
     if (imageUpload) {
       imageUpload.addEventListener("change", uploadSelectedImage);
     }
@@ -1511,9 +1704,18 @@
       visualEditor.addEventListener("keydown", handleVisualEditorKeydown);
       visualEditor.addEventListener("paste", handleVisualEditorPaste);
       visualEditor.addEventListener("focus", saveVisualSelection);
-      visualEditor.addEventListener("keyup", saveVisualSelection);
-      visualEditor.addEventListener("mouseup", saveVisualSelection);
-      document.addEventListener("selectionchange", saveVisualSelection);
+      visualEditor.addEventListener("keyup", () => {
+        saveVisualSelection();
+        updateCodeLanguageSelectFromSelection();
+      });
+      visualEditor.addEventListener("mouseup", () => {
+        saveVisualSelection();
+        updateCodeLanguageSelectFromSelection();
+      });
+      document.addEventListener("selectionchange", () => {
+        saveVisualSelection();
+        updateCodeLanguageSelectFromSelection();
+      });
     }
 
     preview.addEventListener("click", handlePreviewClick);

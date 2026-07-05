@@ -297,13 +297,6 @@
   margin: 1.8rem 0;
 }
 
-.admin-code-block__hint {
-  justify-self: end;
-  color: #8f9db0;
-  font-size: 0.78rem;
-  font-weight: 900;
-}
-
 .admin-visual-editor [data-admin-code-content] {
   display: block;
   min-height: 132px;
@@ -336,7 +329,10 @@
   background: var(--surface-strong);
 }
 
-.admin-toolbar .admin-format-select {
+.admin-toolbar .admin-format-select,
+.admin-toolbar .admin-font-select,
+.admin-toolbar .admin-size-select,
+.admin-toolbar .admin-code-language-select {
   width: auto;
   min-width: 96px;
   height: 34px;
@@ -347,6 +343,18 @@
   color: var(--text);
   font-size: 0.8rem;
   font-weight: 900;
+}
+
+.admin-toolbar .admin-font-select {
+  min-width: 120px;
+}
+
+.admin-toolbar .admin-size-select {
+  min-width: 94px;
+}
+
+.admin-toolbar .admin-code-language-select {
+  min-width: 122px;
 }
 
 .admin-tool-button {
@@ -365,7 +373,10 @@
 
 .admin-tool-button:hover,
 .admin-tool-button:focus-visible,
-.admin-toolbar .admin-format-select:focus-visible {
+.admin-toolbar .admin-format-select:focus-visible,
+.admin-toolbar .admin-font-select:focus-visible,
+.admin-toolbar .admin-size-select:focus-visible,
+.admin-toolbar .admin-code-language-select:focus-visible {
   border-color: var(--accent);
   color: var(--accent-strong);
   outline: 2px solid var(--accent-ring);

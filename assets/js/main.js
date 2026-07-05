@@ -401,6 +401,27 @@
     });
   }
 
+  function enhanceHomeHeroVideo() {
+    const video = document.querySelector("[data-home-hero-video]");
+
+    if (!video) {
+      return;
+    }
+
+    const showVideo = () => {
+      video.classList.add("is-ready");
+    };
+
+    if (video.readyState >= 2) {
+      showVideo();
+      return;
+    }
+
+    video.addEventListener("loadeddata", showVideo, { once: true });
+    video.addEventListener("canplay", showVideo, { once: true });
+    video.addEventListener("playing", showVideo, { once: true });
+  }
+
   function enhanceCategoryMenu() {
     const menu = document.querySelector("[data-category-menu]");
 
@@ -1033,6 +1054,7 @@
     enhanceCodeBlocks();
     enhanceContentDividers();
     enhanceBlogStats();
+    enhanceHomeHeroVideo();
     enhanceHomeTyping();
     enhanceCategoryMenu();
     enhanceThemeToggle();

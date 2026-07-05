@@ -35,17 +35,24 @@
 
 .home-hero__fallback {
   z-index: 0;
-  background: url("/assets/images/home-workspace-1280.jpg") center / cover;
+  background: url("/assets/images/home-hero-poster.jpg") center / cover;
 }
 
 .home-hero__video {
   z-index: 1;
   object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.7s ease;
+}
+
+.home-hero__video.is-ready {
+  opacity: 1;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .home-hero__video {
     display: none;
+    transition: none;
   }
 }
 
@@ -816,4 +823,3 @@ body.layout-home .home-section {
 .curation-item:hover strong {
   color: var(--accent-strong);
 }
-

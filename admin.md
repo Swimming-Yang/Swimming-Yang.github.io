@@ -87,9 +87,18 @@ extra_js:
               </select>
             </label>
 
-            <label class="admin-field" data-admin-topic-field>
+            <label class="admin-field" data-admin-life-topic-field>
               <span>주제</span>
-              <select name="topic" data-admin-field="topic">
+              <select name="life_topic" data-admin-field="lifeTopic">
+                {% for topic in site.data.life_topics %}
+                  <option value="{{ topic.slug }}">{{ topic.title }}</option>
+                {% endfor %}
+              </select>
+            </label>
+
+            <label class="admin-field" data-admin-coding-topic-field hidden>
+              <span>주제</span>
+              <select name="coding_topic" data-admin-field="codingTopic">
                 {% for topic in site.data.coding_topics %}
                   <option value="{{ topic.slug }}">{{ topic.title }}</option>
                 {% endfor %}
@@ -167,7 +176,15 @@ extra_js:
                 <input class="admin-file-input" type="file" accept="image/png,image/jpeg,image/webp,image/gif" data-admin-image-upload>
               </div>
             </div>
-            <textarea name="body" rows="22" spellcheck="false" data-admin-field="body"></textarea>
+            <div
+              class="admin-visual-editor content"
+              contenteditable="true"
+              role="textbox"
+              aria-multiline="true"
+              aria-label="본문"
+              data-admin-visual-editor
+            ></div>
+            <textarea class="admin-body-source" name="body" rows="22" spellcheck="false" data-admin-field="body"></textarea>
           </div>
         </div>
 

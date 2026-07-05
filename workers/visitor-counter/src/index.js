@@ -12,7 +12,8 @@ const DEFAULT_ADMIN_LOGIN = "Swimming-Yang";
 const DEFAULT_SESSION_TTL_SECONDS = 60 * 60 * 4;
 const MAX_POST_BODY_BYTES = 1024 * 1024;
 const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
-const CODING_TOPICS = new Set(["csharp", "wpf", "unity", "cs", "ps"]);
+const CODING_TOPICS = new Set(["csharp", "wpf", "unity", "cs", "ps", "database"]);
+const LIFE_TOPICS = new Set(["health", "travel", "food", "issue"]);
 const IMAGE_MIME_TYPES = new Map([
   ["image/jpeg", "jpg"],
   ["image/png", "png"],
@@ -362,11 +363,11 @@ async function createGitHubFile(env, path, markdown, post, user) {
       content: base64Encode(markdown),
       committer: {
         name: env.GITHUB_COMMITTER_NAME || user.name || user.login,
-        email: env.GITHUB_COMMITTER_EMAIL || "ysw1mst@gmail.com",
+        email: env.GITHUB_COMMITTER_EMAIL || "ysw1mst@naver.com",
       },
       author: {
         name: env.GITHUB_AUTHOR_NAME || user.name || user.login,
-        email: env.GITHUB_AUTHOR_EMAIL || env.GITHUB_COMMITTER_EMAIL || "ysw1mst@gmail.com",
+        email: env.GITHUB_AUTHOR_EMAIL || env.GITHUB_COMMITTER_EMAIL || "ysw1mst@naver.com",
       },
     }),
   });
@@ -400,11 +401,11 @@ async function createGitHubBinaryFile(env, path, bytes, message, user) {
       content: base64EncodeBytes(bytes),
       committer: {
         name: env.GITHUB_COMMITTER_NAME || user.name || user.login,
-        email: env.GITHUB_COMMITTER_EMAIL || "ysw1mst@gmail.com",
+        email: env.GITHUB_COMMITTER_EMAIL || "ysw1mst@naver.com",
       },
       author: {
         name: env.GITHUB_AUTHOR_NAME || user.name || user.login,
-        email: env.GITHUB_AUTHOR_EMAIL || env.GITHUB_COMMITTER_EMAIL || "ysw1mst@gmail.com",
+        email: env.GITHUB_AUTHOR_EMAIL || env.GITHUB_COMMITTER_EMAIL || "ysw1mst@naver.com",
       },
     }),
   });
@@ -450,10 +451,14 @@ function normalizePostInput(input) {
     throw new HttpError("A valid coding topic is required.", 400);
   }
 
+  if (category === "life" && !LIFE_TOPICS.has(topic)) {
+    throw new HttpError("A valid life topic is required.", 400);
+  }
+
   return {
     title,
     category,
-    topic: category === "coding" ? topic : "",
+    topic,
     body,
     description,
     image,
@@ -465,7 +470,7 @@ function normalizePostInput(input) {
 }
 
 function buildPostMarkdown(post) {
-  const categories = post.category === "coding" ? ["coding", post.topic] : ["life"];
+  const categories = [post.category, post.topic];
   const lines = [
     "---",
     "layout: post",
@@ -499,7 +504,7 @@ function getPostPath(post) {
     return `_posts/coding/${post.topic}/${post.datePrefix}-${post.slug}.md`;
   }
 
-  return `_posts/life/${post.datePrefix}-${post.slug}.md`;
+  return `_posts/life/${post.topic}/${post.datePrefix}-${post.slug}.md`;
 }
 
 async function requireAdminSession(request, env, corsHeaders) {
@@ -597,6 +602,7 @@ function getPublicAdminConfig(env) {
     adminLogin: getPrimaryAdminLogin(env),
     categories: ["life", "coding"],
     codingTopics: [...CODING_TOPICS],
+    lifeTopics: [...LIFE_TOPICS],
   };
 }
 

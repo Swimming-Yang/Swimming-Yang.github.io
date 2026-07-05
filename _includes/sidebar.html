@@ -36,14 +36,21 @@
       {% endfor %}
     </div>
 
-    <a class="{% if page.url == '/health/' or page.categories contains 'health' %}is-active{% endif %}" href="{{ '/health/' | relative_url }}">
-      <span>건강</span>
-      <em>{{ site.categories.health.size | default: 0 }}</em>
-    </a>
-    <a class="{% if page.url == '/life/' or page.categories contains 'life' %}is-active{% endif %}" href="{{ '/life/' | relative_url }}">
+    <a class="{% if page.url contains '/life/' or page.categories contains 'life' %}is-active{% endif %}" href="{{ '/life/' | relative_url }}">
       <span>일상</span>
       <em>{{ site.categories.life.size | default: 0 }}</em>
     </a>
+
+    <div class="site-sidebar__subnav" aria-label="일상 주제">
+      {% for topic in site.data.life_topics %}
+        {% assign topic_posts = site.categories.life | where: "topic", topic.slug %}
+        <a class="{% if page.topic == topic.slug and page.url contains '/life/' %}is-active{% endif %}" href="{{ '/life/' | append: topic.slug | append: '/' | relative_url }}">
+          <span>{{ topic.title }}</span>
+          <em>{{ topic_posts.size }}</em>
+        </a>
+      {% endfor %}
+    </div>
+
     <a class="{% if page.url == '/about/' %}is-active{% endif %}" href="{{ '/about/' | relative_url }}">
       <span>소개</span>
       <em>About</em>
@@ -58,14 +65,18 @@
     <div class="site-sidebar__posts">
       {% for post in site.posts limit:5 %}
         {% assign post_topic = "" %}
-        {% if post.topic %}
+        {% if post.topic and post.categories contains "coding" %}
           {% for topic in site.data.coding_topics %}
             {% if topic.slug == post.topic %}
               {% assign post_topic = topic.title %}
             {% endif %}
           {% endfor %}
-        {% elsif post.categories contains "health" %}
-          {% assign post_topic = "Health" %}
+        {% elsif post.topic and post.categories contains "life" %}
+          {% for topic in site.data.life_topics %}
+            {% if topic.slug == post.topic %}
+              {% assign post_topic = topic.title %}
+            {% endif %}
+          {% endfor %}
         {% elsif post.categories contains "life" %}
           {% assign post_topic = "Life" %}
         {% endif %}

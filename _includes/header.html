@@ -16,8 +16,7 @@
       <a class="{% if page.url == '/' %}is-active{% endif %}" href="{{ '/' | relative_url }}">홈</a>
       <a class="{% if page.url == '/blog/' %}is-active{% endif %}" href="{{ '/blog/' | relative_url }}">전체 글</a>
       <a class="{% if page.url == '/coding/' or page.categories contains 'coding' %}is-active{% endif %}" href="{{ '/coding/' | relative_url }}">코딩</a>
-      <a class="{% if page.url == '/health/' or page.categories contains 'health' %}is-active{% endif %}" href="{{ '/health/' | relative_url }}">건강</a>
-      <a class="{% if page.url == '/life/' or page.categories contains 'life' %}is-active{% endif %}" href="{{ '/life/' | relative_url }}">일상</a>
+      <a class="{% if page.url contains '/life/' or page.categories contains 'life' %}is-active{% endif %}" href="{{ '/life/' | relative_url }}">일상</a>
       <a class="{% if page.url == '/about/' %}is-active{% endif %}" href="{{ '/about/' | relative_url }}">소개</a>
       <a class="{% if page.url == '/admin/' %}is-active{% endif %}" href="{{ '/admin/' | relative_url }}" data-admin-entry hidden>글쓰기</a>
     </nav>
@@ -59,18 +58,25 @@
           </div>
 
           <div class="category-menu__section">
+            <p>Life</p>
+            <a class="{% if page.url == '/life/' %}is-active{% endif %}" href="{{ '/life/' | relative_url }}">
+              <span>일상 전체</span>
+              <em>{{ site.categories.life.size | default: 0 }}</em>
+            </a>
+            {% for topic in site.data.life_topics %}
+              {% assign topic_posts = site.categories.life | where: "topic", topic.slug %}
+              <a class="{% if page.topic == topic.slug and page.url contains '/life/' %}is-active{% endif %}" href="{{ '/life/' | append: topic.slug | append: '/' | relative_url }}">
+                <span>{{ topic.title }}</span>
+                <em>{{ topic_posts.size }}</em>
+              </a>
+            {% endfor %}
+          </div>
+
+          <div class="category-menu__section">
             <p>Archive</p>
             <a class="{% if page.url == '/' %}is-active{% endif %}" href="{{ '/' | relative_url }}">
               <span>홈</span>
               <em>Home</em>
-            </a>
-            <a class="{% if page.url == '/health/' or page.categories contains 'health' %}is-active{% endif %}" href="{{ '/health/' | relative_url }}">
-              <span>건강</span>
-              <em>{{ site.categories.health.size | default: 0 }}</em>
-            </a>
-            <a href="{{ '/life/' | relative_url }}">
-              <span>일상</span>
-              <em>{{ site.categories.life.size | default: 0 }}</em>
             </a>
             <a href="{{ '/blog/' | relative_url }}">
               <span>전체 글</span>

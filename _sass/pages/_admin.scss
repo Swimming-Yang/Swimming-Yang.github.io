@@ -253,6 +253,70 @@
   line-height: 1.65;
 }
 
+.admin-body-source {
+  display: none;
+}
+
+.admin-visual-editor {
+  position: relative;
+  min-height: 540px;
+  padding: 20px;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.72;
+  outline: none;
+}
+
+.admin-visual-editor:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-ring);
+}
+
+.admin-visual-editor.is-empty::before {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  color: var(--muted);
+  content: "본문을 입력하세요.";
+  font-weight: 800;
+  pointer-events: none;
+}
+
+.admin-visual-editor p {
+  min-height: 1.72em;
+}
+
+.admin-visual-editor figure {
+  margin: 1.8rem 0;
+}
+
+.admin-visual-editor .admin-code-block {
+  margin: 1.8rem 0;
+}
+
+.admin-code-block__hint {
+  justify-self: end;
+  color: #8f9db0;
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.admin-visual-editor [data-admin-code-content] {
+  display: block;
+  min-height: 132px;
+  outline: none;
+  white-space: pre-wrap;
+}
+
+.admin-visual-editor [data-admin-code-content]:empty::before {
+  color: #7d8f9b;
+  content: attr(data-placeholder);
+  pointer-events: none;
+}
+
 .admin-editor-head {
   display: flex;
   align-items: flex-end;

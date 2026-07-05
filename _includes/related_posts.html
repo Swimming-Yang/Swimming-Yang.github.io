@@ -1,7 +1,7 @@
 {% assign related_pool = site.posts | where: "url", "__no_related_posts__" %}
 {% assign related_title = "" %}
 
-{% if page.topic %}
+{% if page.topic and page.categories contains "coding" %}
   {% assign related_pool = site.categories.coding | where: "topic", page.topic %}
   {% assign related_title = page.topic %}
   {% for topic in site.data.coding_topics %}
@@ -9,12 +9,17 @@
       {% assign related_title = topic.title %}
     {% endif %}
   {% endfor %}
+{% elsif page.topic and page.categories contains "life" %}
+  {% assign related_pool = site.categories.life | where: "topic", page.topic %}
+  {% assign related_title = page.topic %}
+  {% for topic in site.data.life_topics %}
+    {% if topic.slug == page.topic %}
+      {% assign related_title = topic.title %}
+    {% endif %}
+  {% endfor %}
 {% elsif page.categories contains "life" %}
   {% assign related_pool = site.categories.life %}
   {% assign related_title = "Life" %}
-{% elsif page.categories contains "health" %}
-  {% assign related_pool = site.categories.health %}
-  {% assign related_title = "Health" %}
 {% elsif page.categories contains "coding" %}
   {% assign related_pool = site.categories.coding %}
   {% assign related_title = "Coding" %}
@@ -37,8 +42,14 @@
             <span class="related-post__title">{{ related.title }}</span>
             <span class="related-post__meta">
               <time datetime="{{ related.date | date_to_xmlschema }}">{{ related.date | date: "%Y.%m.%d" }}</time>
-              {% if related.topic %}
+              {% if related.topic and related.categories contains "coding" %}
                 {% for topic in site.data.coding_topics %}
+                  {% if topic.slug == related.topic %}
+                    <span>{{ topic.title }}</span>
+                  {% endif %}
+                {% endfor %}
+              {% elsif related.topic and related.categories contains "life" %}
+                {% for topic in site.data.life_topics %}
                   {% if topic.slug == related.topic %}
                     <span>{{ topic.title }}</span>
                   {% endif %}

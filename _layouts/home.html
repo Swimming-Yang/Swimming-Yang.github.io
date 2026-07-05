@@ -4,7 +4,7 @@ layout: default
 
 {% assign coding_posts = site.categories.coding %}
 {% assign life_posts = site.categories.life %}
-{% assign health_posts = site.categories.health %}
+{% assign health_posts = site.categories.life | where: "topic", "health" %}
 
 <section class="home-hero" aria-labelledby="home-title">
   <div class="home-hero__fallback" aria-hidden="true"></div>
@@ -76,7 +76,7 @@ layout: default
         <em>{{ topic_posts.size }} posts</em>
       </a>
     {% endfor %}
-    <a class="topic-card topic-card--health" href="{{ '/health/' | relative_url }}">
+    <a class="topic-card topic-card--health" href="{{ '/life/health/' | relative_url }}">
       <span class="topic-card__rank">#{{ site.data.coding_topics.size | plus: 1 }}</span>
       <strong>Health</strong>
       <p>운동, 수면, 식단, 컨디션을 꾸준히 기록하는 공간입니다.</p>

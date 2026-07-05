@@ -4,11 +4,31 @@ permalink: /search.json
 ---
 [
   {% for post in site.posts %}
+    {% assign topic_label = "" %}
+    {% if post.topic and post.categories contains "coding" %}
+      {% assign topic_label = post.topic %}
+      {% for topic in site.data.coding_topics %}
+        {% if topic.slug == post.topic %}
+          {% assign topic_label = topic.title %}
+        {% endif %}
+      {% endfor %}
+    {% elsif post.topic and post.categories contains "life" %}
+      {% assign topic_label = post.topic %}
+      {% for topic in site.data.life_topics %}
+        {% if topic.slug == post.topic %}
+          {% assign topic_label = topic.title %}
+        {% endif %}
+      {% endfor %}
+    {% elsif post.categories contains "life" %}
+      {% assign topic_label = "Life" %}
+    {% else %}
+      {% assign topic_label = "Post" %}
+    {% endif %}
     {
       "title": {{ post.title | jsonify }},
       "url": {{ post.url | relative_url | jsonify }},
       "date": {{ post.date | date: "%Y.%m.%d" | jsonify }},
-      "topic": {% if post.topic %}{% assign topic_label = post.topic %}{% for topic in site.data.coding_topics %}{% if topic.slug == post.topic %}{% assign topic_label = topic.title %}{% endif %}{% endfor %}{{ topic_label | jsonify }}{% elsif post.categories contains "life" %}"Life"{% else %}"Post"{% endif %},
+      "topic": {{ topic_label | jsonify }},
       "excerpt": {{ post.excerpt | strip_html | normalize_whitespace | truncate: 140 | jsonify }},
       "tags": {{ post.tags | join: " " | jsonify }}
     }{% unless forloop.last %},{% endunless %}

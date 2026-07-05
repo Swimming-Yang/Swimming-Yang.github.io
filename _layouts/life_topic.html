@@ -1,0 +1,9 @@
+---
+layout: page
+---
+
+{% assign posts = site.categories.life | where: "topic", page.topic %}
+
+<section class="coding-board" aria-label="{{ page.title }} 글">
+  {% include post_grid.html posts=posts board=true empty_message="아직 이 주제의 글이 없습니다." %}
+</section>

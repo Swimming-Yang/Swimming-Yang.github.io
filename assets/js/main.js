@@ -25,6 +25,7 @@
     yml: "YAML",
     markdown: "Markdown",
     md: "Markdown",
+    sql: "SQL",
     plaintext: "Code",
     text: "Code",
   };
@@ -73,7 +74,7 @@
   }
 
   function enhanceCodeBlocks() {
-    const blocks = document.querySelectorAll(".content div[class*='language-'].highlighter-rouge");
+    const blocks = document.querySelectorAll(".content .highlighter-rouge");
 
     blocks.forEach((block) => {
       if (block.classList.contains("code-window")) {

@@ -14,7 +14,7 @@ permalink: /about/
     </p>
     <div class="about-actions">
       <a class="about-button about-button--primary" href="https://github.com/Swimming-Yang" target="_blank" rel="noopener noreferrer">GitHub</a>
-      <a class="about-button" href="mailto:ysw1mst@gmail.com">Email</a>
+      <a class="about-button" href="mailto:ysw1mst@naver.com">Email</a>
       <a class="about-button" href="{{ '/coding/' | relative_url }}">Coding</a>
     </div>
   </div>
@@ -118,7 +118,7 @@ permalink: /about/
     <h2>기록은 느리게, 성장은 꾸준히.</h2>
   </div>
   <div class="about-contact__links">
-    <a href="mailto:ysw1mst@gmail.com">ysw1mst@gmail.com</a>
+    <a href="mailto:ysw1mst@naver.com">ysw1mst@naver.com</a>
     <a href="https://github.com/Swimming-Yang" target="_blank" rel="noopener noreferrer">github.com/Swimming-Yang</a>
   </div>
 </section>

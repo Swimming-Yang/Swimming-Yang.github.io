@@ -16,15 +16,48 @@
   const status = root.querySelector("[data-admin-status]");
   const preview = root.querySelector("[data-admin-preview]");
   const form = root.querySelector("[data-admin-form]");
-  const topicField = root.querySelector("[data-admin-topic-field]");
+  const codingTopicField = root.querySelector("[data-admin-coding-topic-field]");
+  const lifeTopicField = root.querySelector("[data-admin-life-topic-field]");
   const formatSelect = root.querySelector("[data-admin-format]");
   const imageUpload = root.querySelector("[data-admin-image-upload]");
   const writeView = root.querySelector("[data-admin-write-view]");
   const previewView = root.querySelector("[data-admin-preview-view]");
   const modeTitle = root.querySelector("[data-admin-mode-title]");
   const viewButtons = root.querySelectorAll("[data-admin-view]");
+  const visualEditor = root.querySelector("[data-admin-visual-editor]");
   const fields = {};
   let token = tokenStorage.getItem(tokenKey) || window.localStorage.getItem(tokenKey) || "";
+  let savedVisualRange = null;
+  const codeLanguageNames = {
+    csharp: "C#",
+    "c#": "C#",
+    cs: "C#",
+    xaml: "XAML",
+    xml: "XML",
+    unity: "Unity",
+    javascript: "JavaScript",
+    js: "JavaScript",
+    typescript: "TypeScript",
+    ts: "TypeScript",
+    css: "CSS",
+    scss: "SCSS",
+    html: "HTML",
+    bash: "Shell",
+    shell: "Shell",
+    sh: "Shell",
+    powershell: "PowerShell",
+    ps1: "PowerShell",
+    python: "Python",
+    py: "Python",
+    sql: "SQL",
+    json: "JSON",
+    yaml: "YAML",
+    yml: "YAML",
+    markdown: "Markdown",
+    md: "Markdown",
+    plaintext: "Code",
+    text: "Code",
+  };
 
   window.localStorage.removeItem(tokenKey);
 
@@ -207,9 +240,11 @@
   }
 
   function getPayload() {
+    syncSourceFromVisualEditor();
+
     return {
       category: fields.category.value,
-      topic: fields.topic.value,
+      topic: getSelectedTopic(),
       date: getKoreanDateInput(),
       slug: "",
       tags: fields.tags.value.trim(),
@@ -222,6 +257,7 @@
 
   function initializeEditor() {
     updateTopicState();
+    hydrateVisualEditorFromSource();
     renderPreview();
   }
 
@@ -235,6 +271,7 @@
     });
     fields.category.value = "life";
     updateTopicState();
+    hydrateVisualEditorFromSource();
     renderPreview();
     setEditorView("write");
     setStatus("새 글을 시작합니다.", "info");
@@ -250,8 +287,8 @@
       return;
     }
 
-    if (payload.category === "coding" && !payload.topic) {
-      setStatus("코딩 글은 주제를 선택해주세요.", "error");
+    if (!payload.topic) {
+      setStatus("주제를 선택해주세요.", "error");
       return;
     }
 
@@ -294,14 +331,598 @@
       button.setAttribute("aria-pressed", String(isActive));
     });
 
-    if (!isPreview && fields.body) {
-      fields.body.focus();
+    if (!isPreview) {
+      focusVisualEditor();
     }
   }
 
   function touchBodyEditor() {
+    syncSourceFromVisualEditor();
     renderPreview();
-    fields.body.focus();
+    focusVisualEditor();
+  }
+
+  function hydrateVisualEditorFromSource() {
+    if (!visualEditor) {
+      return;
+    }
+
+    visualEditor.innerHTML = "";
+
+    if (fields.body.value.trim()) {
+      renderMarkdownIntoVisualEditor(fields.body.value);
+    }
+
+    if (!visualEditor.childNodes.length) {
+      appendEmptyVisualParagraph();
+    }
+
+    updateVisualEditorEmptyState();
+    placeCaretInside(visualEditor.lastElementChild || visualEditor, false);
+  }
+
+  function renderMarkdownIntoVisualEditor(markdown) {
+    const lines = String(markdown || "").split(/\r?\n/);
+    let index = 0;
+
+    while (index < lines.length) {
+      const line = lines[index];
+      const fence = line.match(/^```([a-zA-Z0-9#+._-]*)\s*$/);
+
+      if (!line.trim()) {
+        index += 1;
+        continue;
+      }
+
+      if (fence) {
+        const language = normalizeCodeLanguage(fence[1]);
+        const codeLines = [];
+        index += 1;
+
+        while (index < lines.length && !/^```/.test(lines[index])) {
+          codeLines.push(lines[index]);
+          index += 1;
+        }
+
+        if (index < lines.length) {
+          index += 1;
+        }
+
+        visualEditor.append(createVisualCodeBlock(language, codeLines.join("\n")));
+        continue;
+      }
+
+      const heading = line.match(/^(#{2,4})\s+(.+)$/);
+      const image = line.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
+      const quote = line.match(/^>\s+(.+)$/);
+      const unordered = line.match(/^[-*]\s+(.+)$/);
+      const ordered = line.match(/^\d+\.\s+(.+)$/);
+
+      if (heading) {
+        appendVisualElement(`h${heading[1].length}`, renderInlineMarkdownToHtml(heading[2]));
+        index += 1;
+        continue;
+      }
+
+      if (image) {
+        visualEditor.append(createVisualImageFigure(image[2], image[1]));
+        index += 1;
+        continue;
+      }
+
+      if (quote) {
+        appendVisualElement("blockquote", renderInlineMarkdownToHtml(quote[1]));
+        index += 1;
+        continue;
+      }
+
+      if (unordered || ordered) {
+        const list = document.createElement(unordered ? "ul" : "ol");
+
+        while (index < lines.length) {
+          const item = lines[index].match(unordered ? /^[-*]\s+(.+)$/ : /^\d+\.\s+(.+)$/);
+
+          if (!item) {
+            break;
+          }
+
+          const listItem = document.createElement("li");
+          listItem.innerHTML = renderInlineMarkdownToHtml(item[1]);
+          list.append(listItem);
+          index += 1;
+        }
+
+        visualEditor.append(list);
+        continue;
+      }
+
+      const paragraph = [];
+
+      while (index < lines.length && lines[index].trim() && !/^```/.test(lines[index])) {
+        if (/^(#{2,4})\s+/.test(lines[index]) || /^!\[/.test(lines[index]) || /^>\s+/.test(lines[index]) || /^[-*]\s+/.test(lines[index]) || /^\d+\.\s+/.test(lines[index])) {
+          break;
+        }
+
+        paragraph.push(lines[index].trim());
+        index += 1;
+      }
+
+      appendVisualElement("p", renderInlineMarkdownToHtml(paragraph.join(" ")));
+    }
+  }
+
+  function appendVisualElement(tagName, html) {
+    const element = document.createElement(tagName);
+    element.innerHTML = html || "<br>";
+    visualEditor.append(element);
+    return element;
+  }
+
+  function appendEmptyVisualParagraph() {
+    const paragraph = document.createElement("p");
+    paragraph.innerHTML = "<br>";
+    visualEditor.append(paragraph);
+    return paragraph;
+  }
+
+  function syncSourceFromVisualEditor() {
+    if (!visualEditor || !fields.body) {
+      return;
+    }
+
+    fields.body.value = serializeVisualEditor().trim();
+    updateVisualEditorEmptyState();
+  }
+
+  function serializeVisualEditor() {
+    if (!visualEditor) {
+      return fields.body?.value || "";
+    }
+
+    return Array.from(visualEditor.childNodes)
+      .map((node) => serializeVisualBlock(node))
+      .filter((block) => block.trim())
+      .join("\n\n");
+  }
+
+  function serializeVisualBlock(node) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      return cleanVisualText(node.textContent);
+    }
+
+    if (node.nodeType !== Node.ELEMENT_NODE) {
+      return "";
+    }
+
+    const element = node;
+    const tagName = element.tagName.toLowerCase();
+
+    if (element.matches("[data-admin-code-block]")) {
+      return serializeVisualCodeBlock(element);
+    }
+
+    if (tagName === "figure") {
+      return serializeVisualFigure(element);
+    }
+
+    if (tagName === "img") {
+      return serializeVisualImage(element);
+    }
+
+    if (/^h[1-6]$/.test(tagName)) {
+      const level = Math.max(2, Math.min(4, Number(tagName.slice(1))));
+      return `${"#".repeat(level)} ${serializeVisualInline(element).trim()}`;
+    }
+
+    if (tagName === "blockquote") {
+      const quote = serializeVisualInline(element).trim();
+      return quote
+        .split(/\n+/)
+        .map((line) => `> ${line}`)
+        .join("\n");
+    }
+
+    if (tagName === "ul" || tagName === "ol") {
+      return Array.from(element.children)
+        .filter((child) => child.tagName.toLowerCase() === "li")
+        .map((child, index) => {
+          const marker = tagName === "ol" ? `${index + 1}.` : "-";
+          return `${marker} ${serializeVisualInline(child).trim() || "목록"}`;
+        })
+        .join("\n");
+    }
+
+    const nestedCode = element.querySelector(":scope > [data-admin-code-block]");
+
+    if (nestedCode) {
+      return serializeVisualCodeBlock(nestedCode);
+    }
+
+    return serializeVisualInline(element).trim();
+  }
+
+  function serializeVisualInline(node) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      return cleanVisualText(node.textContent);
+    }
+
+    if (node.nodeType !== Node.ELEMENT_NODE) {
+      return "";
+    }
+
+    const element = node;
+    const tagName = element.tagName.toLowerCase();
+
+    if (element.matches("[data-admin-code-block]")) {
+      return `\n\n${serializeVisualCodeBlock(element)}\n\n`;
+    }
+
+    if (tagName === "br") {
+      return "\n";
+    }
+
+    if (tagName === "img") {
+      return serializeVisualImage(element);
+    }
+
+    const content = Array.from(element.childNodes).map((child) => serializeVisualInline(child)).join("");
+
+    if (!content.trim()) {
+      return "";
+    }
+
+    if (tagName === "strong" || tagName === "b") {
+      return `**${content}**`;
+    }
+
+    if (tagName === "em" || tagName === "i") {
+      return `*${content}*`;
+    }
+
+    if (tagName === "code" && !element.matches("[data-admin-code-content]")) {
+      return `\`${content}\``;
+    }
+
+    if (tagName === "a") {
+      const href = element.getAttribute("href") || "";
+      return href ? `[${content}](${href})` : content;
+    }
+
+    return content;
+  }
+
+  function serializeVisualFigure(figure) {
+    const image = figure.querySelector("img");
+    return image ? serializeVisualImage(image) : "";
+  }
+
+  function serializeVisualImage(image) {
+    const src = image.getAttribute("src") || "";
+    const alt = image.getAttribute("alt") || "";
+    return src ? `![${alt}](${src})` : "";
+  }
+
+  function serializeVisualCodeBlock(block) {
+    const language = normalizeCodeLanguage(block.dataset.language || getDefaultCodeLanguage());
+    const codeElement = block.querySelector("[data-admin-code-content]");
+    const code = cleanCodeText(codeElement?.innerText || "");
+
+    return `\`\`\`${language}\n${code}\n\`\`\``;
+  }
+
+  function cleanVisualText(value) {
+    return String(value || "").replace(/\u00a0/g, " ");
+  }
+
+  function cleanCodeText(value) {
+    return cleanVisualText(value).replace(/\n{2,}$/g, "\n").replace(/\n$/g, "");
+  }
+
+  function renderInlineMarkdownToHtml(value) {
+    return escapeHtml(value)
+      .replace(/`([^`]+)`/g, "<code>$1</code>")
+      .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+      .replace(/\*([^*]+)\*/g, "<em>$1</em>")
+      .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+|\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+  }
+
+  function updateVisualEditorEmptyState() {
+    if (!visualEditor) {
+      return;
+    }
+
+    const hasStructuredContent = Boolean(visualEditor.querySelector("img, [data-admin-code-block]"));
+    const hasText = Boolean(cleanVisualText(visualEditor.textContent).trim());
+
+    visualEditor.classList.toggle("is-empty", !hasStructuredContent && !hasText);
+  }
+
+  function focusVisualEditor() {
+    if (!visualEditor) {
+      fields.body.focus();
+      return;
+    }
+
+    if (!visualEditor.childNodes.length) {
+      appendEmptyVisualParagraph();
+    }
+
+    restoreVisualSelection();
+  }
+
+  function isInsideVisualEditor(node) {
+    return Boolean(visualEditor && node && (node === visualEditor || visualEditor.contains(node)));
+  }
+
+  function saveVisualSelection() {
+    if (!visualEditor) {
+      return;
+    }
+
+    const selection = window.getSelection();
+
+    if (!selection || !selection.rangeCount || !isInsideVisualEditor(selection.anchorNode) || !isInsideVisualEditor(selection.focusNode)) {
+      return;
+    }
+
+    savedVisualRange = selection.getRangeAt(0).cloneRange();
+  }
+
+  function restoreVisualSelection() {
+    if (!visualEditor) {
+      return;
+    }
+
+    visualEditor.focus();
+
+    const selection = window.getSelection();
+
+    if (!selection) {
+      return;
+    }
+
+    selection.removeAllRanges();
+
+    if (savedVisualRange && isInsideVisualEditor(savedVisualRange.commonAncestorContainer)) {
+      selection.addRange(savedVisualRange);
+      return;
+    }
+
+    placeCaretInside(visualEditor.lastElementChild || visualEditor, false);
+  }
+
+  function placeCaretInside(element, atStart) {
+    if (!element) {
+      return;
+    }
+
+    const selection = window.getSelection();
+    const range = document.createRange();
+    range.selectNodeContents(element);
+    range.collapse(Boolean(atStart));
+    selection.removeAllRanges();
+    selection.addRange(range);
+    savedVisualRange = range.cloneRange();
+  }
+
+  function getCurrentTopLevelVisualBlock() {
+    const selection = window.getSelection();
+
+    if (!selection || !selection.rangeCount || !isInsideVisualEditor(selection.anchorNode)) {
+      return null;
+    }
+
+    let node = selection.getRangeAt(0).startContainer;
+
+    if (node.nodeType === Node.TEXT_NODE) {
+      node = node.parentNode;
+    }
+
+    while (node && node.parentNode && node.parentNode !== visualEditor) {
+      node = node.parentNode;
+    }
+
+    return node && node.parentNode === visualEditor ? node : null;
+  }
+
+  function takeVisualSelectionText() {
+    restoreVisualSelection();
+
+    const selection = window.getSelection();
+
+    if (!selection || !selection.rangeCount || !isInsideVisualEditor(selection.anchorNode)) {
+      return "";
+    }
+
+    const selected = selection.toString().replace(/^\n+|\n+$/g, "");
+
+    if (!selected || selection.isCollapsed) {
+      return "";
+    }
+
+    const range = selection.getRangeAt(0);
+    range.deleteContents();
+    range.collapse(true);
+    selection.removeAllRanges();
+    selection.addRange(range);
+    savedVisualRange = range.cloneRange();
+
+    return selected;
+  }
+
+  function insertVisualBlock(block, focusTarget) {
+    restoreVisualSelection();
+
+    const currentBlock = getCurrentTopLevelVisualBlock();
+    const trailing = document.createElement("p");
+    trailing.innerHTML = "<br>";
+
+    if (currentBlock && currentBlock !== visualEditor) {
+      currentBlock.after(block, trailing);
+    } else {
+      visualEditor.append(block, trailing);
+    }
+
+    placeCaretInside(focusTarget || trailing, false);
+    syncSourceFromVisualEditor();
+    renderPreview();
+  }
+
+  function createVisualCodeBlock(language, code) {
+    const safeLanguage = normalizeCodeLanguage(language);
+    const block = document.createElement("div");
+    block.className = `language-${safeLanguage} highlighter-rouge code-window admin-code-block`;
+    block.dataset.language = safeLanguage;
+    block.setAttribute("data-admin-code-block", "");
+
+    const toolbar = document.createElement("div");
+    toolbar.className = "code-window__toolbar";
+    toolbar.contentEditable = "false";
+
+    const dots = document.createElement("span");
+    dots.className = "code-window__dots";
+    dots.setAttribute("aria-hidden", "true");
+    dots.innerHTML = "<i></i><i></i><i></i>";
+
+    const label = document.createElement("span");
+    label.className = "code-window__language";
+    label.textContent = getCodeLanguageLabel(safeLanguage);
+
+    const hint = document.createElement("span");
+    hint.className = "admin-code-block__hint";
+    hint.textContent = "직접 입력";
+
+    toolbar.append(dots, label, hint);
+
+    const highlight = document.createElement("div");
+    highlight.className = "highlight";
+
+    const pre = document.createElement("pre");
+    pre.className = "highlight";
+
+    const codeElement = document.createElement("code");
+    codeElement.className = `language-${safeLanguage}`;
+    codeElement.contentEditable = "true";
+    codeElement.spellcheck = false;
+    codeElement.dataset.adminCodeContent = "";
+    codeElement.dataset.placeholder = "코드를 입력하세요.";
+    codeElement.textContent = code || "";
+
+    pre.append(codeElement);
+    highlight.append(pre);
+    block.append(toolbar, highlight);
+
+    return block;
+  }
+
+  function createVisualImageFigure(src, alt) {
+    const figure = document.createElement("figure");
+    const image = document.createElement("img");
+    image.src = src;
+    image.alt = alt || "";
+    figure.append(image);
+    return figure;
+  }
+
+  function insertVisualCodeBlock() {
+    const selected = takeVisualSelectionText() || "code";
+    const block = createVisualCodeBlock(getDefaultCodeLanguage(), selected);
+    insertVisualBlock(block, block.querySelector("[data-admin-code-content]"));
+  }
+
+  function insertVisualImage(src, alt) {
+    if (!src) {
+      return;
+    }
+
+    insertVisualBlock(createVisualImageFigure(src, alt), null);
+  }
+
+  function applyVisualHeading(format) {
+    restoreVisualSelection();
+    document.execCommand("formatBlock", false, format === "paragraph" ? "p" : format);
+    touchBodyEditor();
+  }
+
+  function applyVisualEditorCommand(command) {
+    if (command === "code") {
+      insertVisualCodeBlock();
+      return;
+    }
+
+    if (command === "image" && imageUpload) {
+      imageUpload.value = "";
+      imageUpload.click();
+      return;
+    }
+
+    restoreVisualSelection();
+
+    if (command === "bold") {
+      document.execCommand("bold", false);
+    }
+
+    if (command === "italic") {
+      document.execCommand("italic", false);
+    }
+
+    if (command === "quote") {
+      document.execCommand("formatBlock", false, "blockquote");
+    }
+
+    if (command === "bullet") {
+      document.execCommand("insertUnorderedList", false);
+    }
+
+    if (command === "number") {
+      document.execCommand("insertOrderedList", false);
+    }
+
+    if (command === "link") {
+      const url = window.prompt("링크 주소를 입력하세요.", "https://");
+
+      if (!url) {
+        return;
+      }
+
+      const selection = window.getSelection();
+      const selected = selection && !selection.isCollapsed ? selection.toString() : "";
+
+      if (selected) {
+        document.execCommand("createLink", false, url.trim());
+      } else {
+        document.execCommand("insertHTML", false, `<a href="${escapeAttribute(url.trim())}" target="_blank" rel="noopener noreferrer">링크</a>`);
+      }
+    }
+
+    touchBodyEditor();
+  }
+
+  function handleVisualEditorInput() {
+    syncSourceFromVisualEditor();
+    saveVisualSelection();
+    renderPreview();
+  }
+
+  function handleVisualEditorKeydown(event) {
+    if (event.key !== "Tab" || !event.target.closest("[data-admin-code-content]")) {
+      return;
+    }
+
+    event.preventDefault();
+    document.execCommand("insertText", false, "  ");
+    handleVisualEditorInput();
+  }
+
+  function handleVisualEditorPaste(event) {
+    const text = event.clipboardData?.getData("text/plain");
+
+    if (!text) {
+      return;
+    }
+
+    event.preventDefault();
+    document.execCommand("insertText", false, text);
   }
 
   function replaceBodyRange(start, end, value, selectionStart, selectionEnd) {
@@ -369,7 +990,46 @@
     transformSelectedLines(transforms[command], command === "quote" ? "인용문" : "목록");
   }
 
+  function insertCodeBlock() {
+    const textarea = fields.body;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selected = textarea.value.slice(start, end).replace(/^\n+|\n+$/g, "") || "code";
+    const language = getDefaultCodeLanguage();
+    const before = start > 0 && textarea.value[start - 1] !== "\n" ? "\n\n" : "";
+    const after = end < textarea.value.length && textarea.value[end] !== "\n" ? "\n\n" : "";
+    const fence = `\`\`\`${language}\n${selected}\n\`\`\``;
+    const next = `${before}${fence}${after}`;
+    const selectionStart = start + before.length + 3 + language.length + 1;
+    const selectionEnd = selectionStart + selected.length;
+
+    replaceBodyRange(start, end, next, selectionStart, selectionEnd);
+  }
+
+  function getDefaultCodeLanguage() {
+    if (fields.category.value !== "coding") {
+      return "text";
+    }
+
+    const topic = fields.codingTopic.value;
+
+    if (topic === "database") {
+      return "sql";
+    }
+
+    if (topic === "csharp" || topic === "wpf" || topic === "unity") {
+      return "csharp";
+    }
+
+    return "text";
+  }
+
   function applyEditorCommand(command) {
+    if (visualEditor) {
+      applyVisualEditorCommand(command);
+      return;
+    }
+
     if (command === "bold") {
       wrapBodySelection("**", "**", "굵은 글씨");
       return;
@@ -386,14 +1046,7 @@
     }
 
     if (command === "code") {
-      const selected = fields.body.value.slice(fields.body.selectionStart, fields.body.selectionEnd);
-
-      if (selected.includes("\n")) {
-        wrapBodySelection("```\n", "\n```", "code");
-        return;
-      }
-
-      wrapBodySelection("`", "`", "code");
+      insertCodeBlock();
       return;
     }
 
@@ -428,11 +1081,17 @@
     try {
       const data = await apiUpload("/admin/uploads", body);
       const markdown = data.markdown || `![${file.name}](${data.url})`;
-      const insert = `\n\n${markdown}\n\n`;
-      const start = fields.body.selectionStart;
-      const end = fields.body.selectionEnd;
 
-      replaceBodyRange(start, end, insert, start + insert.length, start + insert.length);
+      if (visualEditor) {
+        insertVisualImage(data.url || getFirstBodyImage(markdown), file.name);
+      } else {
+        const insert = `\n\n${markdown}\n\n`;
+        const start = fields.body.selectionStart;
+        const end = fields.body.selectionEnd;
+
+        replaceBodyRange(start, end, insert, start + insert.length, start + insert.length);
+      }
+
       setStatus("이미지를 본문에 추가했습니다.", "success");
     } catch (error) {
       setStatus(error.message, "error");
@@ -442,12 +1101,28 @@
   function updateTopicState() {
     const isCoding = fields.category.value === "coding";
 
-    topicField.hidden = !isCoding;
-    fields.topic.disabled = !isCoding;
-
-    if (isCoding && !fields.topic.value) {
-      fields.topic.value = fields.topic.querySelector("option")?.value || "";
+    if (codingTopicField) {
+      codingTopicField.hidden = !isCoding;
     }
+
+    if (lifeTopicField) {
+      lifeTopicField.hidden = isCoding;
+    }
+
+    fields.codingTopic.disabled = !isCoding;
+    fields.lifeTopic.disabled = isCoding;
+
+    if (isCoding && !fields.codingTopic.value) {
+      fields.codingTopic.value = fields.codingTopic.querySelector("option")?.value || "";
+    }
+
+    if (!isCoding && !fields.lifeTopic.value) {
+      fields.lifeTopic.value = fields.lifeTopic.querySelector("option")?.value || "";
+    }
+  }
+
+  function getSelectedTopic() {
+    return fields.category.value === "coding" ? fields.codingTopic.value : fields.lifeTopic.value;
   }
 
   function handleInput(event) {
@@ -486,6 +1161,7 @@
     const html = [];
     const paragraph = [];
     let inCode = false;
+    let codeLanguage = "text";
     let listType = "";
     let tableRows = [];
 
@@ -551,14 +1227,14 @@
         flushParagraph();
         closeList();
         flushTable();
-        const language = fence[1] ? ` class="language-${escapeAttribute(fence[1])}"` : "";
-        html.push(`<pre><code${language}>`);
+        codeLanguage = normalizeCodeLanguage(fence[1]);
+        html.push(renderCodeBlockStart(codeLanguage));
         inCode = true;
         return;
       }
 
       if (fence && inCode) {
-        html.push("</code></pre>");
+        html.push(renderCodeBlockEnd());
         inCode = false;
         return;
       }
@@ -656,7 +1332,7 @@
     flushTable();
 
     if (inCode) {
-      html.push("</code></pre>");
+      html.push(renderCodeBlockEnd());
     }
 
     return html.join("");
@@ -668,6 +1344,84 @@
       .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
       .replace(/\*([^*]+)\*/g, "<em>$1</em>")
       .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+|\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+  }
+
+  function renderCodeBlockStart(language) {
+    const safeLanguage = escapeAttribute(language);
+    const label = escapeHtml(getCodeLanguageLabel(language));
+
+    return [
+      `<div class="language-${safeLanguage} highlighter-rouge code-window">`,
+      '<div class="code-window__toolbar">',
+      '<span class="code-window__dots" aria-hidden="true"><i></i><i></i><i></i></span>',
+      `<span class="code-window__language">${label}</span>`,
+      '<button class="code-window__copy" type="button" data-admin-copy-code aria-label="코드 복사">복사</button>',
+      "</div>",
+      '<div class="highlight">',
+      `<pre class="highlight"><code class="language-${safeLanguage}">`,
+    ].join("");
+  }
+
+  function renderCodeBlockEnd() {
+    return "</code></pre></div></div>";
+  }
+
+  function normalizeCodeLanguage(value) {
+    const language = String(value || "text")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9#+._-]/g, "");
+
+    return language || "text";
+  }
+
+  function getCodeLanguageLabel(language) {
+    return codeLanguageNames[normalizeCodeLanguage(language)] || String(language || "text").toUpperCase();
+  }
+
+  function handlePreviewClick(event) {
+    const button = event.target.closest("[data-admin-copy-code]");
+
+    if (!button || !preview.contains(button)) {
+      return;
+    }
+
+    copyPreviewCode(button);
+  }
+
+  function copyPreviewCode(button) {
+    const codeElement = button.closest(".code-window")?.querySelector("pre code");
+
+    if (!codeElement) {
+      return;
+    }
+
+    const resetLabel = () => {
+      button.textContent = "복사";
+      button.classList.remove("is-copied");
+    };
+    const finish = () => {
+      button.textContent = "완료";
+      button.classList.add("is-copied");
+      window.setTimeout(resetLabel, 1600);
+    };
+    const text = codeElement.innerText;
+
+    if (!navigator.clipboard) {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.setAttribute("readonly", "");
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      textarea.remove();
+      finish();
+      return;
+    }
+
+    navigator.clipboard.writeText(text).then(finish);
   }
 
   function escapeHtml(value) {
@@ -732,12 +1486,18 @@
     });
 
     root.querySelectorAll("[data-admin-command]").forEach((button) => {
+      button.addEventListener("mousedown", (event) => event.preventDefault());
       button.addEventListener("click", () => applyEditorCommand(button.dataset.adminCommand));
     });
 
     if (formatSelect) {
       formatSelect.addEventListener("change", () => {
-        applyHeading(formatSelect.value);
+        if (visualEditor) {
+          applyVisualHeading(formatSelect.value);
+        } else {
+          applyHeading(formatSelect.value);
+        }
+
         formatSelect.value = "paragraph";
       });
     }
@@ -746,6 +1506,17 @@
       imageUpload.addEventListener("change", uploadSelectedImage);
     }
 
+    if (visualEditor) {
+      visualEditor.addEventListener("input", handleVisualEditorInput);
+      visualEditor.addEventListener("keydown", handleVisualEditorKeydown);
+      visualEditor.addEventListener("paste", handleVisualEditorPaste);
+      visualEditor.addEventListener("focus", saveVisualSelection);
+      visualEditor.addEventListener("keyup", saveVisualSelection);
+      visualEditor.addEventListener("mouseup", saveVisualSelection);
+      document.addEventListener("selectionchange", saveVisualSelection);
+    }
+
+    preview.addEventListener("click", handlePreviewClick);
     form.addEventListener("submit", publish);
     form.addEventListener("input", handleInput);
     form.addEventListener("change", handleInput);

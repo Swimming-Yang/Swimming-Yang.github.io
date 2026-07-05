@@ -3,9 +3,16 @@ layout: default
 ---
 
 {% assign topic_title = "" %}
-{% if page.topic %}
+{% if page.topic and page.categories contains "coding" %}
   {% assign topic_title = page.topic %}
   {% for topic in site.data.coding_topics %}
+    {% if topic.slug == page.topic %}
+      {% assign topic_title = topic.title %}
+    {% endif %}
+  {% endfor %}
+{% elsif page.topic and page.categories contains "life" %}
+  {% assign topic_title = page.topic %}
+  {% for topic in site.data.life_topics %}
     {% if topic.slug == page.topic %}
       {% assign topic_title = topic.title %}
     {% endif %}

@@ -4,9 +4,16 @@
 {% assign card_topic = "" %}
 {% assign card_topic_label = "" %}
 
-{% if card_post.topic %}
+{% if card_post.topic and card_post.categories contains "coding" %}
   {% assign card_topic = card_post.topic %}
   {% for topic in site.data.coding_topics %}
+    {% if topic.slug == card_post.topic %}
+      {% assign card_topic_label = topic.title %}
+    {% endif %}
+  {% endfor %}
+{% elsif card_post.topic and card_post.categories contains "life" %}
+  {% assign card_topic = card_post.topic %}
+  {% for topic in site.data.life_topics %}
     {% if topic.slug == card_post.topic %}
       {% assign card_topic_label = topic.title %}
     {% endif %}
@@ -14,9 +21,6 @@
 {% elsif card_post.categories contains "life" %}
   {% assign card_topic = "life" %}
   {% assign card_topic_label = "Life" %}
-{% elsif card_post.categories contains "health" %}
-  {% assign card_topic = "health" %}
-  {% assign card_topic_label = "Health" %}
 {% elsif card_post.categories contains "coding" %}
   {% assign card_topic = "coding" %}
   {% assign card_topic_label = "Coding" %}

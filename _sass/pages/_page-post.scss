@@ -73,17 +73,18 @@
 
 .topic-strip {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 10px;
 }
 
 .topic-strip a {
   display: flex;
+  min-width: 0;
   min-height: 58px;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  padding: 0 14px;
+  gap: 8px;
+  padding: 0 12px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--surface);
@@ -92,11 +93,17 @@
 }
 
 .topic-strip strong {
+  min-width: 0;
   color: var(--text-strong);
+  font-size: 0.95rem;
   font-weight: 900;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .topic-strip span {
+  flex: 0 0 auto;
   color: var(--accent-strong);
   font-family: "JetBrains Mono", monospace;
   font-weight: 900;
@@ -237,4 +244,3 @@
   font-size: 0.8rem;
   font-weight: 900;
 }
-

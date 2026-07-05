@@ -547,6 +547,8 @@
 
   function enhanceSearch() {
     const openButtons = document.querySelectorAll("[data-search-open]");
+    const headerSearchForm = document.querySelector("[data-header-search-form]");
+    const headerSearchInput = document.querySelector("[data-header-search-input]");
     const homeSearchForm = document.querySelector("[data-home-search-form]");
     const homeSearchInput = document.querySelector("[data-home-search-input]");
 
@@ -560,6 +562,13 @@
         goToSearch("");
       });
     });
+
+    if (headerSearchForm && headerSearchInput) {
+      headerSearchForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        goToSearch(headerSearchInput.value);
+      });
+    }
 
     if (homeSearchForm && homeSearchInput) {
       homeSearchForm.addEventListener("submit", (event) => {

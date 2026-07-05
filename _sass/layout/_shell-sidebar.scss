@@ -64,6 +64,26 @@ body.layout-home .theme-switch {
   box-shadow: 0 1px 18px rgba(0, 0, 0, 0.18);
 }
 
+body.layout-home .site-search {
+  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 1px 18px rgba(0, 0, 0, 0.18);
+}
+
+body.layout-home .site-search input {
+  color: #ffffff;
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.42);
+}
+
+body.layout-home .site-search input::placeholder {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+body.layout-home .site-search button {
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--accent-strong);
+}
+
 body.layout-home .theme-switch__thumb {
   background: rgba(255, 255, 255, 0.94);
 }

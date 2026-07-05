@@ -20,6 +20,16 @@
       <a class="{% if page.url == '/about/' %}is-active{% endif %}" href="{{ '/about/' | relative_url }}">소개</a>
     </nav>
 
+    <form class="site-search" action="{{ '/search/' | relative_url }}" method="get" data-header-search-form role="search">
+      <input type="search" name="q" data-header-search-input placeholder="게시글 검색" aria-label="게시글 검색">
+      <button type="submit" aria-label="검색">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="m16.5 16.5 4 4"></path>
+        </svg>
+      </button>
+    </form>
+
     <div class="site-tools">
       <details class="category-menu" data-category-menu>
         <summary class="icon-button category-menu__button" aria-label="카테고리 열기">
@@ -48,6 +58,10 @@
 
           <div class="category-menu__section">
             <p>Archive</p>
+            <a class="{% if page.url == '/' %}is-active{% endif %}" href="{{ '/' | relative_url }}">
+              <span>홈</span>
+              <em>Home</em>
+            </a>
             <a class="{% if page.url == '/health/' or page.categories contains 'health' %}is-active{% endif %}" href="{{ '/health/' | relative_url }}">
               <span>건강</span>
               <em>{{ site.categories.health.size | default: 0 }}</em>
@@ -60,16 +74,13 @@
               <span>전체 글</span>
               <em>{{ site.posts.size }}</em>
             </a>
+            <a class="{% if page.url == '/about/' %}is-active{% endif %}" href="{{ '/about/' | relative_url }}">
+              <span>소개</span>
+              <em>About</em>
+            </a>
           </div>
         </div>
       </details>
-
-      <button class="icon-button" type="button" data-search-open aria-label="검색 열기">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="11" cy="11" r="7"></circle>
-          <path d="m16.5 16.5 4 4"></path>
-        </svg>
-      </button>
 
       <button class="theme-switch" type="button" data-theme-toggle aria-label="테마 변경">
         <span class="theme-switch__icon theme-switch__icon--sun" aria-hidden="true">

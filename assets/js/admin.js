@@ -20,6 +20,10 @@
   const topicField = root.querySelector("[data-admin-topic-field]");
   const formatSelect = root.querySelector("[data-admin-format]");
   const imageUpload = root.querySelector("[data-admin-image-upload]");
+  const writeView = root.querySelector("[data-admin-write-view]");
+  const previewView = root.querySelector("[data-admin-preview-view]");
+  const modeTitle = root.querySelector("[data-admin-mode-title]");
+  const viewButtons = root.querySelectorAll("[data-admin-view]");
   const fields = {};
   let token = tokenStorage.getItem(tokenKey) || window.localStorage.getItem(tokenKey) || "";
   let slugTouched = false;
@@ -274,6 +278,7 @@
     window.localStorage.removeItem(draftKey);
     updateTopicState();
     renderPreview();
+    setEditorView("write");
     setStatus("새 글을 시작합니다.", "info");
   }
 
@@ -304,6 +309,36 @@
       setPublishedStatus(data);
     } catch (error) {
       setStatus(error.message, "error");
+    }
+  }
+
+  function setEditorView(view) {
+    const isPreview = view === "preview";
+
+    if (isPreview) {
+      renderPreview();
+    }
+
+    if (writeView) {
+      writeView.hidden = isPreview;
+    }
+
+    if (previewView) {
+      previewView.hidden = !isPreview;
+    }
+
+    if (modeTitle) {
+      modeTitle.textContent = isPreview ? "미리보기" : "글쓰기";
+    }
+
+    viewButtons.forEach((button) => {
+      const isActive = button.dataset.adminView === view;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-pressed", String(isActive));
+    });
+
+    if (!isPreview && fields.body) {
+      fields.body.focus();
     }
   }
 
@@ -740,6 +775,10 @@
     root.querySelector("[data-admin-logout]").addEventListener("click", logout);
     root.querySelector("[data-admin-draft]").addEventListener("click", () => saveDraft(false));
     root.querySelector("[data-admin-new]").addEventListener("click", resetEditor);
+    viewButtons.forEach((button) => {
+      button.addEventListener("click", () => setEditorView(button.dataset.adminView));
+    });
+
     root.querySelectorAll("[data-admin-command]").forEach((button) => {
       button.addEventListener("click", () => applyEditorCommand(button.dataset.adminCommand));
     });

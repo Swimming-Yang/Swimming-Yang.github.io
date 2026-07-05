@@ -72,28 +72,26 @@
 
 .admin-editor {
   display: grid;
-  grid-template-columns: 280px minmax(0, 1.1fr) minmax(300px, 0.9fr);
+  grid-template-columns: 280px minmax(0, 1fr);
   gap: 16px;
   align-items: start;
 }
 
 .admin-panel--meta,
-.admin-panel--writer,
-.admin-panel--preview {
+.admin-panel--writer {
   display: grid;
   gap: 14px;
   padding: 18px;
 }
 
-.admin-panel--meta,
-.admin-panel--preview {
+.admin-panel--meta {
   position: sticky;
   top: 88px;
 }
 
-.admin-panel--preview {
-  max-height: calc(100vh - 110px);
-  overflow: auto;
+.admin-panel--writer {
+  align-content: start;
+  min-height: 720px;
 }
 
 .admin-panel__header {
@@ -107,6 +105,99 @@
   margin: 0;
   color: var(--text-strong);
   font-size: 1.05rem;
+}
+
+.admin-writer-bar {
+  flex-wrap: wrap;
+}
+
+.admin-writer-controls {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.admin-mode-toggle {
+  display: inline-flex;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-strong);
+}
+
+.admin-mode-button {
+  min-height: 34px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: calc(var(--radius) - 2px);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.admin-mode-button:hover,
+.admin-mode-button:focus-visible {
+  color: var(--accent-strong);
+  outline: 2px solid var(--accent-ring);
+  outline-offset: 1px;
+}
+
+.admin-mode-button.is-active,
+.admin-mode-button[aria-pressed="true"] {
+  background: var(--accent);
+  color: #ffffff;
+  box-shadow: 0 8px 18px var(--accent-ring);
+}
+
+.admin-view {
+  display: grid;
+  gap: 14px;
+}
+
+.admin-view[hidden] {
+  display: none;
+}
+
+.admin-view--preview {
+  min-height: 674px;
+  padding: 24px;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg);
+}
+
+.admin-preview {
+  width: min(100%, 860px);
+  margin: 0 auto;
+}
+
+.admin-preview__header {
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.admin-preview__header p {
+  margin: 0 0 10px;
+  color: var(--accent-strong);
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.admin-preview__header h1 {
+  margin: 0;
+  color: var(--text-strong);
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  line-height: 1.14;
+}
+
+.admin-preview__desc {
+  color: var(--muted);
+  font-weight: 800;
 }
 
 .admin-field {

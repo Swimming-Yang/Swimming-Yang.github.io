@@ -18,6 +18,8 @@
   const preview = root.querySelector("[data-admin-preview]");
   const form = root.querySelector("[data-admin-form]");
   const topicField = root.querySelector("[data-admin-topic-field]");
+  const formatSelect = root.querySelector("[data-admin-format]");
+  const imageUpload = root.querySelector("[data-admin-image-upload]");
   const fields = {};
   let token = tokenStorage.getItem(tokenKey) || window.localStorage.getItem(tokenKey) || "";
   let slugTouched = false;
@@ -115,6 +117,30 @@
 
     if (!response.ok) {
       throw new Error(data.error || "요청에 실패했습니다.");
+    }
+
+    return data;
+  }
+
+  async function apiUpload(path, body) {
+    const response = await fetch(`${apiBase}${path}`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body,
+    });
+    const data = await response.json().catch(() => ({}));
+
+    if (response.status === 401) {
+      setToken("");
+      showAuth();
+      throw new Error(data.error || "로그인이 필요합니다.");
+    }
+
+    if (!response.ok) {
+      throw new Error(data.error || "업로드에 실패했습니다.");
     }
 
     return data;
@@ -281,6 +307,152 @@
     }
   }
 
+  function touchBodyEditor() {
+    renderPreview();
+    saveDraft(true);
+    fields.body.focus();
+  }
+
+  function replaceBodyRange(start, end, value, selectionStart, selectionEnd) {
+    fields.body.setRangeText(value, start, end, "end");
+
+    if (Number.isInteger(selectionStart) && Number.isInteger(selectionEnd)) {
+      fields.body.setSelectionRange(selectionStart, selectionEnd);
+    }
+
+    touchBodyEditor();
+  }
+
+  function wrapBodySelection(before, after, placeholder) {
+    const textarea = fields.body;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selected = textarea.value.slice(start, end) || placeholder;
+    const next = `${before}${selected}${after}`;
+    const innerStart = start + before.length;
+    const innerEnd = innerStart + selected.length;
+
+    replaceBodyRange(start, end, next, innerStart, innerEnd);
+  }
+
+  function transformSelectedLines(transform, fallback) {
+    const textarea = fields.body;
+    const value = textarea.value;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const lineStart = value.lastIndexOf("\n", Math.max(0, start - 1)) + 1;
+    const nextBreak = value.indexOf("\n", end);
+    const lineEnd = nextBreak === -1 ? value.length : nextBreak;
+    const block = value.slice(lineStart, lineEnd) || fallback;
+    const lines = block.split("\n");
+    const next = lines.map((line, index) => transform(line, index)).join("\n");
+
+    replaceBodyRange(lineStart, lineEnd, next, lineStart, lineStart + next.length);
+  }
+
+  function stripBlockPrefix(line) {
+    return line.replace(/^\s*(#{1,6}\s+|[-*]\s+|\d+\.\s+|>\s+)/, "");
+  }
+
+  function applyHeading(format) {
+    const markers = {
+      h2: "## ",
+      h3: "### ",
+      h4: "#### ",
+    };
+    const marker = markers[format] || "";
+
+    transformSelectedLines((line) => {
+      const content = stripBlockPrefix(line).trim() || "제목";
+      return marker ? `${marker}${content}` : content;
+    }, "제목");
+  }
+
+  function applyLineCommand(command) {
+    const transforms = {
+      quote: (line) => `> ${stripBlockPrefix(line).trim() || "인용문"}`,
+      bullet: (line) => `- ${stripBlockPrefix(line).trim() || "목록"}`,
+      number: (line, index) => `${index + 1}. ${stripBlockPrefix(line).trim() || "목록"}`,
+    };
+
+    transformSelectedLines(transforms[command], command === "quote" ? "인용문" : "목록");
+  }
+
+  function applyEditorCommand(command) {
+    if (command === "bold") {
+      wrapBodySelection("**", "**", "굵은 글씨");
+      return;
+    }
+
+    if (command === "italic") {
+      wrapBodySelection("*", "*", "기울임 글씨");
+      return;
+    }
+
+    if (command === "quote" || command === "bullet" || command === "number") {
+      applyLineCommand(command);
+      return;
+    }
+
+    if (command === "code") {
+      const selected = fields.body.value.slice(fields.body.selectionStart, fields.body.selectionEnd);
+
+      if (selected.includes("\n")) {
+        wrapBodySelection("```\n", "\n```", "code");
+        return;
+      }
+
+      wrapBodySelection("`", "`", "code");
+      return;
+    }
+
+    if (command === "link") {
+      const url = window.prompt("링크 주소를 입력하세요.", "https://");
+
+      if (!url) {
+        return;
+      }
+
+      wrapBodySelection("[", `](${url.trim()})`, "링크");
+      return;
+    }
+
+    if (command === "image" && imageUpload) {
+      imageUpload.value = "";
+      imageUpload.click();
+    }
+  }
+
+  async function uploadSelectedImage() {
+    const file = imageUpload?.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    const body = new FormData();
+    body.append("image", file);
+    setStatus("이미지 업로드 중...", "info");
+
+    try {
+      const data = await apiUpload("/admin/uploads", body);
+      const markdown = data.markdown || `![${file.name}](${data.url})`;
+      const insert = `\n\n${markdown}\n\n`;
+      const start = fields.body.selectionStart;
+      const end = fields.body.selectionEnd;
+
+      replaceBodyRange(start, end, insert, start + insert.length, start + insert.length);
+
+      if (!fields.image.value && data.url) {
+        fields.image.value = data.url;
+      }
+
+      setStatus("이미지를 본문에 추가했습니다.", "success");
+    } catch (error) {
+      setStatus(error.message, "error");
+    }
+  }
+
   function updateTopicState() {
     const isCoding = fields.category.value === "coding";
 
@@ -428,7 +600,7 @@
         return;
       }
 
-      const heading = line.match(/^(#{1,3})\s+(.+)$/);
+      const heading = line.match(/^(#{1,4})\s+(.+)$/);
       const image = line.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
       const listItem = line.match(/^[-*]\s+(.+)$/);
       const orderedListItem = line.match(/^\d+\.\s+(.+)$/);
@@ -519,6 +691,7 @@
     return escapeHtml(value)
       .replace(/`([^`]+)`/g, "<code>$1</code>")
       .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+      .replace(/\*([^*]+)\*/g, "<em>$1</em>")
       .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+|\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
   }
 
@@ -567,6 +740,21 @@
     root.querySelector("[data-admin-logout]").addEventListener("click", logout);
     root.querySelector("[data-admin-draft]").addEventListener("click", () => saveDraft(false));
     root.querySelector("[data-admin-new]").addEventListener("click", resetEditor);
+    root.querySelectorAll("[data-admin-command]").forEach((button) => {
+      button.addEventListener("click", () => applyEditorCommand(button.dataset.adminCommand));
+    });
+
+    if (formatSelect) {
+      formatSelect.addEventListener("change", () => {
+        applyHeading(formatSelect.value);
+        formatSelect.value = "paragraph";
+      });
+    }
+
+    if (imageUpload) {
+      imageUpload.addEventListener("change", uploadSelectedImage);
+    }
+
     form.addEventListener("submit", publish);
     form.addEventListener("input", handleInput);
     form.addEventListener("change", handleInput);

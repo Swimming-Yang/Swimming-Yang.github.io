@@ -11,7 +11,14 @@ const DEFAULT_GITHUB_BRANCH = "main";
 const DEFAULT_ADMIN_LOGIN = "Swimming-Yang";
 const DEFAULT_SESSION_TTL_SECONDS = 60 * 60 * 4;
 const MAX_POST_BODY_BYTES = 1024 * 1024;
+const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
 const CODING_TOPICS = new Set(["csharp", "wpf", "unity", "cs", "ps"]);
+const IMAGE_MIME_TYPES = new Map([
+  ["image/jpeg", "jpg"],
+  ["image/png", "png"],
+  ["image/webp", "webp"],
+  ["image/gif", "gif"],
+]);
 
 export default {
   async fetch(request, env) {
@@ -110,6 +117,16 @@ async function handleAdmin(request, env, corsHeaders) {
       }
 
       return handleCreatePost(request, env, corsHeaders, session.user);
+    }
+
+    if (url.pathname === "/admin/uploads" && request.method === "POST") {
+      const session = await requireAdminSession(request, env, corsHeaders);
+
+      if (session instanceof Response) {
+        return session;
+      }
+
+      return handleUploadImage(request, env, corsHeaders, session.user);
     }
 
     return json({ error: "Not found" }, 404, corsHeaders);
@@ -275,6 +292,56 @@ async function handleCreatePost(request, env, corsHeaders, user) {
   );
 }
 
+async function handleUploadImage(request, env, corsHeaders, user) {
+  requireEnv(env, "GITHUB_CONTENT_TOKEN");
+
+  const form = await request.formData();
+  const file = form.get("image");
+
+  if (!file || typeof file.arrayBuffer !== "function") {
+    throw new HttpError("Image file is required.", 400);
+  }
+
+  if (!file.size) {
+    throw new HttpError("Image file is empty.", 400);
+  }
+
+  if (file.size > MAX_UPLOAD_BYTES) {
+    throw new HttpError("Image file is too large.", 413);
+  }
+
+  const mimeType = String(file.type || "").toLowerCase();
+  const extension = IMAGE_MIME_TYPES.get(mimeType);
+
+  if (!extension) {
+    throw new HttpError("Only jpg, png, webp, and gif images are supported.", 400);
+  }
+
+  const originalName = cleanInline(file.name || "image");
+  const stem = sanitizeUploadStem(originalName);
+  const datePath = getKoreanUploadDatePath();
+  const id = `${Date.now()}-${randomToken(6)}`;
+  const path = `assets/images/uploads/${datePath}/${id}-${stem}.${extension}`;
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  const alt = cleanInline(String(form.get("alt") || originalName.replace(/\.[^.]+$/, "") || "image")).slice(0, 80);
+  const result = await createGitHubBinaryFile(env, path, bytes, `upload: ${originalName}`, user);
+  const url = `/${path}`;
+
+  return json(
+    {
+      ok: true,
+      path,
+      url,
+      markdown: `![${alt}](${url})`,
+      htmlUrl: result.content?.html_url || result.commit?.html_url || "",
+      commitUrl: result.commit?.html_url || "",
+      commitSha: result.commit?.sha || "",
+    },
+    201,
+    corsHeaders
+  );
+}
+
 async function createGitHubFile(env, path, markdown, post, user) {
   const owner = env.GITHUB_OWNER || DEFAULT_GITHUB_OWNER;
   const repo = env.GITHUB_REPO || DEFAULT_GITHUB_REPO;
@@ -307,6 +374,44 @@ async function createGitHubFile(env, path, markdown, post, user) {
 
   if (!response.ok) {
     const detail = data.message || "github_create_file_failed";
+    throw new HttpError(detail, response.status);
+  }
+
+  return data;
+}
+
+async function createGitHubBinaryFile(env, path, bytes, message, user) {
+  const owner = env.GITHUB_OWNER || DEFAULT_GITHUB_OWNER;
+  const repo = env.GITHUB_REPO || DEFAULT_GITHUB_REPO;
+  const branch = env.GITHUB_BRANCH || DEFAULT_GITHUB_BRANCH;
+  const url = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${encodePath(path)}`;
+  const response = await fetch(url, {
+    method: "PUT",
+    headers: {
+      Accept: "application/vnd.github+json",
+      Authorization: `Bearer ${requireEnv(env, "GITHUB_CONTENT_TOKEN")}`,
+      "Content-Type": "application/json",
+      "User-Agent": "Swimming-Yang-blog-admin",
+      "X-GitHub-Api-Version": "2026-03-10",
+    },
+    body: JSON.stringify({
+      branch,
+      message,
+      content: base64EncodeBytes(bytes),
+      committer: {
+        name: env.GITHUB_COMMITTER_NAME || user.name || user.login,
+        email: env.GITHUB_COMMITTER_EMAIL || "ysw1mst@gmail.com",
+      },
+      author: {
+        name: env.GITHUB_AUTHOR_NAME || user.name || user.login,
+        email: env.GITHUB_AUTHOR_EMAIL || env.GITHUB_COMMITTER_EMAIL || "ysw1mst@gmail.com",
+      },
+    }),
+  });
+  const data = await response.json();
+
+  if (!response.ok) {
+    const detail = data.message || "github_upload_file_failed";
     throw new HttpError(detail, response.status);
   }
 
@@ -648,6 +753,32 @@ function sanitizeSlug(value) {
   return slug || `post-${Date.now()}`;
 }
 
+function sanitizeUploadStem(value) {
+  const baseName = String(value || "image")
+    .replace(/\.[^.]+$/, "")
+    .normalize("NFKD")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 48);
+
+  return baseName || "image";
+}
+
+function getKoreanUploadDatePath() {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+  }).formatToParts(new Date());
+  const values = parts.reduce((result, part) => {
+    result[part.type] = part.value;
+    return result;
+  }, {});
+
+  return `${values.year}/${values.month}`;
+}
+
 function formatJekyllDate(value) {
   const input = String(value || "").trim();
   const match = input.match(/^(\d{4})-(\d{2})-(\d{2})(?:[T\s](\d{2}):(\d{2}))?/);
@@ -682,6 +813,10 @@ function yamlString(value) {
 
 function base64Encode(value) {
   const bytes = new TextEncoder().encode(value);
+  return base64EncodeBytes(bytes);
+}
+
+function base64EncodeBytes(bytes) {
   let binary = "";
   const chunkSize = 0x8000;
 

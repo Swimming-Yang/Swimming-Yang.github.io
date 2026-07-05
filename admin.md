@@ -117,10 +117,68 @@ extra_js:
           <textarea name="description" rows="2" data-admin-field="description"></textarea>
         </label>
 
-        <label class="admin-field admin-field--body">
-          <span>본문</span>
+        <div class="admin-field admin-field--body">
+          <div class="admin-editor-head">
+            <span>본문</span>
+            <div class="admin-toolbar" aria-label="글쓰기 도구">
+              <select class="admin-format-select" aria-label="글자 크기" data-admin-format>
+                <option value="paragraph">문단</option>
+                <option value="h2">큰 제목</option>
+                <option value="h3">중간 제목</option>
+                <option value="h4">작은 제목</option>
+              </select>
+              <button class="admin-tool-button admin-tool-button--text" type="button" data-admin-command="bold" title="굵게" aria-label="굵게">B</button>
+              <button class="admin-tool-button admin-tool-button--text" type="button" data-admin-command="italic" title="기울임" aria-label="기울임"><em>I</em></button>
+              <button class="admin-tool-button" type="button" data-admin-command="quote" title="인용" aria-label="인용">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M8 10h-4a4 4 0 0 1 4-4v2a2 2 0 0 0-2 2h2v6H4v-6"></path>
+                  <path d="M20 10h-4a4 4 0 0 1 4-4v2a2 2 0 0 0-2 2h2v6h-4v-6"></path>
+                </svg>
+              </button>
+              <button class="admin-tool-button" type="button" data-admin-command="bullet" title="글머리 목록" aria-label="글머리 목록">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M8 6h13"></path>
+                  <path d="M8 12h13"></path>
+                  <path d="M8 18h13"></path>
+                  <path d="M3 6h.01"></path>
+                  <path d="M3 12h.01"></path>
+                  <path d="M3 18h.01"></path>
+                </svg>
+              </button>
+              <button class="admin-tool-button" type="button" data-admin-command="number" title="번호 목록" aria-label="번호 목록">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M10 6h11"></path>
+                  <path d="M10 12h11"></path>
+                  <path d="M10 18h11"></path>
+                  <path d="M4 6h1v4"></path>
+                  <path d="M4 10h2"></path>
+                  <path d="M4 14h2l-2 4h2"></path>
+                </svg>
+              </button>
+              <button class="admin-tool-button" type="button" data-admin-command="code" title="코드" aria-label="코드">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M16 18l6-6-6-6"></path>
+                  <path d="M8 6l-6 6 6 6"></path>
+                </svg>
+              </button>
+              <button class="admin-tool-button" type="button" data-admin-command="link" title="링크" aria-label="링크">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M10 13a5 5 0 0 0 7.1 0l2-2a5 5 0 0 0-7.1-7.1l-1.1 1.1"></path>
+                  <path d="M14 11a5 5 0 0 0-7.1 0l-2 2A5 5 0 0 0 12 20.1l1.1-1.1"></path>
+                </svg>
+              </button>
+              <button class="admin-tool-button" type="button" data-admin-command="image" title="이미지 첨부" aria-label="이미지 첨부">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+                  <circle cx="8.5" cy="10.5" r="1.5"></circle>
+                  <path d="M21 15l-5-5L5 19"></path>
+                </svg>
+              </button>
+              <input class="admin-file-input" type="file" accept="image/png,image/jpeg,image/webp,image/gif" data-admin-image-upload>
+            </div>
+          </div>
           <textarea name="body" rows="22" spellcheck="false" data-admin-field="body"></textarea>
-        </label>
+        </div>
       </section>
 
       <aside class="admin-panel admin-panel--preview">

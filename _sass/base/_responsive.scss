@@ -87,6 +87,26 @@
   }
 }
 
+@media (max-aspect-ratio: 10 / 16) {
+  body.layout-post .post-shell {
+    grid-template-columns: minmax(0, 820px);
+    width: min(100%, 820px);
+  }
+
+  body.layout-post .post-sidebar {
+    display: none;
+  }
+
+  body.layout-post .post-after {
+    width: min(100%, 820px);
+  }
+
+  body.layout-post .related-posts,
+  body.layout-post .comments {
+    width: 100%;
+  }
+}
+
 @media (max-width: 780px) {
   .site-header__inner {
     min-height: 64px;

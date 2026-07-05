@@ -1,7 +1,8 @@
 {% assign visitor_api_endpoint = site.visitor_api_endpoint | default: "" %}
+{% assign admin_api_endpoint = site.admin_api_endpoint | default: site.visitor_api_endpoint | replace: "/visit", "" %}
 {% comment %} Redeploy trigger for header brand update. {% endcomment %}
 
-<header class="site-header">
+<header class="site-header" data-admin-api="{{ admin_api_endpoint }}">
   <a class="skip-link" href="#content">본문으로 이동</a>
 
   <div class="site-header__inner">
@@ -18,6 +19,7 @@
       <a class="{% if page.url == '/health/' or page.categories contains 'health' %}is-active{% endif %}" href="{{ '/health/' | relative_url }}">건강</a>
       <a class="{% if page.url == '/life/' or page.categories contains 'life' %}is-active{% endif %}" href="{{ '/life/' | relative_url }}">일상</a>
       <a class="{% if page.url == '/about/' %}is-active{% endif %}" href="{{ '/about/' | relative_url }}">소개</a>
+      <a class="{% if page.url == '/admin/' %}is-active{% endif %}" href="{{ '/admin/' | relative_url }}" data-admin-entry hidden>글쓰기</a>
     </nav>
 
     <form class="site-search" action="{{ '/search/' | relative_url }}" method="get" data-header-search-form role="search">
@@ -77,6 +79,10 @@
             <a class="{% if page.url == '/about/' %}is-active{% endif %}" href="{{ '/about/' | relative_url }}">
               <span>소개</span>
               <em>About</em>
+            </a>
+            <a class="{% if page.url == '/admin/' %}is-active{% endif %}" href="{{ '/admin/' | relative_url }}" data-admin-entry hidden>
+              <span>글쓰기</span>
+              <em>Write</em>
             </a>
           </div>
         </div>

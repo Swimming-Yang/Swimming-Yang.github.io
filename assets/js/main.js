@@ -534,6 +534,75 @@
     });
   }
 
+  function enhanceAdminEntry() {
+    const entries = Array.from(document.querySelectorAll("[data-admin-entry]"));
+    const header = document.querySelector("[data-admin-api]");
+
+    if (!entries.length || !header) {
+      return;
+    }
+
+    const apiBase = String(header.dataset.adminApi || "").replace(/\/+$/, "");
+    const tokenKey = "swimming-yang.admin.token";
+    const params = window.location.hash ? new URLSearchParams(window.location.hash.slice(1)) : null;
+    const hashToken = params ? params.get("admin_token") : "";
+    let token = hashToken || window.sessionStorage.getItem(tokenKey) || "";
+
+    const showEntries = (isVisible) => {
+      entries.forEach((entry) => {
+        entry.hidden = !isVisible;
+      });
+    };
+
+    if (hashToken) {
+      window.sessionStorage.setItem(tokenKey, hashToken);
+      window.localStorage.removeItem(tokenKey);
+      token = hashToken;
+    }
+
+    if (!apiBase || !token) {
+      showEntries(false);
+      return;
+    }
+
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 4000);
+
+    fetch(`${apiBase}/admin/me`, {
+      cache: "no-store",
+      signal: controller.signal,
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => {
+        window.clearTimeout(timeout);
+
+        if (response.status === 401) {
+          window.sessionStorage.removeItem(tokenKey);
+          showEntries(false);
+          return null;
+        }
+
+        if (!response.ok) {
+          showEntries(false);
+          return null;
+        }
+
+        return response.json();
+      })
+      .then((data) => {
+        if (data && data.ok) {
+          showEntries(true);
+        }
+      })
+      .catch(() => {
+        window.clearTimeout(timeout);
+        showEntries(false);
+      });
+  }
+
   function getSearchPageUrl(query) {
     const keyword = String(query || "").trim();
     const path = `${getBaseUrl()}/search/`;
@@ -1120,6 +1189,7 @@
     enhanceHomeTyping();
     enhanceCategoryMenu();
     enhanceThemeToggle();
+    enhanceAdminEntry();
     enhanceSearch();
     enhanceSearchPage();
     enhanceToc();

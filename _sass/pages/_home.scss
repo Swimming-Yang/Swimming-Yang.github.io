@@ -96,12 +96,34 @@
 }
 
 .home-hero__title-line {
+  position: relative;
   display: inline-block;
   min-height: 0.98em;
+  overflow: hidden;
 }
 
 .home-hero__title-accent {
   color: #06c755;
+}
+
+.home-hero__typing.is-title-complete .home-hero__title-line::before {
+  position: absolute;
+  z-index: 1;
+  inset: -12% auto -12% -35%;
+  width: 34%;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.08) 24%,
+    rgba(255, 255, 255, 0.72) 48%,
+    rgba(255, 255, 255, 0.12) 68%,
+    transparent 100%
+  );
+  content: "";
+  filter: blur(1px);
+  pointer-events: none;
+  transform: skewX(-18deg);
+  animation: homeTitleGlint 4.8s ease-in-out 0.8s infinite;
 }
 
 .home-hero__title-line::after,
@@ -371,6 +393,28 @@
   }
 }
 
+@keyframes homeTitleGlint {
+  0%,
+  58% {
+    opacity: 0;
+    transform: translateX(0) skewX(-18deg);
+  }
+
+  65% {
+    opacity: 0.95;
+  }
+
+  76% {
+    opacity: 0;
+    transform: translateX(410%) skewX(-18deg);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(410%) skewX(-18deg);
+  }
+}
+
 @keyframes homeScrollArrow {
   0% {
     opacity: 0;
@@ -392,6 +436,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .home-hero__typing.is-title-complete .home-hero__title-line::before {
+    animation: none;
+  }
+
   .home-hero__scroll-circle span {
     opacity: 0.86;
     transform: translateY(0) rotate(45deg);

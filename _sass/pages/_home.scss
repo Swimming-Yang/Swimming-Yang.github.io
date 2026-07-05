@@ -98,32 +98,48 @@
 .home-hero__title-line {
   position: relative;
   display: inline-block;
-  min-height: 0.98em;
-  overflow: hidden;
+  min-height: 1.08em;
+  margin-bottom: -0.1em;
+  padding-bottom: 0.1em;
+  line-height: 1.06;
+  overflow: visible;
 }
 
 .home-hero__title-accent {
   color: #06c755;
 }
 
-.home-hero__typing.is-title-complete .home-hero__title-line::before {
-  position: absolute;
-  z-index: 1;
-  inset: -12% auto -12% -35%;
-  width: 34%;
-  background: linear-gradient(
-    105deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.08) 24%,
-    rgba(255, 255, 255, 0.72) 48%,
-    rgba(255, 255, 255, 0.12) 68%,
-    transparent 100%
-  );
-  content: "";
-  filter: blur(1px);
-  pointer-events: none;
-  transform: skewX(-18deg);
-  animation: homeTitleGlint 4.8s ease-in-out 0.8s infinite;
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .home-hero__typing.is-title-complete .home-hero__title-line::before {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    display: block;
+    background: linear-gradient(
+      105deg,
+      transparent 0%,
+      transparent 38%,
+      rgba(255, 255, 255, 0.16) 45%,
+      rgba(255, 255, 255, 0.88) 50%,
+      rgba(255, 255, 255, 0.22) 56%,
+      transparent 64%,
+      transparent 100%
+    );
+    background-position: 145% 50%;
+    background-size: 260% 100%;
+    background-clip: text;
+    color: transparent;
+    content: attr(data-home-title-text);
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.2));
+    font: inherit;
+    line-height: inherit;
+    opacity: 0;
+    pointer-events: none;
+    white-space: nowrap;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: homeTitleGlint 4.8s ease-in-out 0.8s infinite;
+  }
 }
 
 .home-hero__title-line::after,
@@ -204,6 +220,17 @@
 .home-code-token--comment {
   color: #aeb8c8;
   font-style: italic;
+}
+
+.home-hero__code-line code.is-hangul-code {
+  color: #ffffff;
+  font-family: "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-weight: 900;
+}
+
+.home-hero__code-line code.is-hangul-code .home-code-token {
+  color: #ffffff;
+  font-style: normal;
 }
 
 .home-hero__search {
@@ -396,22 +423,22 @@
 @keyframes homeTitleGlint {
   0%,
   58% {
+    background-position: 145% 50%;
     opacity: 0;
-    transform: translateX(0) skewX(-18deg);
   }
 
   65% {
-    opacity: 0.95;
+    opacity: 1;
   }
 
   76% {
+    background-position: -145% 50%;
     opacity: 0;
-    transform: translateX(410%) skewX(-18deg);
   }
 
   100% {
+    background-position: -145% 50%;
     opacity: 0;
-    transform: translateX(410%) skewX(-18deg);
   }
 }
 

@@ -267,6 +267,7 @@
     const titleText = titleElement.dataset.homeTitleText || titleElement.textContent.trim();
     const titleAccentText = titleElement.dataset.homeTitleAccent || "";
     const token = (text, tone = "plain") => ({ text, tone });
+    const hangulPattern = /[ㄱ-ㅎㅏ-ㅣ가-힣]/;
     const examples = [
       [
         token("std", "namespace"),
@@ -375,6 +376,11 @@
     };
 
     const getCodeText = (tokens) => tokens.map((part) => part.text).join("");
+    const hasHangul = (tokens) => tokens.some((part) => hangulPattern.test(part.text));
+
+    const setCodeTone = (element, tokens) => {
+      element.classList.toggle("is-hangul-code", hasHangul(tokens));
+    };
 
     const renderCodeTokens = (element, tokens, visibleLength) => {
       const fragment = document.createDocumentFragment();
@@ -429,6 +435,7 @@
 
       while (document.body.contains(container)) {
         for (const example of examples) {
+          setCodeTone(codeElement, example);
           await typeCode(codeElement, example, 58);
           await wait(1700);
           await eraseCode(codeElement, example, 34);
@@ -441,6 +448,7 @@
     codeElement.textContent = "";
     run().catch(() => {
       renderTitleText(titleElement, titleText, titleText.length);
+      setCodeTone(codeElement, examples[0]);
       renderCodeTokens(codeElement, examples[0], getCodeText(examples[0]).length);
       container.classList.add("is-title-complete");
     });

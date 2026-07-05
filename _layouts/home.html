@@ -22,19 +22,32 @@ layout: default
         </p>
       </div>
 
-      <form class="home-hero__search" data-home-search-form role="search">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="11" cy="11" r="7"></circle>
-          <path d="m16.5 16.5 4 4"></path>
-        </svg>
-        <input type="search" data-home-search-input placeholder="게시글 검색" aria-label="게시글 검색">
-        <button type="submit" aria-label="검색">
+      <div class="home-hero__search-stack">
+        <form class="home-hero__search" data-home-search-form role="search">
           <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M5 12h14"></path>
-            <path d="m13 6 6 6-6 6"></path>
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="m16.5 16.5 4 4"></path>
           </svg>
-        </button>
-      </form>
+          <input type="search" data-home-search-input placeholder="게시글 검색" aria-label="게시글 검색">
+          <button type="submit" aria-label="검색">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 12h14"></path>
+              <path d="m13 6 6 6-6 6"></path>
+            </svg>
+          </button>
+        </form>
+        <div
+          class="home-hero__stats"
+          data-blog-start="{{ site.blog_start_date }}"
+          data-visitor-endpoint="{{ site.visitor_api_endpoint | default: '' }}"
+        >
+          <span>글 개수 : <strong>{{ site.posts.size }}</strong></span>
+          <span aria-hidden="true">|</span>
+          <span>총 방문자 : <strong data-visitor-total>...</strong></span>
+          <span aria-hidden="true">|</span>
+          <span>오늘 방문자 : <strong data-visitor-today>...</strong></span>
+        </div>
+      </div>
     </div>
   </div>
   <div class="home-hero__scroll-cue" aria-hidden="true">

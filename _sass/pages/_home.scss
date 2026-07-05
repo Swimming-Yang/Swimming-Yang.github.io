@@ -199,6 +199,36 @@
   backdrop-filter: blur(14px);
 }
 
+.home-hero__search-stack {
+  display: grid;
+  justify-items: center;
+  width: min(100%, 640px);
+  gap: 12px;
+}
+
+.home-hero__stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.92rem;
+  font-weight: 800;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.42);
+}
+
+.home-hero__stats strong {
+  color: #ffffff;
+  font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+  font-weight: 900;
+}
+
+.home-hero__stats.is-visitor-offline [data-visitor-total],
+.home-hero__stats.is-visitor-offline [data-visitor-today] {
+  color: rgba(255, 255, 255, 0.62);
+}
+
 .home-hero__search:focus-within {
   border-color: rgba(183, 199, 255, 0.82);
   box-shadow:

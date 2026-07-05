@@ -184,9 +184,7 @@ body.layout-home .category-menu__panel {
 }
 
 .site-sidebar__nav a:hover,
-.site-sidebar__nav a.is-active,
-.site-sidebar__subnav a:hover,
-.site-sidebar__subnav a.is-active {
+.site-sidebar__nav a.is-active {
   background: var(--accent-soft);
   color: var(--accent-strong);
 }
@@ -206,14 +204,37 @@ body.layout-home .category-menu__panel {
   margin: 0 0 2px;
   padding: 8px 0 8px 14px;
   border-left: 2px solid var(--line);
-  background:
-    linear-gradient(90deg, var(--accent-wash), transparent 62%);
   border-radius: 0 6px 6px 0;
 }
 
 .site-sidebar__subnav a {
+  position: relative;
   min-height: 34px;
+  padding-left: 22px;
+  background: transparent;
   font-size: 0.84rem;
+}
+
+.site-sidebar__subnav a::before {
+  position: absolute;
+  left: 8px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--line-strong);
+  content: "";
+}
+
+.site-sidebar__subnav a:hover,
+.site-sidebar__subnav a.is-active {
+  background: transparent;
+  color: var(--accent-strong);
+}
+
+.site-sidebar__subnav a:hover::before,
+.site-sidebar__subnav a.is-active::before {
+  background: var(--accent-strong);
+  box-shadow: 0 0 0 4px var(--accent-ring);
 }
 
 .site-sidebar__heading {

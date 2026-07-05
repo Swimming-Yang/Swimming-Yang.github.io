@@ -5,16 +5,5 @@ layout: page
 {% assign posts = site.categories.coding | where: "topic", page.topic %}
 
 <section class="coding-board" aria-label="{{ page.title }} 글">
-  <header class="coding-board__header">
-    <div>
-      <p class="section-kicker">Coding Archive</p>
-      <h2>{{ page.title }}</h2>
-      {% if page.description %}
-        <p>{{ page.description }}</p>
-      {% endif %}
-    </div>
-    <span>{{ posts.size }} posts</span>
-  </header>
-
   {% include post_grid.html posts=posts board=true empty_message="아직 이 게시판에 글이 없습니다." %}
 </section>

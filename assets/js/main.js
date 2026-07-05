@@ -265,6 +265,7 @@
     }
 
     const titleText = titleElement.dataset.homeTitleText || titleElement.textContent.trim();
+    const titleAccentText = titleElement.dataset.homeTitleAccent || "";
     const token = (text, tone = "plain") => ({ text, tone });
     const examples = [
       [
@@ -320,11 +321,55 @@
 
     const wait = (duration) => new Promise((resolve) => window.setTimeout(resolve, duration));
 
+    const renderTitleText = (element, text, visibleLength) => {
+      const accentIndex = titleAccentText ? text.indexOf(titleAccentText) : -1;
+
+      element.textContent = "";
+
+      if (accentIndex < 0) {
+        element.textContent = text.slice(0, visibleLength);
+        return;
+      }
+
+      const fragment = document.createDocumentFragment();
+      const titleParts = [
+        { text: text.slice(0, accentIndex), isAccent: false },
+        { text: titleAccentText, isAccent: true },
+        { text: text.slice(accentIndex + titleAccentText.length), isAccent: false },
+      ];
+      let consumed = 0;
+
+      titleParts.forEach((part) => {
+        const remaining = visibleLength - consumed;
+
+        if (remaining <= 0) {
+          return;
+        }
+
+        const visibleText = part.text.slice(0, Math.min(part.text.length, remaining));
+
+        if (visibleText) {
+          const span = document.createElement("span");
+          span.textContent = visibleText;
+
+          if (part.isAccent) {
+            span.className = "home-hero__title-accent";
+          }
+
+          fragment.append(span);
+        }
+
+        consumed += part.text.length;
+      });
+
+      element.append(fragment);
+    };
+
     const typeText = async (element, text, delay) => {
       element.textContent = "";
 
       for (let index = 1; index <= text.length; index += 1) {
-        element.textContent = text.slice(0, index);
+        renderTitleText(element, text, index);
         await wait(delay);
       }
     };
@@ -395,7 +440,7 @@
     titleElement.textContent = "";
     codeElement.textContent = "";
     run().catch(() => {
-      titleElement.textContent = titleText;
+      renderTitleText(titleElement, titleText, titleText.length);
       renderCodeTokens(codeElement, examples[0], getCodeText(examples[0]).length);
       container.classList.add("is-title-complete");
     });

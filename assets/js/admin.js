@@ -7,7 +7,6 @@
 
   const apiBase = String(root.dataset.adminApi || "").replace(/\/+$/, "");
   const tokenKey = "swimming-yang.admin.token";
-  const draftKey = "swimming-yang.admin.draft";
   const tokenStorage = window.sessionStorage;
   const authPanel = root.querySelector("[data-admin-auth]");
   const workspace = root.querySelector("[data-admin-workspace]");
@@ -26,7 +25,6 @@
   const viewButtons = root.querySelectorAll("[data-admin-view]");
   const fields = {};
   let token = tokenStorage.getItem(tokenKey) || window.localStorage.getItem(tokenKey) || "";
-  let slugTouched = false;
 
   window.localStorage.removeItem(tokenKey);
 
@@ -212,56 +210,19 @@
     return {
       category: fields.category.value,
       topic: fields.topic.value,
-      date: fields.date.value,
-      slug: fields.slug.value.trim(),
+      date: getKoreanDateInput(),
+      slug: "",
       tags: fields.tags.value.trim(),
-      image: fields.image.value.trim(),
+      image: getFirstBodyImage(fields.body.value),
       title: fields.title.value.trim(),
       description: fields.description.value.trim(),
       body: fields.body.value.trim(),
     };
   }
 
-  function setPayload(payload) {
-    Object.keys(fields).forEach((key) => {
-      if (Object.prototype.hasOwnProperty.call(payload, key)) {
-        fields[key].value = payload[key] || "";
-      }
-    });
-
-    slugTouched = Boolean(fields.slug.value);
+  function initializeEditor() {
     updateTopicState();
     renderPreview();
-  }
-
-  function saveDraft(silent) {
-    window.localStorage.setItem(draftKey, JSON.stringify(getPayload()));
-
-    if (!silent) {
-      setStatus("임시저장 완료.", "success");
-    }
-  }
-
-  function loadDraft() {
-    const raw = window.localStorage.getItem(draftKey);
-
-    if (!raw) {
-      fields.date.value = getKoreanDateInput();
-      updateTopicState();
-      renderPreview();
-      return;
-    }
-
-    try {
-      setPayload(JSON.parse(raw));
-    } catch {
-      window.localStorage.removeItem(draftKey);
-      fields.date.value = getKoreanDateInput();
-    }
-
-    if (!fields.date.value) {
-      fields.date.value = getKoreanDateInput();
-    }
   }
 
   function resetEditor() {
@@ -273,9 +234,6 @@
       field.value = "";
     });
     fields.category.value = "life";
-    fields.date.value = getKoreanDateInput();
-    slugTouched = false;
-    window.localStorage.removeItem(draftKey);
     updateTopicState();
     renderPreview();
     setEditorView("write");
@@ -305,7 +263,6 @@
         body: JSON.stringify(payload),
       });
 
-      window.localStorage.removeItem(draftKey);
       setPublishedStatus(data);
     } catch (error) {
       setStatus(error.message, "error");
@@ -344,7 +301,6 @@
 
   function touchBodyEditor() {
     renderPreview();
-    saveDraft(true);
     fields.body.focus();
   }
 
@@ -477,11 +433,6 @@
       const end = fields.body.selectionEnd;
 
       replaceBodyRange(start, end, insert, start + insert.length, start + insert.length);
-
-      if (!fields.image.value && data.url) {
-        fields.image.value = data.url;
-      }
-
       setStatus("이미지를 본문에 추가했습니다.", "success");
     } catch (error) {
       setStatus(error.message, "error");
@@ -506,22 +457,11 @@
       return;
     }
 
-    if (field === fields.slug) {
-      slugTouched = true;
-      fields.slug.value = slugify(fields.slug.value);
-    }
-
-    if (field === fields.title && !slugTouched) {
-      fields.slug.value = slugify(fields.title.value);
-    }
-
     if (field === fields.category) {
       updateTopicState();
     }
 
     renderPreview();
-    window.clearTimeout(handleInput.timer);
-    handleInput.timer = window.setTimeout(() => saveDraft(true), 500);
   }
 
   function renderPreview() {
@@ -743,13 +683,26 @@
     return escapeHtml(value).replace(/`/g, "&#096;");
   }
 
-  function slugify(value) {
-    return String(value || "")
-      .normalize("NFKD")
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "")
-      .slice(0, 70);
+  function getFirstBodyImage(markdown) {
+    const value = String(markdown || "");
+    const markdownImage = value.match(/!\[[^\]]*\]\(([^)\s]+)(?:\s+["'][^"']*["'])?\)/);
+    const htmlImage = value.match(/<img\b[^>]*\bsrc=["']([^"']+)["'][^>]*>/i);
+
+    return cleanImageUrl(markdownImage?.[1] || htmlImage?.[1] || "");
+  }
+
+  function cleanImageUrl(value) {
+    const image = String(value || "").trim();
+
+    if (/^(https?:\/\/|\/)/i.test(image)) {
+      return image.slice(0, 240);
+    }
+
+    if (/^assets\//i.test(image)) {
+      return `/${image}`.slice(0, 240);
+    }
+
+    return "";
   }
 
   function getKoreanDateInput() {
@@ -773,7 +726,6 @@
   function bindEvents() {
     root.querySelector("[data-admin-login-button]").addEventListener("click", login);
     root.querySelector("[data-admin-logout]").addEventListener("click", logout);
-    root.querySelector("[data-admin-draft]").addEventListener("click", () => saveDraft(false));
     root.querySelector("[data-admin-new]").addEventListener("click", resetEditor);
     viewButtons.forEach((button) => {
       button.addEventListener("click", () => setEditorView(button.dataset.adminView));
@@ -801,6 +753,6 @@
 
   consumeHash();
   bindEvents();
-  loadDraft();
+  initializeEditor();
   verifySession();
 })();

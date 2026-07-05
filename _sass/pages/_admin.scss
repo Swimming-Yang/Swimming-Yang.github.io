@@ -49,6 +49,12 @@
   font-weight: 900;
 }
 
+.admin-user__identity {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .admin-user img {
   width: 32px;
   height: 32px;
@@ -72,21 +78,15 @@
 
 .admin-editor {
   display: grid;
-  grid-template-columns: 280px minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
   align-items: start;
 }
 
-.admin-panel--meta,
 .admin-panel--writer {
   display: grid;
   gap: 14px;
   padding: 18px;
-}
-
-.admin-panel--meta {
-  position: sticky;
-  top: 88px;
 }
 
 .admin-panel--writer {
@@ -159,6 +159,13 @@
 
 .admin-view[hidden] {
   display: none;
+}
+
+.admin-meta-grid {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.7fr) minmax(150px, 0.8fr) minmax(220px, 1.6fr);
+  gap: 12px;
+  align-items: end;
 }
 
 .admin-view--preview {
@@ -339,10 +346,27 @@
   padding: 0 14px;
 }
 
+.admin-button--compact {
+  min-height: 34px;
+  padding: 0 10px;
+  font-size: 0.82rem;
+}
+
 .admin-icon-button {
   width: 36px;
   height: 36px;
   padding: 0;
+}
+
+.admin-button svg,
+.admin-icon-button svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
 }
 
 .admin-button--primary {

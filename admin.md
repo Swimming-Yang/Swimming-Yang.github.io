@@ -18,8 +18,18 @@ extra_js:
       <h1>글쓰기</h1>
     </div>
     <div class="admin-user" data-admin-user hidden>
-      <img src="" alt="" data-admin-avatar>
-      <span data-admin-login></span>
+      <span class="admin-user__identity">
+        <img src="" alt="" data-admin-avatar>
+        <span data-admin-login></span>
+      </span>
+      <button class="admin-button admin-button--compact" type="button" data-admin-logout>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <path d="M16 17l5-5-5-5"></path>
+          <path d="M21 12H9"></path>
+        </svg>
+        로그아웃
+      </button>
     </div>
   </header>
 
@@ -38,74 +48,6 @@ extra_js:
 
   <section class="admin-workspace" data-admin-workspace hidden>
     <form class="admin-editor" data-admin-form>
-      <aside class="admin-panel admin-panel--meta">
-        <div class="admin-panel__header">
-          <h2>설정</h2>
-          <button class="admin-icon-button" type="button" data-admin-new title="새 글">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 5v14"></path>
-              <path d="M5 12h14"></path>
-            </svg>
-          </button>
-        </div>
-
-        <label class="admin-field">
-          <span>게시판</span>
-          <select name="category" data-admin-field="category">
-            <option value="life">일상</option>
-            <option value="coding">코딩</option>
-          </select>
-        </label>
-
-        <label class="admin-field" data-admin-topic-field>
-          <span>주제</span>
-          <select name="topic" data-admin-field="topic">
-            {% for topic in site.data.coding_topics %}
-              <option value="{{ topic.slug }}">{{ topic.title }}</option>
-            {% endfor %}
-          </select>
-        </label>
-
-        <label class="admin-field">
-          <span>날짜</span>
-          <input name="date" type="datetime-local" data-admin-field="date">
-        </label>
-
-        <label class="admin-field">
-          <span>슬러그</span>
-          <input name="slug" type="text" inputmode="latin" autocomplete="off" data-admin-field="slug">
-        </label>
-
-        <label class="admin-field">
-          <span>태그</span>
-          <input name="tags" type="text" autocomplete="off" data-admin-field="tags">
-        </label>
-
-        <label class="admin-field">
-          <span>대표 이미지</span>
-          <input name="image" type="text" autocomplete="off" data-admin-field="image">
-        </label>
-
-        <div class="admin-actions">
-          <button class="admin-button" type="button" data-admin-draft>
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-              <path d="M17 21v-8H7v8"></path>
-              <path d="M7 3v5h8"></path>
-            </svg>
-            임시저장
-          </button>
-          <button class="admin-button" type="button" data-admin-logout>
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-              <path d="M16 17l5-5-5-5"></path>
-              <path d="M21 12H9"></path>
-            </svg>
-            로그아웃
-          </button>
-        </div>
-      </aside>
-
       <section class="admin-panel admin-panel--writer">
         <div class="admin-panel__header admin-writer-bar">
           <h2 data-admin-mode-title>글쓰기</h2>
@@ -114,6 +56,12 @@ extra_js:
               <button class="admin-mode-button is-active" type="button" data-admin-view="write" aria-pressed="true">글쓰기</button>
               <button class="admin-mode-button" type="button" data-admin-view="preview" aria-pressed="false">미리보기</button>
             </div>
+            <button class="admin-icon-button" type="button" data-admin-new title="새 글" aria-label="새 글">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 5v14"></path>
+                <path d="M5 12h14"></path>
+              </svg>
+            </button>
             <button class="admin-button admin-button--primary" type="submit" data-admin-publish>
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M12 19V5"></path>
@@ -129,6 +77,30 @@ extra_js:
             <span>제목</span>
             <input name="title" type="text" autocomplete="off" data-admin-field="title">
           </label>
+
+          <div class="admin-meta-grid">
+            <label class="admin-field">
+              <span>게시판</span>
+              <select name="category" data-admin-field="category">
+                <option value="life">일상</option>
+                <option value="coding">코딩</option>
+              </select>
+            </label>
+
+            <label class="admin-field" data-admin-topic-field>
+              <span>주제</span>
+              <select name="topic" data-admin-field="topic">
+                {% for topic in site.data.coding_topics %}
+                  <option value="{{ topic.slug }}">{{ topic.title }}</option>
+                {% endfor %}
+              </select>
+            </label>
+
+            <label class="admin-field">
+              <span>태그</span>
+              <input name="tags" type="text" autocomplete="off" data-admin-field="tags">
+            </label>
+          </div>
 
           <label class="admin-field">
             <span>요약</span>

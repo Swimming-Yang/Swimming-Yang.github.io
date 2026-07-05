@@ -70,7 +70,7 @@ img {
 
 a {
   color: inherit;
-  text-decoration-color: rgba(31, 63, 143, 0.42);
+  text-decoration-color: var(--accent-border);
   text-underline-offset: 0.22em;
 }
 
@@ -103,4 +103,3 @@ textarea {
 .skip-link:focus {
   transform: translateY(0);
 }
-

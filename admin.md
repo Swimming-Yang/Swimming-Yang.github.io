@@ -52,9 +52,13 @@ extra_js:
         <div class="admin-panel__header admin-writer-bar">
           <h2 data-admin-mode-title>글쓰기</h2>
           <div class="admin-writer-controls">
-            <div class="admin-mode-toggle" role="group" aria-label="보기 전환">
-              <button class="admin-mode-button is-active" type="button" data-admin-view="write" aria-pressed="true">글쓰기</button>
-              <button class="admin-mode-button" type="button" data-admin-view="preview" aria-pressed="false">미리보기</button>
+            <div class="admin-post-loader">
+              <select class="admin-post-select" aria-label="수정할 글 선택" data-admin-post-picker>
+                <option value="">수정할 글 선택</option>
+              </select>
+              <button class="admin-button admin-button--compact" type="button" data-admin-load-post>
+                불러오기
+              </button>
             </div>
             <button class="admin-icon-button" type="button" data-admin-new title="새 글" aria-label="새 글">
               <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -126,12 +130,10 @@ extra_js:
                   <option value="text-font-serif">Serif</option>
                   <option value="text-font-mono">Mono</option>
                 </select>
-                <select class="admin-size-select" aria-label="글자 크기" data-admin-text-size>
-                  <option value="">기본 크기</option>
-                  <option value="text-size-small">작게</option>
-                  <option value="text-size-large">크게</option>
-                  <option value="text-size-xl">더 크게</option>
-                </select>
+                <label class="admin-pt-control" aria-label="글자 크기 pt">
+                  <input type="number" min="8" max="72" step="1" value="16" data-admin-font-size>
+                  <span>pt</span>
+                </label>
                 <select class="admin-format-select" aria-label="문단 형식" data-admin-format>
                   <option value="paragraph">문단</option>
                   <option value="h2">큰 제목</option>
@@ -166,6 +168,15 @@ extra_js:
                 <button class="admin-tool-button" type="button" data-admin-command="divider" title="구분선" aria-label="구분선">
                   <svg viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M4 12h16"></path>
+                  </svg>
+                </button>
+                <button class="admin-tool-button" type="button" data-admin-command="table" title="표 삽입" aria-label="표 삽입">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+                    <path d="M3 10h18"></path>
+                    <path d="M3 16h18"></path>
+                    <path d="M9 4v16"></path>
+                    <path d="M15 4v16"></path>
                   </svg>
                 </button>
                 <button class="admin-tool-button" type="button" data-admin-command="bullet" title="글머리 목록" aria-label="글머리 목록">
@@ -220,10 +231,6 @@ extra_js:
             ></div>
             <textarea class="admin-body-source" name="body" rows="22" spellcheck="false" data-admin-field="body"></textarea>
           </div>
-        </div>
-
-        <div class="admin-view admin-view--preview" data-admin-preview-view hidden>
-          <article class="admin-preview content" data-admin-preview></article>
         </div>
 
         <p class="admin-status" data-admin-status></p>

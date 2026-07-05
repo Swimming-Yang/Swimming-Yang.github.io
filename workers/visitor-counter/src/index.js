@@ -1,5 +1,6 @@
 const DEFAULT_ALLOWED_ORIGINS = [
   "https://xn--9p4bn7dwj.com",
+  "https://www.xn--9p4bn7dwj.com",
   "https://swimming-yang.github.io",
   "http://127.0.0.1:4000",
   "http://localhost:4000",
@@ -110,6 +111,20 @@ async function handleAdmin(request, env, corsHeaders) {
       return json({ ok: true }, 200, corsHeaders);
     }
 
+    if (url.pathname === "/admin/posts" && request.method === "GET") {
+      const session = await requireAdminSession(request, env, corsHeaders);
+
+      if (session instanceof Response) {
+        return session;
+      }
+
+      if (url.searchParams.get("path")) {
+        return handleGetPost(request, env, corsHeaders);
+      }
+
+      return handleListPosts(env, corsHeaders);
+    }
+
     if (url.pathname === "/admin/posts" && request.method === "POST") {
       const session = await requireAdminSession(request, env, corsHeaders);
 
@@ -118,6 +133,16 @@ async function handleAdmin(request, env, corsHeaders) {
       }
 
       return handleCreatePost(request, env, corsHeaders, session.user);
+    }
+
+    if (url.pathname === "/admin/posts" && request.method === "PUT") {
+      const session = await requireAdminSession(request, env, corsHeaders);
+
+      if (session instanceof Response) {
+        return session;
+      }
+
+      return handleUpdatePost(request, env, corsHeaders, session.user);
     }
 
     if (url.pathname === "/admin/uploads" && request.method === "POST") {
@@ -270,6 +295,33 @@ async function fetchGitHubUser(accessToken) {
   return data;
 }
 
+async function handleListPosts(env, corsHeaders) {
+  const posts = await listGitHubPosts(env);
+
+  return json({ ok: true, posts }, 200, corsHeaders);
+}
+
+async function handleGetPost(request, env, corsHeaders) {
+  const url = new URL(request.url);
+  const path = validatePostPath(url.searchParams.get("path"));
+  const file = await fetchGitHubFile(env, path);
+  const parsed = parsePostMarkdown(file.content, path);
+
+  return json(
+    {
+      ok: true,
+      post: {
+        ...parsed,
+        path,
+        sha: file.sha,
+        htmlUrl: file.htmlUrl,
+      },
+    },
+    200,
+    corsHeaders
+  );
+}
+
 async function handleCreatePost(request, env, corsHeaders, user) {
   requireEnv(env, "GITHUB_CONTENT_TOKEN");
 
@@ -278,17 +330,46 @@ async function handleCreatePost(request, env, corsHeaders, user) {
   const markdown = buildPostMarkdown(post);
   const path = getPostPath(post);
   const result = await createGitHubFile(env, path, markdown, post, user);
+  const siteUrl = getSitePostUrl(post, path);
 
   return json(
     {
       ok: true,
       path,
       title: post.title,
+      siteUrl,
       htmlUrl: result.content?.html_url || result.commit?.html_url || "",
       commitUrl: result.commit?.html_url || "",
       commitSha: result.commit?.sha || "",
     },
     201,
+    corsHeaders
+  );
+}
+
+async function handleUpdatePost(request, env, corsHeaders, user) {
+  requireEnv(env, "GITHUB_CONTENT_TOKEN");
+
+  const url = new URL(request.url);
+  const path = validatePostPath(url.searchParams.get("path"));
+  const existing = await fetchGitHubFile(env, path);
+  const input = await readJson(request);
+  const post = normalizePostInput(input);
+  const markdown = buildPostMarkdown(post);
+  const result = await putGitHubFile(env, path, markdown, post, user, existing.sha);
+  const siteUrl = getSitePostUrl(post, path);
+
+  return json(
+    {
+      ok: true,
+      path,
+      title: post.title,
+      siteUrl,
+      htmlUrl: result.content?.html_url || result.commit?.html_url || "",
+      commitUrl: result.commit?.html_url || "",
+      commitSha: result.commit?.sha || "",
+    },
+    200,
     corsHeaders
   );
 }
@@ -344,10 +425,40 @@ async function handleUploadImage(request, env, corsHeaders, user) {
 }
 
 async function createGitHubFile(env, path, markdown, post, user) {
+  const existing = await fetchGitHubFile(env, path).catch((error) => {
+    if (error.status === 404) {
+      return null;
+    }
+
+    throw error;
+  });
+
+  return putGitHubFile(env, path, markdown, post, user, existing?.sha);
+}
+
+async function putGitHubFile(env, path, markdown, post, user, sha) {
   const owner = env.GITHUB_OWNER || DEFAULT_GITHUB_OWNER;
   const repo = env.GITHUB_REPO || DEFAULT_GITHUB_REPO;
   const branch = env.GITHUB_BRANCH || DEFAULT_GITHUB_BRANCH;
   const url = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${encodePath(path)}`;
+  const payload = {
+    branch,
+    message: `post: ${post.title}`,
+    content: base64Encode(markdown),
+    committer: {
+      name: env.GITHUB_COMMITTER_NAME || user.name || user.login,
+      email: env.GITHUB_COMMITTER_EMAIL || "ysw1mst@naver.com",
+    },
+    author: {
+      name: env.GITHUB_AUTHOR_NAME || user.name || user.login,
+      email: env.GITHUB_AUTHOR_EMAIL || env.GITHUB_COMMITTER_EMAIL || "ysw1mst@naver.com",
+    },
+  };
+
+  if (sha) {
+    payload.sha = sha;
+  }
+
   const response = await fetch(url, {
     method: "PUT",
     headers: {
@@ -357,19 +468,7 @@ async function createGitHubFile(env, path, markdown, post, user) {
       "User-Agent": "Swimming-Yang-blog-admin",
       "X-GitHub-Api-Version": "2026-03-10",
     },
-    body: JSON.stringify({
-      branch,
-      message: `post: ${post.title}`,
-      content: base64Encode(markdown),
-      committer: {
-        name: env.GITHUB_COMMITTER_NAME || user.name || user.login,
-        email: env.GITHUB_COMMITTER_EMAIL || "ysw1mst@naver.com",
-      },
-      author: {
-        name: env.GITHUB_AUTHOR_NAME || user.name || user.login,
-        email: env.GITHUB_AUTHOR_EMAIL || env.GITHUB_COMMITTER_EMAIL || "ysw1mst@naver.com",
-      },
-    }),
+    body: JSON.stringify(payload),
   });
   const data = await response.json();
 
@@ -417,6 +516,176 @@ async function createGitHubBinaryFile(env, path, bytes, message, user) {
   }
 
   return data;
+}
+
+async function listGitHubPosts(env) {
+  const owner = env.GITHUB_OWNER || DEFAULT_GITHUB_OWNER;
+  const repo = env.GITHUB_REPO || DEFAULT_GITHUB_REPO;
+  const branch = env.GITHUB_BRANCH || DEFAULT_GITHUB_BRANCH;
+  const treeUrl = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/git/trees/${encodeURIComponent(branch)}?recursive=1`;
+  const data = await fetchGitHubJson(env, treeUrl);
+  const paths = (data.tree || [])
+    .filter((item) => item.type === "blob" && /^_posts\/.+\.md$/.test(item.path || ""))
+    .map((item) => item.path)
+    .sort()
+    .reverse()
+    .slice(0, 80);
+  const posts = await Promise.all(paths.map(async (path) => {
+    try {
+      const file = await fetchGitHubFile(env, path);
+      const parsed = parsePostMarkdown(file.content, path);
+
+      return {
+        path,
+        title: parsed.title,
+        date: parsed.datePrefix,
+        category: parsed.category,
+        topic: parsed.topic,
+        description: parsed.description,
+        url: getSitePostUrl(parsed, path),
+        htmlUrl: file.htmlUrl,
+      };
+    } catch {
+      return {
+        path,
+        title: path.split("/").pop().replace(/^\d{4}-\d{2}-\d{2}-/, "").replace(/\.md$/, ""),
+        date: getDatePrefixFromPath(path),
+        category: getCategoryFromPath(path),
+        topic: getTopicFromPath(path),
+        description: "",
+        url: "",
+        htmlUrl: "",
+      };
+    }
+  }));
+
+  return posts;
+}
+
+async function fetchGitHubFile(env, path) {
+  const owner = env.GITHUB_OWNER || DEFAULT_GITHUB_OWNER;
+  const repo = env.GITHUB_REPO || DEFAULT_GITHUB_REPO;
+  const branch = env.GITHUB_BRANCH || DEFAULT_GITHUB_BRANCH;
+  const url = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${encodePath(path)}?ref=${encodeURIComponent(branch)}`;
+  const data = await fetchGitHubJson(env, url);
+
+  return {
+    sha: data.sha,
+    htmlUrl: data.html_url || "",
+    content: decodeBase64Content(data.content || ""),
+  };
+}
+
+async function fetchGitHubJson(env, url, options = {}) {
+  const response = await fetch(url, {
+    ...options,
+    headers: {
+      Accept: "application/vnd.github+json",
+      Authorization: `Bearer ${requireEnv(env, "GITHUB_CONTENT_TOKEN")}`,
+      "User-Agent": "Swimming-Yang-blog-admin",
+      "X-GitHub-Api-Version": "2026-03-10",
+      ...(options.headers || {}),
+    },
+  });
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new HttpError(data.message || "github_request_failed", response.status);
+  }
+
+  return data;
+}
+
+function parsePostMarkdown(markdown, path) {
+  const match = String(markdown || "").match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
+  const frontMatter = match ? parseFrontMatter(match[1]) : {};
+  const body = match ? match[2].trim() : String(markdown || "").trim();
+  const categories = Array.isArray(frontMatter.categories) ? frontMatter.categories : [];
+  const category = cleanInline(frontMatter.category || categories[0] || getCategoryFromPath(path) || "life").toLowerCase();
+  let topic = cleanInline(frontMatter.topic || categories[1] || getTopicFromPath(path) || "").toLowerCase();
+  const title = cleanInline(frontMatter.title || path.split("/").pop().replace(/^\d{4}-\d{2}-\d{2}-/, "").replace(/\.md$/, ""));
+  const date = cleanInline(frontMatter.date || getDatePrefixFromPath(path));
+  const tags = Array.isArray(frontMatter.tags) ? frontMatter.tags : [];
+
+  if (category === "life" && !LIFE_TOPICS.has(topic)) {
+    topic = "issue";
+  }
+
+  if (category === "coding" && !CODING_TOPICS.has(topic)) {
+    topic = "csharp";
+  }
+
+  return {
+    title,
+    category,
+    topic,
+    date,
+    dateInput: getDateInputFromJekyllDate(date),
+    datePrefix: String(date || "").slice(0, 10),
+    slug: getSlugFromPath(path),
+    description: cleanInline(frontMatter.description || ""),
+    image: cleanInline(frontMatter.image || ""),
+    tags,
+    body,
+  };
+}
+
+function parseFrontMatter(value) {
+  return String(value || "")
+    .split(/\r?\n/)
+    .reduce((result, line) => {
+      const match = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
+
+      if (!match) {
+        return result;
+      }
+
+      result[match[1]] = parseFrontMatterValue(match[2]);
+      return result;
+    }, {});
+}
+
+function parseFrontMatterValue(value) {
+  const raw = String(value || "").trim();
+
+  if (raw.startsWith("[") && raw.endsWith("]")) {
+    return raw
+      .slice(1, -1)
+      .split(",")
+      .map((item) => parseFrontMatterValue(item))
+      .filter(Boolean);
+  }
+
+  if ((raw.startsWith('"') && raw.endsWith('"')) || (raw.startsWith("'") && raw.endsWith("'"))) {
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return raw.slice(1, -1);
+    }
+  }
+
+  return raw;
+}
+
+function decodeBase64Content(value) {
+  const binary = atob(String(value || "").replace(/\s/g, ""));
+  const bytes = new Uint8Array(binary.length);
+
+  for (let i = 0; i < binary.length; i += 1) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+
+  return new TextDecoder().decode(bytes);
+}
+
+function validatePostPath(value) {
+  const path = String(value || "").trim();
+
+  if (!/^_posts\/.+\.md$/.test(path) || path.includes("..")) {
+    throw new HttpError("Invalid post path.", 400);
+  }
+
+  return path;
 }
 
 function normalizePostInput(input) {
@@ -505,6 +774,52 @@ function getPostPath(post) {
   }
 
   return `_posts/life/${post.topic}/${post.datePrefix}-${post.slug}.md`;
+}
+
+function getSitePostUrl(post, path) {
+  const datePrefix = post.datePrefix || getDatePrefixFromPath(path);
+  const [year, month, day] = datePrefix.split("-");
+  const category = post.category || getCategoryFromPath(path);
+  const topic = post.topic || getTopicFromPath(path);
+  const slug = getSlugFromPath(path) || post.slug;
+
+  if (!year || !month || !day || !category || !slug) {
+    return "/blog/";
+  }
+
+  return `/${[category, topic, year, month, day, slug].filter(Boolean).join("/")}/`;
+}
+
+function getCategoryFromPath(path) {
+  return String(path || "").split("/")[1] || "";
+}
+
+function getTopicFromPath(path) {
+  const parts = String(path || "").split("/");
+
+  return parts.length > 3 ? parts[2] : "";
+}
+
+function getDatePrefixFromPath(path) {
+  const match = String(path || "").match(/(\d{4}-\d{2}-\d{2})-[^/]+\.md$/);
+
+  return match ? match[1] : "";
+}
+
+function getSlugFromPath(path) {
+  const match = String(path || "").match(/\d{4}-\d{2}-\d{2}-(.+)\.md$/);
+
+  return match ? match[1] : "";
+}
+
+function getDateInputFromJekyllDate(value) {
+  const match = String(value || "").match(/^(\d{4}-\d{2}-\d{2})(?:[T\s](\d{2}):(\d{2}))?/);
+
+  if (!match) {
+    return "";
+  }
+
+  return `${match[1]}T${match[2] || "00"}:${match[3] || "00"}`;
 }
 
 async function requireAdminSession(request, env, corsHeaders) {
@@ -677,7 +992,7 @@ function getCorsHeaders(request, env) {
 
   return {
     "Access-Control-Allow-Origin": allowOrigin,
-    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, Accept, Authorization",
     "Access-Control-Max-Age": "86400",
     Vary: "Origin",

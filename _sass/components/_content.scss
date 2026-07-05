@@ -107,11 +107,12 @@
 }
 
 .content-flow-divider {
-  height: 1px;
+  width: min(100%, 240px);
+  height: 4px;
   margin: 0 0 2.25rem;
   border: 0;
-  background:
-    linear-gradient(90deg, transparent, var(--line), var(--accent-border), var(--line), transparent);
+  border-radius: 999px;
+  background: var(--line-strong);
 }
 
 .content table {
@@ -137,9 +138,12 @@
 }
 
 .content hr {
+  width: min(100%, 260px);
+  height: 4px;
   margin: 2.6rem 0;
   border: 0;
-  border-top: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--line-strong);
 }
 
 .content .highlighter-rouge {

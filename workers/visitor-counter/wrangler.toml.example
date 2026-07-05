@@ -4,7 +4,7 @@ compatibility_date = "2026-06-01"
 workers_dev = true
 
 [vars]
-ALLOWED_ORIGINS = "https://xn--9p4bn7dwj.com,https://swimming-yang.github.io,http://127.0.0.1:4000,http://localhost:4000"
+ALLOWED_ORIGINS = "https://xn--9p4bn7dwj.com,https://www.xn--9p4bn7dwj.com,https://swimming-yang.github.io,http://127.0.0.1:4000,http://localhost:4000"
 ADMIN_GITHUB_LOGIN = "Swimming-Yang"
 ADMIN_REDIRECT_URI = "https://xn--9p4bn7dwj.com/admin/"
 GITHUB_CLIENT_ID = "REPLACE_WITH_GITHUB_OAUTH_CLIENT_ID"

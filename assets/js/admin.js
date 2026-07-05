@@ -14,23 +14,25 @@
   const avatar = root.querySelector("[data-admin-avatar]");
   const loginName = root.querySelector("[data-admin-login]");
   const status = root.querySelector("[data-admin-status]");
-  const preview = root.querySelector("[data-admin-preview]");
   const form = root.querySelector("[data-admin-form]");
   const codingTopicField = root.querySelector("[data-admin-coding-topic-field]");
   const lifeTopicField = root.querySelector("[data-admin-life-topic-field]");
   const formatSelect = root.querySelector("[data-admin-format]");
   const fontSelect = root.querySelector("[data-admin-font]");
-  const textSizeSelect = root.querySelector("[data-admin-text-size]");
+  const fontSizeInput = root.querySelector("[data-admin-font-size]");
   const codeLanguageSelect = root.querySelector("[data-admin-code-language]");
   const imageUpload = root.querySelector("[data-admin-image-upload]");
   const writeView = root.querySelector("[data-admin-write-view]");
-  const previewView = root.querySelector("[data-admin-preview-view]");
   const modeTitle = root.querySelector("[data-admin-mode-title]");
-  const viewButtons = root.querySelectorAll("[data-admin-view]");
+  const postPicker = root.querySelector("[data-admin-post-picker]");
+  const loadPostButton = root.querySelector("[data-admin-load-post]");
+  const publishButton = root.querySelector("[data-admin-publish]");
   const visualEditor = root.querySelector("[data-admin-visual-editor]");
   const fields = {};
   let token = tokenStorage.getItem(tokenKey) || window.localStorage.getItem(tokenKey) || "";
   let savedVisualRange = null;
+  let currentPost = null;
+  let postIndexLoaded = false;
   const allowedInlineClasses = new Set([
     "text-font-sans",
     "text-font-serif",
@@ -95,7 +97,7 @@
     status.classList.add("is-success");
 
     const text = document.createElement("span");
-    text.textContent = `발행 완료: ${data.path}`;
+    text.textContent = `${currentPost ? "수정" : "발행"} 완료. 글 목록으로 이동합니다.`;
     status.append(text);
 
     if (data.htmlUrl) {
@@ -107,6 +109,10 @@
       status.append(document.createTextNode(" "));
       status.append(link);
     }
+
+    window.setTimeout(() => {
+      window.location.href = data.siteUrl || "/blog/";
+    }, 900);
   }
 
   function setToken(value) {
@@ -144,15 +150,26 @@
   }
 
   async function apiFetch(path, options) {
-    const response = await fetch(`${apiBase}${path}`, {
-      ...options,
-      headers: {
-        Accept: "application/json",
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-        ...(options && options.headers ? options.headers : {}),
-      },
-    });
+    if (!apiBase) {
+      throw new Error("관리자 API 주소가 없습니다.");
+    }
+
+    let response;
+
+    try {
+      response = await fetch(`${apiBase}${path}`, {
+        ...options,
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+          ...(options && options.headers ? options.headers : {}),
+        },
+      });
+    } catch (error) {
+      throw new Error(`API 연결 실패: ${apiBase}${path} (${error.message || "Failed to fetch"})`);
+    }
+
     const data = await response.json().catch(() => ({}));
 
     if (response.status === 401) {
@@ -169,14 +186,25 @@
   }
 
   async function apiUpload(path, body) {
-    const response = await fetch(`${apiBase}${path}`, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body,
-    });
+    if (!apiBase) {
+      throw new Error("관리자 API 주소가 없습니다.");
+    }
+
+    let response;
+
+    try {
+      response = await fetch(`${apiBase}${path}`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body,
+      });
+    } catch (error) {
+      throw new Error(`업로드 API 연결 실패: ${apiBase}${path} (${error.message || "Failed to fetch"})`);
+    }
+
     const data = await response.json().catch(() => ({}));
 
     if (response.status === 401) {
@@ -210,6 +238,8 @@
     if (loginName) {
       loginName.textContent = user.login || "admin";
     }
+
+    loadPostIndex();
   }
 
   async function verifySession() {
@@ -256,8 +286,8 @@
     return {
       category: fields.category.value,
       topic: getSelectedTopic(),
-      date: getKoreanDateInput(),
-      slug: "",
+      date: currentPost?.dateInput || getKoreanDateInput(),
+      slug: currentPost?.slug || "",
       tags: fields.tags.value.trim(),
       image: getFirstBodyImage(fields.body.value),
       title: fields.title.value.trim(),
@@ -269,7 +299,7 @@
   function initializeEditor() {
     updateTopicState();
     hydrateVisualEditorFromSource();
-    renderPreview();
+    updateEditorModeLabel();
   }
 
   function resetEditor() {
@@ -281,10 +311,11 @@
       field.value = "";
     });
     fields.category.value = "life";
+    currentPost = null;
     updateTopicState();
     hydrateVisualEditorFromSource();
-    renderPreview();
-    setEditorView("write");
+    updateEditorModeLabel();
+    focusVisualEditor();
     setStatus("새 글을 시작합니다.", "info");
   }
 
@@ -306,50 +337,133 @@
     setStatus("GitHub에 커밋하는 중...", "info");
 
     try {
-      const data = await apiFetch("/admin/posts", {
-        method: "POST",
+      const isEditing = Boolean(currentPost?.path);
+      const data = await apiFetch(isEditing ? `/admin/posts?path=${encodeURIComponent(currentPost.path)}` : "/admin/posts", {
+        method: isEditing ? "PUT" : "POST",
         body: JSON.stringify(payload),
       });
 
       setPublishedStatus(data);
     } catch (error) {
+      const recovered = await recoverPublishedPost(payload).catch(() => null);
+
+      if (recovered) {
+        setPublishedStatus(recovered);
+        return;
+      }
+
       setStatus(error.message, "error");
     }
   }
 
-  function setEditorView(view) {
-    const isPreview = view === "preview";
-
-    if (isPreview) {
-      renderPreview();
+  async function loadPostIndex() {
+    if (!postPicker || postIndexLoaded || !token) {
+      return;
     }
 
-    if (writeView) {
-      writeView.hidden = isPreview;
+    postIndexLoaded = true;
+
+    try {
+      const data = await apiFetch("/admin/posts", { method: "GET" });
+      const posts = Array.isArray(data.posts) ? data.posts : [];
+      postPicker.innerHTML = '<option value="">수정할 글 선택</option>';
+
+      posts.forEach((post) => {
+        const option = document.createElement("option");
+        option.value = post.path;
+        option.textContent = `${post.date || ""} ${post.title || post.path}`.trim();
+        postPicker.append(option);
+      });
+    } catch (error) {
+      postIndexLoaded = false;
+      setStatus(`글 목록을 불러오지 못했습니다: ${error.message}`, "error");
+    }
+  }
+
+  async function loadSelectedPost() {
+    const path = postPicker?.value || "";
+
+    if (!path) {
+      setStatus("수정할 글을 선택해주세요.", "error");
+      return;
     }
 
-    if (previewView) {
-      previewView.hidden = !isPreview;
+    setStatus("글을 불러오는 중...", "info");
+
+    try {
+      const data = await apiFetch(`/admin/posts?path=${encodeURIComponent(path)}`, { method: "GET" });
+      fillEditorFromPost(data.post);
+      setStatus("수정 모드로 열었습니다.", "success");
+    } catch (error) {
+      setStatus(error.message, "error");
+    }
+  }
+
+  function fillEditorFromPost(post) {
+    currentPost = post || null;
+
+    if (!currentPost) {
+      return;
     }
 
+    fields.title.value = currentPost.title || "";
+    fields.category.value = currentPost.category || "life";
+    fields.tags.value = Array.isArray(currentPost.tags) ? currentPost.tags.join(", ") : currentPost.tags || "";
+    fields.description.value = currentPost.description || "";
+    fields.body.value = currentPost.body || "";
+
+    updateTopicState();
+
+    if (fields.category.value === "coding") {
+      fields.codingTopic.value = currentPost.topic || fields.codingTopic.value;
+    } else {
+      fields.lifeTopic.value = currentPost.topic || fields.lifeTopic.value;
+    }
+
+    hydrateVisualEditorFromSource();
+    updateEditorModeLabel();
+    focusVisualEditor();
+  }
+
+  async function recoverPublishedPost(payload) {
+    if (currentPost) {
+      return null;
+    }
+
+    const data = await apiFetch("/admin/posts", { method: "GET" });
+    const posts = Array.isArray(data.posts) ? data.posts : [];
+    const datePrefix = String(payload.date || "").slice(0, 10);
+    const matched = posts.find((post) => post.title === payload.title && (!datePrefix || post.date === datePrefix));
+
+    if (!matched) {
+      return null;
+    }
+
+    return {
+      ok: true,
+      path: matched.path,
+      title: matched.title,
+      siteUrl: matched.url || "/blog/",
+      htmlUrl: matched.htmlUrl || "",
+    };
+  }
+
+  function updateEditorModeLabel() {
     if (modeTitle) {
-      modeTitle.textContent = isPreview ? "미리보기" : "글쓰기";
+      modeTitle.textContent = currentPost ? "글 수정" : "글쓰기";
     }
 
-    viewButtons.forEach((button) => {
-      const isActive = button.dataset.adminView === view;
-      button.classList.toggle("is-active", isActive);
-      button.setAttribute("aria-pressed", String(isActive));
-    });
+    if (publishButton) {
+      const textNode = Array.from(publishButton.childNodes).find((node) => node.nodeType === Node.TEXT_NODE);
 
-    if (!isPreview) {
-      focusVisualEditor();
+      if (textNode) {
+        textNode.textContent = currentPost ? " 수정" : " 발행";
+      }
     }
   }
 
   function touchBodyEditor() {
     syncSourceFromVisualEditor();
-    renderPreview();
     focusVisualEditor();
   }
 
@@ -388,6 +502,18 @@
       if (/^(-{3,}|\*{3,}|_{3,})$/.test(line.trim())) {
         visualEditor.append(document.createElement("hr"));
         index += 1;
+        continue;
+      }
+
+      if (isMarkdownTableLine(line)) {
+        const tableLines = [];
+
+        while (index < lines.length && isMarkdownTableLine(lines[index])) {
+          tableLines.push(lines[index]);
+          index += 1;
+        }
+
+        visualEditor.append(createVisualTable(parseMarkdownTableRows(tableLines)));
         continue;
       }
 
@@ -530,6 +656,10 @@
       return "---";
     }
 
+    if (tagName === "table") {
+      return serializeVisualTable(element);
+    }
+
     if (/^h[1-6]$/.test(tagName)) {
       const level = Math.max(2, Math.min(4, Number(tagName.slice(1))));
       return `${"#".repeat(level)} ${serializeVisualInline(element).trim()}`;
@@ -611,9 +741,19 @@
 
     if (tagName === "span") {
       const classes = getAllowedInlineClassList(element);
+      const fontSize = getAllowedFontSize(element);
+      const attributes = [];
 
       if (classes) {
-        return `<span class="${classes}">${content}</span>`;
+        attributes.push(`class="${classes}"`);
+      }
+
+      if (fontSize) {
+        attributes.push(`style="font-size: ${fontSize}pt"`);
+      }
+
+      if (attributes.length) {
+        return `<span ${attributes.join(" ")}>${content}</span>`;
       }
     }
 
@@ -626,6 +766,30 @@
       .join(" ");
   }
 
+  function getAllowedFontSize(element) {
+    const rawValue = element.style?.fontSize || "";
+    return normalizeFontSizeValue(rawValue);
+  }
+
+  function normalizeFontSizeValue(value) {
+    const rawValue = String(value || "").trim();
+    const match = rawValue.match(/font-size:\s*(\d{1,2})(px|pt)|^(\d{1,2})(px|pt)?$/i);
+
+    if (!match) {
+      return "";
+    }
+
+    const number = Number(match[1] || match[3]);
+    const unit = String(match[2] || match[4] || "pt").toLowerCase();
+    const pt = unit === "px" ? Math.round(number * 0.75) : number;
+
+    if (!Number.isFinite(pt) || pt < 8 || pt > 72) {
+      return "";
+    }
+
+    return String(pt);
+  }
+
   function serializeVisualFigure(figure) {
     const image = figure.querySelector("img");
     return image ? serializeVisualImage(image) : "";
@@ -635,6 +799,32 @@
     const src = image.getAttribute("src") || "";
     const alt = image.getAttribute("alt") || "";
     return src ? `![${alt}](${src})` : "";
+  }
+
+  function serializeVisualTable(table) {
+    const rows = Array.from(table.querySelectorAll("tr"))
+      .map((row) => Array.from(row.children).map((cell) => serializeVisualInline(cell).trim() || " "))
+      .filter((cells) => cells.length);
+
+    if (!rows.length) {
+      return "";
+    }
+
+    const columnCount = Math.max(...rows.map((row) => row.length));
+    const normalizedRows = rows.map((row) => {
+      const next = row.slice();
+
+      while (next.length < columnCount) {
+        next.push(" ");
+      }
+
+      return next;
+    });
+    const [head, ...body] = normalizedRows;
+    const separator = Array.from({ length: columnCount }, () => "---");
+    const formatRow = (row) => `| ${row.join(" | ")} |`;
+
+    return [formatRow(head), formatRow(separator), ...body.map(formatRow)].join("\n");
   }
 
   function serializeVisualCodeBlock(block) {
@@ -851,6 +1041,50 @@
     return figure;
   }
 
+  function createVisualTable(rows) {
+    const normalizedRows = rows && rows.length ? rows : [
+      ["제목", "제목", "제목"],
+      ["내용", "내용", "내용"],
+      ["내용", "내용", "내용"],
+    ];
+    const table = document.createElement("table");
+    const tbody = document.createElement("tbody");
+
+    normalizedRows.forEach((row, rowIndex) => {
+      const tableRow = document.createElement("tr");
+
+      row.forEach((cell) => {
+        const cellElement = document.createElement(rowIndex === 0 ? "th" : "td");
+        cellElement.innerHTML = renderInlineMarkdownToHtml(cell || " ");
+        tableRow.append(cellElement);
+      });
+
+      tbody.append(tableRow);
+    });
+
+    table.append(tbody);
+    return table;
+  }
+
+  function isMarkdownTableLine(line) {
+    return /^\s*\|.*\|\s*$/.test(line || "");
+  }
+
+  function isMarkdownTableSeparator(line) {
+    return /^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$/.test(line || "");
+  }
+
+  function parseMarkdownTableRows(lines) {
+    return lines
+      .filter((line) => !isMarkdownTableSeparator(line))
+      .map((line) => line
+        .trim()
+        .replace(/^\|/, "")
+        .replace(/\|$/, "")
+        .split("|")
+        .map((cell) => cell.trim() || " "));
+  }
+
   function insertVisualCodeBlock() {
     const selected = takeVisualSelectionText() || "code";
     const block = createVisualCodeBlock(getPreferredCodeLanguage(), selected);
@@ -859,6 +1093,11 @@
 
   function insertVisualDivider() {
     insertVisualBlock(document.createElement("hr"), null);
+  }
+
+  function insertVisualTable() {
+    const table = createVisualTable();
+    insertVisualBlock(table, table.querySelector("td") || table.querySelector("th"));
   }
 
   function insertVisualImage(src, alt) {
@@ -889,6 +1128,22 @@
     touchBodyEditor();
   }
 
+  function applyVisualFontSize(value) {
+    const fontSize = normalizeFontSizeValue(value);
+
+    if (!fontSize) {
+      return;
+    }
+
+    restoreVisualSelection();
+
+    const selection = window.getSelection();
+    const selected = selection && !selection.isCollapsed ? selection.toString() : "텍스트";
+
+    document.execCommand("insertHTML", false, `<span style="font-size: ${fontSize}pt">${escapeHtml(selected)}</span>`);
+    touchBodyEditor();
+  }
+
   function applyVisualEditorCommand(command) {
     if (command === "code") {
       insertVisualCodeBlock();
@@ -897,6 +1152,11 @@
 
     if (command === "divider") {
       insertVisualDivider();
+      return;
+    }
+
+    if (command === "table") {
+      insertVisualTable();
       return;
     }
 
@@ -956,13 +1216,37 @@
   }
 
   function handleVisualEditorKeydown(event) {
-    if (event.key !== "Tab" || !event.target.closest("[data-admin-code-content]")) {
-      return;
+    const activeElement = getActiveVisualElement();
+
+    if (event.key === "Enter" && !event.shiftKey) {
+      const quote = activeElement?.closest("blockquote");
+
+      if (quote && visualEditor.contains(quote)) {
+        event.preventDefault();
+        const paragraph = document.createElement("p");
+        paragraph.innerHTML = "<br>";
+        quote.after(paragraph);
+        placeCaretInside(paragraph, true);
+        handleVisualEditorInput();
+        return;
+      }
     }
 
-    event.preventDefault();
-    document.execCommand("insertText", false, "  ");
-    handleVisualEditorInput();
+    if (event.key === "Tab" && activeElement?.closest("[data-admin-code-content]")) {
+      event.preventDefault();
+      document.execCommand("insertText", false, "  ");
+      handleVisualEditorInput();
+    }
+  }
+
+  function getActiveVisualElement() {
+    const selection = window.getSelection();
+
+    if (!selection || !selection.rangeCount || !isInsideVisualEditor(selection.anchorNode)) {
+      return null;
+    }
+
+    return selection.anchorNode.nodeType === Node.TEXT_NODE ? selection.anchorNode.parentElement : selection.anchorNode;
   }
 
   function handleVisualEditorPaste(event) {
@@ -1168,6 +1452,15 @@
       return;
     }
 
+    if (command === "table") {
+      const table = "\n\n| 제목 | 제목 | 제목 |\n| --- | --- | --- |\n| 내용 | 내용 | 내용 |\n| 내용 | 내용 | 내용 |\n\n";
+      const start = fields.body.selectionStart;
+      const end = fields.body.selectionEnd;
+
+      replaceBodyRange(start, end, table, start + table.length, start + table.length);
+      return;
+    }
+
     if (command === "link") {
       const url = window.prompt("링크 주소를 입력하세요.", "https://");
 
@@ -1258,20 +1551,7 @@
   }
 
   function renderPreview() {
-    const payload = getPayload();
-    const title = payload.title || "제목";
-    const body = payload.body || "";
-    const date = payload.date ? payload.date.replace("T", " ") : "";
-    const description = payload.description ? `<p class="admin-preview__desc">${escapeHtml(payload.description)}</p>` : "";
-
-    preview.innerHTML = `
-      <header class="admin-preview__header">
-        <p>${escapeHtml(payload.category)}${payload.topic ? ` · ${escapeHtml(payload.topic)}` : ""}${date ? ` · ${escapeHtml(date)}` : ""}</p>
-        <h1>${escapeHtml(title)}</h1>
-        ${description}
-      </header>
-      ${renderMarkdown(body)}
-    `;
+    // The visual editor is already the publishing preview surface.
   }
 
   function renderMarkdown(markdown) {
@@ -1467,15 +1747,27 @@
   function formatInline(value) {
     const protectedSpans = [];
     const source = String(value || "").replace(
-      /<span class="((?:text-font-(?:sans|serif|mono)|text-size-(?:small|large|xl))(?:\s+(?:text-font-(?:sans|serif|mono)|text-size-(?:small|large|xl)))*)">([\s\S]*?)<\/span>/g,
-      (_match, classList, content) => {
+      /<span\s+([^>]*)>([\s\S]*?)<\/span>/g,
+      (_match, rawAttributes, content) => {
         const token = `@@ADMIN_INLINE_SPAN_${protectedSpans.length}@@`;
-        const classes = String(classList)
+        const classMatch = String(rawAttributes).match(/\bclass="([^"]+)"/);
+        const styleMatch = String(rawAttributes).match(/\bstyle="([^"]+)"/);
+        const classes = String(classMatch?.[1] || "")
           .split(/\s+/)
           .filter((className) => allowedInlineClasses.has(className))
           .join(" ");
+        const fontSize = normalizeFontSizeValue(styleMatch?.[1] || "");
+        const attributes = [];
 
-        protectedSpans.push(`<span class="${escapeAttribute(classes)}">${formatInline(content)}</span>`);
+        if (classes) {
+          attributes.push(`class="${escapeAttribute(classes)}"`);
+        }
+
+        if (fontSize) {
+          attributes.push(`style="font-size: ${fontSize}pt"`);
+        }
+
+        protectedSpans.push(attributes.length ? `<span ${attributes.join(" ")}>${formatInline(content)}</span>` : formatInline(content));
         return token;
       }
     );
@@ -1541,7 +1833,7 @@
   function handlePreviewClick(event) {
     const button = event.target.closest("[data-admin-copy-code]");
 
-    if (!button || !preview.contains(button)) {
+    if (!button || !root.contains(button)) {
       return;
     }
 
@@ -1640,9 +1932,10 @@
     root.querySelector("[data-admin-login-button]").addEventListener("click", login);
     root.querySelector("[data-admin-logout]").addEventListener("click", logout);
     root.querySelector("[data-admin-new]").addEventListener("click", resetEditor);
-    viewButtons.forEach((button) => {
-      button.addEventListener("click", () => setEditorView(button.dataset.adminView));
-    });
+
+    if (loadPostButton) {
+      loadPostButton.addEventListener("click", loadSelectedPost);
+    }
 
     root.querySelectorAll("[data-admin-command]").forEach((button) => {
       button.addEventListener("mousedown", (event) => event.preventDefault());
@@ -1673,15 +1966,17 @@
       });
     }
 
-    if (textSizeSelect) {
-      textSizeSelect.addEventListener("change", () => {
+    if (fontSizeInput) {
+      fontSizeInput.addEventListener("change", () => {
         if (visualEditor) {
-          applyVisualInlineClass(textSizeSelect.value, "크기");
-        } else if (textSizeSelect.value) {
-          wrapBodySelection(`<span class="${textSizeSelect.value}">`, "</span>", "크기");
-        }
+          applyVisualFontSize(fontSizeInput.value);
+        } else {
+          const fontSize = normalizeFontSizeValue(fontSizeInput.value);
 
-        textSizeSelect.value = "";
+          if (fontSize) {
+            wrapBodySelection(`<span style="font-size: ${fontSize}pt">`, "</span>", "크기");
+          }
+        }
       });
     }
 
@@ -1718,7 +2013,7 @@
       });
     }
 
-    preview.addEventListener("click", handlePreviewClick);
+    root.addEventListener("click", handlePreviewClick);
     form.addEventListener("submit", publish);
     form.addEventListener("input", handleInput);
     form.addEventListener("change", handleInput);

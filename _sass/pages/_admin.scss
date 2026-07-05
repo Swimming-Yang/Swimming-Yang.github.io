@@ -119,6 +119,24 @@
   flex-wrap: wrap;
 }
 
+.admin-post-loader {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-post-select {
+  width: min(46vw, 260px);
+  height: 36px;
+  padding: 0 28px 0 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
 .admin-mode-toggle {
   display: inline-flex;
   padding: 4px;
@@ -297,6 +315,16 @@
   margin: 1.8rem 0;
 }
 
+.admin-visual-editor table {
+  table-layout: fixed;
+}
+
+.admin-visual-editor th,
+.admin-visual-editor td {
+  min-width: 90px;
+  outline: none;
+}
+
 .admin-visual-editor [data-admin-code-content] {
   display: block;
   min-height: 132px;
@@ -357,6 +385,31 @@
   min-width: 122px;
 }
 
+.admin-pt-control {
+  display: inline-flex;
+  height: 34px;
+  align-items: center;
+  gap: 4px;
+  padding: 0 8px;
+  border: 1px solid var(--line);
+  border-radius: calc(var(--radius) - 2px);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 900;
+}
+
+.admin-pt-control input {
+  width: 48px;
+  height: 26px;
+  padding: 0 3px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font-weight: 900;
+  outline: none;
+}
+
 .admin-tool-button {
   display: inline-flex;
   width: 34px;
@@ -376,7 +429,9 @@
 .admin-toolbar .admin-format-select:focus-visible,
 .admin-toolbar .admin-font-select:focus-visible,
 .admin-toolbar .admin-size-select:focus-visible,
-.admin-toolbar .admin-code-language-select:focus-visible {
+.admin-toolbar .admin-code-language-select:focus-visible,
+.admin-post-select:focus-visible,
+.admin-pt-control:focus-within {
   border-color: var(--accent);
   color: var(--accent-strong);
   outline: 2px solid var(--accent-ring);

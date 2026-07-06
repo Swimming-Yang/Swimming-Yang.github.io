@@ -830,9 +830,53 @@
   function serializeVisualCodeBlock(block) {
     const language = normalizeCodeLanguage(block.dataset.language || getDefaultCodeLanguage());
     const codeElement = block.querySelector("[data-admin-code-content]");
-    const code = cleanCodeText(codeElement?.innerText || "");
+    const code = cleanCodeText(getVisualCodeText(codeElement));
 
     return `\`\`\`${language}\n${code}\n\`\`\``;
+  }
+
+  function getVisualCodeText(codeElement) {
+    if (!codeElement) {
+      return "";
+    }
+
+    return Array.from(codeElement.childNodes).reduce((text, child) => {
+      const needsLineBreak = isCodeLineElement(child) && text && !text.endsWith("\n");
+      return `${text}${needsLineBreak ? "\n" : ""}${serializeCodeNode(child)}`;
+    }, "");
+  }
+
+  function serializeCodeNode(node) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      return node.textContent || "";
+    }
+
+    if (node.nodeType !== Node.ELEMENT_NODE) {
+      return "";
+    }
+
+    const element = node;
+    const tagName = element.tagName.toLowerCase();
+
+    if (tagName === "br") {
+      return "\n";
+    }
+
+    const content = Array.from(element.childNodes).reduce((text, child) => {
+      const needsLineBreak = isCodeLineElement(child) && text && !text.endsWith("\n");
+      return `${text}${needsLineBreak ? "\n" : ""}${serializeCodeNode(child)}`;
+    }, "");
+
+    if (isCodeLineElement(element)) {
+      const line = content.replace(/\n+$/g, "");
+      return line ? `${line}\n` : "\n";
+    }
+
+    return content;
+  }
+
+  function isCodeLineElement(node) {
+    return node.nodeType === Node.ELEMENT_NODE && /^(div|p)$/i.test(node.tagName);
   }
 
   function cleanVisualText(value) {
@@ -840,7 +884,10 @@
   }
 
   function cleanCodeText(value) {
-    return cleanVisualText(value).replace(/\n{2,}$/g, "\n").replace(/\n$/g, "");
+    return cleanVisualText(value)
+      .replace(/\r\n?/g, "\n")
+      .replace(/\n{2,}$/g, "\n")
+      .replace(/\n$/g, "");
   }
 
   function renderInlineMarkdownToHtml(value) {
@@ -969,6 +1016,27 @@
     savedVisualRange = range.cloneRange();
 
     return selected;
+  }
+
+  function insertPlainTextAtVisualSelection(text) {
+    const selection = window.getSelection();
+
+    if (!selection || !selection.rangeCount || !isInsideVisualEditor(selection.anchorNode) || !isInsideVisualEditor(selection.focusNode)) {
+      return false;
+    }
+
+    const range = selection.getRangeAt(0);
+    const textNode = document.createTextNode(text);
+
+    range.deleteContents();
+    range.insertNode(textNode);
+    range.setStart(textNode, textNode.textContent.length);
+    range.collapse(true);
+    selection.removeAllRanges();
+    selection.addRange(range);
+    savedVisualRange = range.cloneRange();
+
+    return true;
   }
 
   function insertVisualBlock(block, focusTarget) {
@@ -1215,8 +1283,33 @@
     renderPreview();
   }
 
+  function handleVisualEditorBeforeInput(event) {
+    const codeContent = getActiveVisualCodeContent();
+
+    if (!codeContent || !["insertParagraph", "insertLineBreak"].includes(event.inputType)) {
+      return;
+    }
+
+    event.preventDefault();
+
+    if (insertPlainTextAtVisualSelection("\n")) {
+      handleVisualEditorInput();
+    }
+  }
+
   function handleVisualEditorKeydown(event) {
     const activeElement = getActiveVisualElement();
+    const codeContent = activeElement?.closest("[data-admin-code-content]");
+
+    if (codeContent && event.key === "Enter") {
+      event.preventDefault();
+
+      if (insertPlainTextAtVisualSelection("\n")) {
+        handleVisualEditorInput();
+      }
+
+      return;
+    }
 
     if (event.key === "Enter" && !event.shiftKey) {
       const quote = activeElement?.closest("blockquote");
@@ -1232,10 +1325,12 @@
       }
     }
 
-    if (event.key === "Tab" && activeElement?.closest("[data-admin-code-content]")) {
+    if (event.key === "Tab" && codeContent) {
       event.preventDefault();
-      document.execCommand("insertText", false, "  ");
-      handleVisualEditorInput();
+
+      if (insertPlainTextAtVisualSelection("  ")) {
+        handleVisualEditorInput();
+      }
     }
   }
 
@@ -1249,6 +1344,10 @@
     return selection.anchorNode.nodeType === Node.TEXT_NODE ? selection.anchorNode.parentElement : selection.anchorNode;
   }
 
+  function getActiveVisualCodeContent() {
+    return getActiveVisualElement()?.closest("[data-admin-code-content]") || null;
+  }
+
   function handleVisualEditorPaste(event) {
     const text = event.clipboardData?.getData("text/plain");
 
@@ -1257,6 +1356,12 @@
     }
 
     event.preventDefault();
+
+    if (getActiveVisualCodeContent() && insertPlainTextAtVisualSelection(text.replace(/\r\n?/g, "\n"))) {
+      handleVisualEditorInput();
+      return;
+    }
+
     document.execCommand("insertText", false, text);
   }
 
@@ -1995,6 +2100,7 @@
     }
 
     if (visualEditor) {
+      visualEditor.addEventListener("beforeinput", handleVisualEditorBeforeInput);
       visualEditor.addEventListener("input", handleVisualEditorInput);
       visualEditor.addEventListener("keydown", handleVisualEditorKeydown);
       visualEditor.addEventListener("paste", handleVisualEditorPaste);

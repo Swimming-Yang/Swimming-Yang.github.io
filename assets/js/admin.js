@@ -486,8 +486,12 @@
     placeCaretInside(visualEditor.lastElementChild || visualEditor, false);
   }
 
-  function renderMarkdownIntoVisualEditor(markdown) {
-    const lines = String(markdown || "").split(/\r?\n/);
+  function renderMarkdownIntoVisualEditor(markdown, target = visualEditor) {
+    if (!target) {
+      return;
+    }
+
+    const lines = normalizePastedMarkdown(markdown).split(/\n/);
     let index = 0;
 
     while (index < lines.length) {
@@ -500,7 +504,7 @@
       }
 
       if (/^(-{3,}|\*{3,}|_{3,})$/.test(line.trim())) {
-        visualEditor.append(document.createElement("hr"));
+        target.append(document.createElement("hr"));
         index += 1;
         continue;
       }
@@ -513,7 +517,7 @@
           index += 1;
         }
 
-        visualEditor.append(createVisualTable(parseMarkdownTableRows(tableLines)));
+        target.append(createVisualTable(parseMarkdownTableRows(tableLines)));
         continue;
       }
 
@@ -531,31 +535,44 @@
           index += 1;
         }
 
-        visualEditor.append(createVisualCodeBlock(language, codeLines.join("\n")));
+        target.append(createVisualCodeBlock(language, codeLines.join("\n")));
         continue;
       }
 
-      const heading = line.match(/^(#{2,4})\s+(.+)$/);
+      const heading = line.match(/^(#{1,4})\s+(.+)$/);
       const image = line.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
-      const quote = line.match(/^>\s+(.+)$/);
+      const quote = line.match(/^>\s?(.*)$/);
       const unordered = line.match(/^[-*]\s+(.+)$/);
       const ordered = line.match(/^\d+\.\s+(.+)$/);
 
       if (heading) {
-        appendVisualElement(`h${heading[1].length}`, renderInlineMarkdownToHtml(heading[2]));
+        const level = Math.max(2, Math.min(4, heading[1].length));
+        appendVisualElement(`h${level}`, renderInlineMarkdownToHtml(heading[2]), target);
         index += 1;
         continue;
       }
 
       if (image) {
-        visualEditor.append(createVisualImageFigure(image[2], image[1]));
+        target.append(createVisualImageFigure(image[2], image[1]));
         index += 1;
         continue;
       }
 
       if (quote) {
-        appendVisualElement("blockquote", renderInlineMarkdownToHtml(quote[1]));
-        index += 1;
+        const quoteLines = [];
+
+        while (index < lines.length) {
+          const quoteLine = lines[index].match(/^>\s?(.*)$/);
+
+          if (!quoteLine) {
+            break;
+          }
+
+          quoteLines.push(renderInlineMarkdownToHtml(quoteLine[1].trim()));
+          index += 1;
+        }
+
+        appendVisualElement("blockquote", quoteLines.join("<br>"), target);
         continue;
       }
 
@@ -575,14 +592,14 @@
           index += 1;
         }
 
-        visualEditor.append(list);
+        target.append(list);
         continue;
       }
 
       const paragraph = [];
 
       while (index < lines.length && lines[index].trim() && !/^```/.test(lines[index])) {
-        if (/^(#{2,4})\s+/.test(lines[index]) || /^!\[/.test(lines[index]) || /^>\s+/.test(lines[index]) || /^[-*]\s+/.test(lines[index]) || /^\d+\.\s+/.test(lines[index])) {
+        if (/^(#{1,4})\s+/.test(lines[index]) || /^!\[/.test(lines[index]) || /^>\s?/.test(lines[index]) || /^[-*]\s+/.test(lines[index]) || /^\d+\.\s+/.test(lines[index])) {
           break;
         }
 
@@ -590,14 +607,14 @@
         index += 1;
       }
 
-      appendVisualElement("p", renderInlineMarkdownToHtml(paragraph.join(" ")));
+      appendVisualElement("p", renderInlineMarkdownToHtml(paragraph.join(" ")), target);
     }
   }
 
-  function appendVisualElement(tagName, html) {
+  function appendVisualElement(tagName, html, target = visualEditor) {
     const element = document.createElement(tagName);
     element.innerHTML = html || "<br>";
-    visualEditor.append(element);
+    target.append(element);
     return element;
   }
 
@@ -606,6 +623,257 @@
     paragraph.innerHTML = "<br>";
     visualEditor.append(paragraph);
     return paragraph;
+  }
+
+  function createVisualBlocksFromMarkdown(markdown) {
+    const fragment = document.createDocumentFragment();
+    renderMarkdownIntoVisualEditor(markdown, fragment);
+    return Array.from(fragment.childNodes);
+  }
+
+  function normalizePastedMarkdown(value) {
+    return String(value || "")
+      .replace(/\r\n?/g, "\n")
+      .replace(/\u00a0/g, " ")
+      .replace(/<aside\b[^>]*>([\s\S]*?)<\/aside>/gi, (_match, content) => normalizeAsideMarkdown(content))
+      .replace(/\n{3,}/g, "\n\n")
+      .trim();
+  }
+
+  function normalizeAsideMarkdown(content) {
+    const lines = stripHtmlToText(content)
+      .split(/\n/)
+      .map((line) => line.trim())
+      .filter(Boolean);
+
+    if (lines.length && isCalloutIconLine(lines[0])) {
+      lines.shift();
+    }
+
+    return lines.map((line) => `> ${line}`).join("\n");
+  }
+
+  function isCalloutIconLine(line) {
+    return /^[\p{Extended_Pictographic}\uFE0F\s]+$/u.test(String(line || "").trim());
+  }
+
+  function stripHtmlToText(value) {
+    const source = String(value || "")
+      .replace(/<br\s*\/?>/gi, "\n")
+      .replace(/<\/(p|div|li|h[1-6]|blockquote|aside)>/gi, "\n")
+      .replace(/<[^>]+>/g, "");
+
+    return decodeHtmlEntities(source);
+  }
+
+  function decodeHtmlEntities(value) {
+    const textarea = document.createElement("textarea");
+    textarea.innerHTML = String(value || "");
+    return textarea.value;
+  }
+
+  function getStructuredPasteMarkdown(event) {
+    const text = event.clipboardData?.getData("text/plain") || "";
+    const html = event.clipboardData?.getData("text/html") || "";
+    const textMarkdown = normalizePastedMarkdown(text);
+
+    if (isStructuredMarkdown(textMarkdown) || /<aside\b/i.test(text)) {
+      return textMarkdown;
+    }
+
+    const htmlMarkdown = normalizePastedMarkdown(convertClipboardHtmlToMarkdown(html));
+
+    if (isStructuredMarkdown(htmlMarkdown)) {
+      return htmlMarkdown;
+    }
+
+    return "";
+  }
+
+  function isStructuredMarkdown(markdown) {
+    const value = String(markdown || "").trim();
+
+    if (!value) {
+      return false;
+    }
+
+    return /(^|\n)\s*(#{1,4}\s+\S|```|>\s*\S|!\[[^\]]*\]\(|[-*]\s+\S|\d+\.\s+\S|(-{3,}|\*{3,}|_{3,})\s*$)/m.test(value) || value.split(/\n/).some(isMarkdownTableLine);
+  }
+
+  function convertClipboardHtmlToMarkdown(html) {
+    if (!html) {
+      return "";
+    }
+
+    const document = new DOMParser().parseFromString(html, "text/html");
+
+    return Array.from(document.body.childNodes)
+      .map((node) => htmlNodeToMarkdown(node))
+      .filter((block) => block.trim())
+      .join("\n\n");
+  }
+
+  function htmlNodeToMarkdown(node) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      return cleanVisualText(node.textContent).trim();
+    }
+
+    if (node.nodeType !== Node.ELEMENT_NODE) {
+      return "";
+    }
+
+    const element = node;
+    const tagName = element.tagName.toLowerCase();
+
+    if (/^h[1-4]$/.test(tagName)) {
+      return `${"#".repeat(Number(tagName.slice(1)))} ${htmlInlineToMarkdown(element).trim()}`;
+    }
+
+    if (tagName === "pre" || isNotionCodeBlock(element)) {
+      const code = tagName === "pre" ? element.innerText || element.textContent || "" : stripHtmlToText(element.innerHTML);
+      return `\`\`\`${getPreferredCodeLanguage()}\n${cleanCodeText(code)}\n\`\`\``;
+    }
+
+    if (tagName === "aside" || tagName === "blockquote" || isNotionCallout(element)) {
+      return markdownQuoteFromText(stripHtmlToText(element.innerHTML));
+    }
+
+    if (tagName === "ul" || tagName === "ol") {
+      return Array.from(element.children)
+        .filter((child) => child.tagName.toLowerCase() === "li")
+        .map((child, index) => `${tagName === "ol" ? `${index + 1}.` : "-"} ${htmlInlineToMarkdown(child).trim()}`)
+        .join("\n");
+    }
+
+    if (tagName === "table") {
+      return htmlTableToMarkdown(element);
+    }
+
+    if (tagName === "img") {
+      return htmlImageToMarkdown(element);
+    }
+
+    if (isInlineHtmlElement(element) || (tagName === "div" && !hasHtmlBlockChildren(element))) {
+      return htmlInlineToMarkdown(element).trim();
+    }
+
+    const blockChildren = Array.from(element.childNodes)
+      .map((child) => htmlNodeToMarkdown(child))
+      .filter((block) => block.trim());
+
+    if (blockChildren.length > 1) {
+      return blockChildren.join("\n\n");
+    }
+
+    return blockChildren[0] || htmlInlineToMarkdown(element).trim();
+  }
+
+  function isInlineHtmlElement(element) {
+    return /^(p|span|strong|b|em|i|a|code|mark|small|sub|sup)$/i.test(element.tagName);
+  }
+
+  function hasHtmlBlockChildren(element) {
+    return Array.from(element.children).some((child) => /^(h[1-6]|p|div|pre|blockquote|aside|ul|ol|table|figure|img)$/i.test(child.tagName));
+  }
+
+  function htmlInlineToMarkdown(node) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      return cleanVisualText(node.textContent);
+    }
+
+    if (node.nodeType !== Node.ELEMENT_NODE) {
+      return "";
+    }
+
+    const element = node;
+    const tagName = element.tagName.toLowerCase();
+
+    if (tagName === "br") {
+      return "\n";
+    }
+
+    if (tagName === "img") {
+      return htmlImageToMarkdown(element);
+    }
+
+    const content = Array.from(element.childNodes).map((child) => htmlInlineToMarkdown(child)).join("");
+
+    if (tagName === "strong" || tagName === "b") {
+      return `**${content}**`;
+    }
+
+    if (tagName === "em" || tagName === "i") {
+      return `*${content}*`;
+    }
+
+    if (tagName === "code") {
+      return `\`${content}\``;
+    }
+
+    if (tagName === "a") {
+      const href = element.getAttribute("href") || "";
+      return href ? `[${content}](${href})` : content;
+    }
+
+    return content;
+  }
+
+  function htmlImageToMarkdown(image) {
+    const src = image.getAttribute("src") || "";
+    const alt = image.getAttribute("alt") || "";
+    return src ? `![${alt}](${src})` : "";
+  }
+
+  function htmlTableToMarkdown(table) {
+    const rows = Array.from(table.querySelectorAll("tr"))
+      .map((row) => Array.from(row.children).map((cell) => htmlInlineToMarkdown(cell).trim() || " "))
+      .filter((cells) => cells.length);
+
+    if (!rows.length) {
+      return "";
+    }
+
+    const columnCount = Math.max(...rows.map((row) => row.length));
+    const normalizeRow = (row) => {
+      const next = row.slice();
+
+      while (next.length < columnCount) {
+        next.push(" ");
+      }
+
+      return next;
+    };
+    const normalizedRows = rows.map(normalizeRow);
+    const separator = Array.from({ length: columnCount }, () => "---");
+    const formatRow = (row) => `| ${row.join(" | ")} |`;
+
+    return [formatRow(normalizedRows[0]), formatRow(separator), ...normalizedRows.slice(1).map(formatRow)].join("\n");
+  }
+
+  function markdownQuoteFromText(value) {
+    const lines = cleanVisualText(value)
+      .split(/\n/)
+      .map((line) => line.trim())
+      .filter(Boolean);
+
+    if (lines.length && isCalloutIconLine(lines[0])) {
+      lines.shift();
+    }
+
+    return lines.map((line) => `> ${line}`).join("\n");
+  }
+
+  function isNotionCallout(element) {
+    const className = element.getAttribute("class") || "";
+    const text = cleanVisualText(element.textContent).trim();
+
+    return /callout|notion-callout/i.test(className) || isCalloutIconLine(text.split(/\n/)[0]);
+  }
+
+  function isNotionCodeBlock(element) {
+    const className = element.getAttribute("class") || "";
+
+    return /notion-code|code-block|source-code/i.test(className);
   }
 
   function syncSourceFromVisualEditor() {
@@ -1349,20 +1617,135 @@
   }
 
   function handleVisualEditorPaste(event) {
-    const text = event.clipboardData?.getData("text/plain");
+    const text = getClipboardPlainText(event);
+    const html = event.clipboardData?.getData("text/html") || "";
 
-    if (!text) {
+    if (!text && !html) {
       return;
     }
 
     event.preventDefault();
 
-    if (getActiveVisualCodeContent() && insertPlainTextAtVisualSelection(text.replace(/\r\n?/g, "\n"))) {
+    if (text && getActiveVisualCodeContent() && insertPlainTextAtVisualSelection(text.replace(/\r\n?/g, "\n"))) {
       handleVisualEditorInput();
       return;
     }
 
-    document.execCommand("insertText", false, text);
+    const markdown = getStructuredPasteMarkdown(event);
+
+    if (markdown && insertStructuredMarkdownPaste(markdown)) {
+      return;
+    }
+
+    if (text) {
+      document.execCommand("insertText", false, text);
+    }
+  }
+
+  function getClipboardPlainText(event) {
+    const text = event.clipboardData?.getData("text/plain") || "";
+
+    if (text) {
+      return text;
+    }
+
+    return stripHtmlToText(event.clipboardData?.getData("text/html") || "");
+  }
+
+  function insertStructuredMarkdownPaste(markdown) {
+    const prepared = preparePastedPostMarkdown(markdown);
+    const body = prepared.body || prepared.markdown;
+
+    if (prepared.title && !fields.title.value.trim()) {
+      fields.title.value = prepared.title;
+    }
+
+    const blocks = createVisualBlocksFromMarkdown(body);
+
+    if (!blocks.length) {
+      return false;
+    }
+
+    insertVisualBlocksAtSelection(blocks);
+    return true;
+  }
+
+  function preparePastedPostMarkdown(markdown) {
+    const normalized = normalizePastedMarkdown(markdown);
+    const lines = normalized.split(/\n/);
+    const firstContentIndex = lines.findIndex((line) => line.trim());
+    let title = "";
+
+    if (firstContentIndex >= 0) {
+      const titleLine = lines[firstContentIndex].match(/^#\s+(.+)$/);
+
+      if (titleLine && !fields.title.value.trim()) {
+        title = cleanMarkdownTitle(titleLine[1]);
+        lines.splice(firstContentIndex, 1);
+
+        while (lines[firstContentIndex] !== undefined && !lines[firstContentIndex].trim()) {
+          lines.splice(firstContentIndex, 1);
+        }
+      }
+    }
+
+    return {
+      title,
+      markdown: normalized,
+      body: lines.join("\n").trim(),
+    };
+  }
+
+  function cleanMarkdownTitle(value) {
+    return stripHtmlToText(
+      String(value || "")
+        .replace(/`([^`]+)`/g, "$1")
+        .replace(/\*\*([^*]+)\*\*/g, "$1")
+        .replace(/\*([^*]+)\*/g, "$1")
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    ).trim();
+  }
+
+  function insertVisualBlocksAtSelection(blocks) {
+    const nextBlocks = blocks.filter((block) => block.nodeType === Node.ELEMENT_NODE);
+
+    if (!nextBlocks.length) {
+      return;
+    }
+
+    const currentBlock = getCurrentTopLevelVisualBlock();
+
+    if (isVisualEditorEmpty()) {
+      visualEditor.innerHTML = "";
+      visualEditor.append(...nextBlocks);
+    } else if (currentBlock && isEmptyVisualParagraph(currentBlock)) {
+      currentBlock.replaceWith(...nextBlocks);
+    } else if (currentBlock && currentBlock !== visualEditor) {
+      currentBlock.after(...nextBlocks);
+    } else {
+      visualEditor.append(...nextBlocks);
+    }
+
+    placeCaretInside(getVisualBlockCaretTarget(nextBlocks[nextBlocks.length - 1]), false);
+    handleVisualEditorInput();
+  }
+
+  function getVisualBlockCaretTarget(block) {
+    return block?.querySelector?.("[data-admin-code-content]") || block;
+  }
+
+  function isVisualEditorEmpty() {
+    return !visualEditor.childNodes.length || Array.from(visualEditor.childNodes).every((node) => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        return !cleanVisualText(node.textContent).trim();
+      }
+
+      return node.nodeType === Node.ELEMENT_NODE && isEmptyVisualParagraph(node);
+    });
+  }
+
+  function isEmptyVisualParagraph(element) {
+    return element?.tagName?.toLowerCase() === "p" && !cleanVisualText(element.textContent).trim() && !element.querySelector("img, table, [data-admin-code-block]");
   }
 
   function replaceBodyRange(start, end, value, selectionStart, selectionEnd) {

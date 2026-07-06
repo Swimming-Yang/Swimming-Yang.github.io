@@ -1336,16 +1336,20 @@
     toolbar.className = "code-window__toolbar";
     toolbar.contentEditable = "false";
 
-    const dots = document.createElement("span");
-    dots.className = "code-window__dots";
-    dots.setAttribute("aria-hidden", "true");
-    dots.innerHTML = "<i></i><i></i><i></i>";
+    const mark = document.createElement("span");
+    mark.className = "image-window__mark";
+    mark.setAttribute("aria-hidden", "true");
+    mark.textContent = "IMG";
 
     const label = document.createElement("span");
     label.className = "code-window__language";
     label.textContent = getCodeLanguageLabel(safeLanguage);
 
-    toolbar.append(dots, label);
+    const actions = document.createElement("div");
+    actions.className = "code-window__actions";
+    actions.append(label);
+
+    toolbar.append(mark, actions);
 
     const highlight = document.createElement("div");
     highlight.className = "highlight";
@@ -1370,10 +1374,34 @@
 
   function createVisualImageFigure(src, alt) {
     const figure = document.createElement("figure");
+    figure.className = "image-window";
+
+    const toolbar = document.createElement("div");
+    toolbar.className = "code-window__toolbar image-window__toolbar";
+    toolbar.contentEditable = "false";
+
+    const dots = document.createElement("span");
+    dots.className = "code-window__dots";
+    dots.setAttribute("aria-hidden", "true");
+    dots.innerHTML = "<i></i><i></i><i></i>";
+
+    const label = document.createElement("span");
+    label.className = "code-window__language image-window__label";
+    label.textContent = "Image";
+
+    const actions = document.createElement("div");
+    actions.className = "code-window__actions";
+    actions.append(label);
+
+    const body = document.createElement("div");
+    body.className = "image-window__body";
+
     const image = document.createElement("img");
     image.src = src;
     image.alt = alt || "";
-    figure.append(image);
+    body.append(image);
+    toolbar.append(dots, actions);
+    figure.append(toolbar, body);
     return figure;
   }
 
@@ -2175,7 +2203,7 @@
       if (image) {
         flushParagraph();
         closeList();
-        html.push(`<figure><img src="${escapeAttribute(image[2])}" alt="${escapeAttribute(image[1])}"></figure>`);
+        html.push(renderImageFigure(image[2], image[1]));
         return;
       }
 
@@ -2280,16 +2308,51 @@
       `<div class="language-${safeLanguage} highlighter-rouge code-window">`,
       '<div class="code-window__toolbar">',
       '<span class="code-window__dots" aria-hidden="true"><i></i><i></i><i></i></span>',
+      '<div class="code-window__actions">',
       `<span class="code-window__language">${label}</span>`,
-      '<button class="code-window__copy" type="button" data-admin-copy-code aria-label="코드 복사">복사</button>',
+      `<button class="code-window__copy" type="button" data-admin-copy-code aria-label="코드 복사" title="코드 복사">${renderCodeCopyIcon(false)}</button>`,
+      "</div>",
       "</div>",
       '<div class="highlight">',
       `<pre class="highlight"><code class="language-${safeLanguage}">`,
     ].join("");
   }
 
+  function renderCodeCopyIcon(copied) {
+    if (copied) {
+      return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>';
+    }
+
+    return '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+  }
+
+  function setCodeCopyButtonState(button, copied) {
+    const label = copied ? "복사 완료" : "코드 복사";
+
+    button.innerHTML = renderCodeCopyIcon(copied);
+    button.classList.toggle("is-copied", copied);
+    button.setAttribute("aria-label", label);
+    button.title = label;
+  }
+
   function renderCodeBlockEnd() {
     return "</code></pre></div></div>";
+  }
+
+  function renderImageFigure(src, alt) {
+    return [
+      '<figure class="image-window">',
+      '<div class="code-window__toolbar image-window__toolbar">',
+      '<span class="image-window__mark" aria-hidden="true">IMG</span>',
+      '<div class="code-window__actions">',
+      '<span class="code-window__language image-window__label">Image</span>',
+      "</div>",
+      "</div>",
+      '<div class="image-window__body">',
+      `<img src="${escapeAttribute(src)}" alt="${escapeAttribute(alt)}">`,
+      "</div>",
+      "</figure>",
+    ].join("");
   }
 
   function normalizeCodeLanguage(value) {
@@ -2336,12 +2399,10 @@
     }
 
     const resetLabel = () => {
-      button.textContent = "복사";
-      button.classList.remove("is-copied");
+      setCodeCopyButtonState(button, false);
     };
     const finish = () => {
-      button.textContent = "완료";
-      button.classList.add("is-copied");
+      setCodeCopyButtonState(button, true);
       window.setTimeout(resetLabel, 1600);
     };
     const text = codeElement.innerText;

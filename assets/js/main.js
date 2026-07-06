@@ -46,13 +46,11 @@
   function copyCode(button, codeElement) {
     const text = codeElement.innerText;
     const resetLabel = () => {
-      button.textContent = "복사";
-      button.classList.remove("is-copied");
+      setCodeCopyButtonState(button, false);
     };
 
     const finish = () => {
-      button.textContent = "완료";
-      button.classList.add("is-copied");
+      setCodeCopyButtonState(button, true);
       window.setTimeout(resetLabel, 1600);
     };
 
@@ -71,6 +69,23 @@
     }
 
     navigator.clipboard.writeText(text).then(finish);
+  }
+
+  function renderCodeCopyIcon(copied) {
+    if (copied) {
+      return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>';
+    }
+
+    return '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+  }
+
+  function setCodeCopyButtonState(button, copied) {
+    const label = copied ? "복사 완료" : "코드 복사";
+
+    button.innerHTML = renderCodeCopyIcon(copied);
+    button.classList.toggle("is-copied", copied);
+    button.setAttribute("aria-label", label);
+    button.title = label;
   }
 
   function enhanceCodeBlocks() {
@@ -106,46 +121,92 @@
       const copyButton = document.createElement("button");
       copyButton.className = "code-window__copy";
       copyButton.type = "button";
-      copyButton.textContent = "복사";
-      copyButton.setAttribute("aria-label", "코드 복사");
+      setCodeCopyButtonState(copyButton, false);
       copyButton.addEventListener("click", () => copyCode(copyButton, codeElement));
 
-      toolbar.append(dots, language, copyButton);
+      const actions = document.createElement("div");
+      actions.className = "code-window__actions";
+      actions.append(language, copyButton);
+
+      toolbar.append(dots, actions);
       block.classList.add("code-window");
       block.insertBefore(toolbar, highlight);
     });
   }
 
-  function enhanceContentDividers() {
+  function createImageWindowMark() {
+    const mark = document.createElement("span");
+    mark.className = "image-window__mark";
+    mark.setAttribute("aria-hidden", "true");
+    mark.textContent = "IMG";
+    return mark;
+  }
+
+  function createImageWindow(image) {
+    const figure = document.createElement("figure");
+    figure.append(image);
+    enhanceImageWindow(figure);
+    return figure;
+  }
+
+  function enhanceImageWindow(figure) {
+    if (!figure || figure.querySelector(":scope > .image-window__toolbar")) {
+      return;
+    }
+
+    const image = figure.querySelector(":scope > img");
+
+    if (!image) {
+      return;
+    }
+
+    figure.classList.add("image-window");
+
+    const toolbar = document.createElement("div");
+    toolbar.className = "code-window__toolbar image-window__toolbar";
+
+    const label = document.createElement("span");
+    label.className = "code-window__language image-window__label";
+    label.textContent = "Image";
+
+    const actions = document.createElement("div");
+    actions.className = "code-window__actions";
+    actions.append(label);
+
+    const body = document.createElement("div");
+    body.className = "image-window__body";
+    body.append(image);
+
+    toolbar.append(createImageWindowMark(), actions);
+    figure.prepend(toolbar, body);
+  }
+
+  function enhanceImageBlocks() {
     const content = document.querySelector(".post-content");
 
     if (!content) {
       return;
     }
 
-    content.querySelectorAll("[data-content-divider]").forEach((divider) => divider.remove());
-    content.querySelectorAll(".has-content-divider").forEach((element) => {
-      element.classList.remove("has-content-divider");
-    });
+    Array.from(content.children).forEach((element) => {
+      if (element.matches("p")) {
+        const image = element.querySelector(":scope > img:only-child");
 
-    const children = Array.from(content.children);
-    const isImageBlock = (element) =>
-      element.matches("img, figure") ||
-      (element.matches("p") && element.querySelector("img") && element.textContent.trim() === "");
-    const isSeparatedBlock = (element) => element.matches("blockquote, .highlighter-rouge") || isImageBlock(element);
-    const hasVisibleNext = (index) => children.slice(index + 1).some((element) => !element.hidden);
+        if (image && element.textContent.trim() === "") {
+          element.replaceWith(createImageWindow(image));
+        }
 
-    children.forEach((element, index) => {
-      if (!isSeparatedBlock(element) || !hasVisibleNext(index)) {
         return;
       }
 
-      const divider = document.createElement("div");
-      divider.className = "content-flow-divider";
-      divider.dataset.contentDivider = "true";
-      divider.setAttribute("aria-hidden", "true");
-      element.classList.add("has-content-divider");
-      element.insertAdjacentElement("afterend", divider);
+      if (element.matches("img")) {
+        element.replaceWith(createImageWindow(element));
+        return;
+      }
+
+      if (element.matches("figure:not(.image-window)")) {
+        enhanceImageWindow(element);
+      }
     });
   }
 
@@ -1213,7 +1274,7 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     enhanceCodeBlocks();
-    enhanceContentDividers();
+    enhanceImageBlocks();
     enhanceBlogStats();
     enhanceHomeHeroVideo();
     enhanceHomeTyping();

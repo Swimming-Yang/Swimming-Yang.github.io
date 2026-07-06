@@ -321,7 +321,11 @@
     flex-direction: column;
   }
 
-  .comments__header p {
+  .comments__summary {
+    justify-items: start;
+  }
+
+  .comments__summary p {
     max-width: none;
     text-align: left;
   }

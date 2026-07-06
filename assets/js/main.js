@@ -801,6 +801,33 @@
     section.append(script);
   }
 
+  function updateGiscusManageLink(section, discussion) {
+    const manageLink = section.querySelector("[data-giscus-manage]");
+
+    if (!manageLink || !discussion || !discussion.url) {
+      return;
+    }
+
+    manageLink.href = discussion.url;
+    manageLink.hidden = false;
+  }
+
+  function listenForGiscusMetadata(section) {
+    window.addEventListener("message", (event) => {
+      if (event.origin !== "https://giscus.app") {
+        return;
+      }
+
+      const message = event.data;
+
+      if (!message || typeof message !== "object" || !message.giscus) {
+        return;
+      }
+
+      updateGiscusManageLink(section, message.giscus.discussion);
+    });
+  }
+
   function enhancePageTransitions() {
     const overlay = document.querySelector("[data-page-transition]");
 
@@ -1156,6 +1183,8 @@
     if (!section) {
       return;
     }
+
+    listenForGiscusMetadata(section);
 
     const button = section.querySelector("[data-giscus-load]");
 

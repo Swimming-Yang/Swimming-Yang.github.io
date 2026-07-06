@@ -96,12 +96,37 @@
   font-size: 1.45rem;
 }
 
-.comments__header p {
+.comments__summary {
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+}
+
+.comments__summary p {
   max-width: 300px;
   margin: 0;
   color: var(--muted);
   font-size: 0.92rem;
   text-align: right;
+}
+
+.comments__manage-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--text-strong);
+  font-size: 0.82rem;
+  font-weight: 900;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.comments__manage-link:hover {
+  border-color: var(--accent-border);
+  color: var(--accent-strong);
 }
 
 .comments__loader {
@@ -181,4 +206,3 @@
   color: var(--muted);
   font-size: 0.86rem;
 }
-

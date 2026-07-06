@@ -18,7 +18,7 @@ comments:
     mapping: "pathname"
     strict: "0"
     reactions_enabled: "1"
-    emit_metadata: "0"
+    emit_metadata: "1"
     input_position: "bottom"
     theme: "https://xn--9p4bn7dwj.com/assets/css/giscus-theme.css"
     lang: "ko"

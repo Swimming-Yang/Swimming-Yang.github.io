@@ -638,9 +638,64 @@
       return;
     }
 
+    const summary = menu.querySelector("summary");
+    const prefersReducedMotion = window.matchMedia
+      ? window.matchMedia("(prefers-reduced-motion: reduce)")
+      : { matches: false };
+    const closeDuration = 220;
+    let closeTimer;
+
+    const finishClose = (focusSummary) => {
+      menu.open = false;
+      menu.classList.remove("is-closing");
+
+      if (focusSummary && summary) {
+        summary.focus();
+      }
+    };
+
+    const closeMenu = (options = {}) => {
+      if (!menu.open) {
+        return;
+      }
+
+      window.clearTimeout(closeTimer);
+
+      if (prefersReducedMotion.matches) {
+        finishClose(options.focusSummary);
+        return;
+      }
+
+      menu.classList.add("is-closing");
+      closeTimer = window.setTimeout(() => {
+        finishClose(options.focusSummary);
+      }, closeDuration);
+    };
+
+    if (summary) {
+      summary.addEventListener("click", (event) => {
+        if (!menu.open) {
+          menu.classList.remove("is-closing");
+          return;
+        }
+
+        event.preventDefault();
+        closeMenu();
+      });
+    }
+
+    menu.addEventListener("toggle", () => {
+      if (!menu.open) {
+        return;
+      }
+
+      window.clearTimeout(closeTimer);
+      menu.classList.remove("is-closing");
+    });
+
     document.addEventListener("click", (event) => {
       if (menu.open && !menu.contains(event.target)) {
-        menu.open = false;
+        closeMenu();
       }
     });
 
@@ -649,12 +704,7 @@
         return;
       }
 
-      menu.open = false;
-      const summary = menu.querySelector("summary");
-
-      if (summary) {
-        summary.focus();
-      }
+      closeMenu({ focusSummary: true });
     });
   }
 

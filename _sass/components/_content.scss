@@ -209,10 +209,10 @@
   height: 32px;
   padding: 0;
   place-items: center;
-  border: 1px solid var(--accent-border);
+  border: 1px solid rgba(185, 197, 214, 0.24);
   border-radius: 6px;
-  background: var(--accent-soft);
-  color: var(--accent-strong);
+  background: rgba(185, 197, 214, 0.08);
+  color: #c8d3e1;
   cursor: pointer;
   line-height: 1;
 }
@@ -227,14 +227,10 @@
   stroke-width: 2;
 }
 
-html[data-theme="dark"] .code-window__copy {
-  background: rgba(110, 137, 245, 0.16);
-  color: #dfe7ff;
-}
-
 .code-window__copy:hover,
 .code-window__copy.is-copied {
-  background: var(--accent);
+  border-color: rgba(229, 237, 247, 0.42);
+  background: rgba(229, 237, 247, 0.16);
   color: #ffffff;
 }
 

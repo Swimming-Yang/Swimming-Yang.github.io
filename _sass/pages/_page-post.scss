@@ -228,11 +228,19 @@
   font-size: 1.05rem;
 }
 
+.post__tagbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 20px;
+}
+
 .tags {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 20px;
+  min-width: 0;
 }
 
 .tags span {
@@ -243,4 +251,39 @@
   color: var(--muted-strong);
   font-size: 0.8rem;
   font-weight: 900;
+}
+
+.post__share {
+  display: inline-grid;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.post__share svg {
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.post__share:hover,
+.post__share.is-copied {
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+}
+
+.post__share:focus-visible {
+  outline: 2px solid var(--accent-ring);
+  outline-offset: 3px;
 }

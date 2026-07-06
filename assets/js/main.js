@@ -88,6 +88,64 @@
     button.title = label;
   }
 
+  function getCurrentPageUrl() {
+    const canonical = document.querySelector("link[rel='canonical']");
+    const url = canonical ? canonical.href : window.location.href;
+    return url.split("#")[0];
+  }
+
+  function copyText(text, finish) {
+    if (!navigator.clipboard) {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.setAttribute("readonly", "");
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      textarea.remove();
+      finish();
+      return;
+    }
+
+    navigator.clipboard.writeText(text).then(finish);
+  }
+
+  function renderShareIcon(copied) {
+    if (copied) {
+      return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>';
+    }
+
+    return '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><path d="m8.6 10.7 6.8-4.4"></path><path d="m8.6 13.3 6.8 4.4"></path></svg>';
+  }
+
+  function setShareButtonState(button, copied) {
+    const label = copied ? "글 주소 복사 완료" : "글 주소 복사";
+
+    button.innerHTML = renderShareIcon(copied);
+    button.classList.toggle("is-copied", copied);
+    button.setAttribute("aria-label", label);
+    button.title = label;
+  }
+
+  function enhancePostShare() {
+    const button = document.querySelector("[data-post-share]");
+
+    if (!button) {
+      return;
+    }
+
+    setShareButtonState(button, false);
+
+    button.addEventListener("click", () => {
+      copyText(getCurrentPageUrl(), () => {
+        setShareButtonState(button, true);
+        window.setTimeout(() => setShareButtonState(button, false), 1600);
+      });
+    });
+  }
+
   function enhanceCodeBlocks() {
     const blocks = document.querySelectorAll(".content .highlighter-rouge");
 
@@ -1273,6 +1331,7 @@
   }
 
   document.addEventListener("DOMContentLoaded", () => {
+    enhancePostShare();
     enhanceCodeBlocks();
     enhanceImageBlocks();
     enhanceBlogStats();

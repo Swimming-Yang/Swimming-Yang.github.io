@@ -1,0 +1,52 @@
+@media (pointer: fine) {
+  html,
+  body {
+    cursor: url("/assets/cursors/maplestory/aero_arrow.cur"), auto;
+  }
+
+  p,
+  li,
+  blockquote,
+  figcaption,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  code,
+  pre,
+  input,
+  textarea,
+  [contenteditable="true"] {
+    cursor: url("/assets/cursors/maplestory/aero_select.cur"), text;
+  }
+
+  a,
+  button,
+  select,
+  summary,
+  label,
+  [role="button"],
+  input[type="button"],
+  input[type="submit"],
+  input[type="reset"],
+  input[type="file"]::file-selector-button {
+    cursor:
+      url("/assets/cursors/maplestory/aero_link.ani"),
+      url("/assets/cursors/maplestory/aero_helpsel.cur"),
+      pointer;
+  }
+
+  button:disabled,
+  input:disabled,
+  select:disabled,
+  textarea:disabled,
+  [aria-disabled="true"] {
+    cursor: url("/assets/cursors/maplestory/aero_unavail.cur"), not-allowed;
+  }
+
+  [draggable="true"] {
+    cursor: url("/assets/cursors/maplestory/aero_move.cur"), move;
+  }
+}

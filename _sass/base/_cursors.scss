@@ -50,8 +50,7 @@
   input[type="time"],
   input[type="week"] {
     cursor:
-      url("/assets/cursors/maplestory/aero_link.ani"),
-      url("/assets/cursors/maplestory/aero_helpsel.cur"),
+      url("/assets/cursors/maplestory/aero_arrow.cur"),
       pointer;
   }
 
@@ -65,5 +64,13 @@
 
   [draggable="true"] {
     cursor: url("/assets/cursors/maplestory/aero_move.cur"), move;
+  }
+
+  html.is-click-cursor,
+  html.is-click-cursor * {
+    cursor:
+      url("/assets/cursors/maplestory/aero_link.ani"),
+      url("/assets/cursors/maplestory/aero_arrow.cur"),
+      pointer !important;
   }
 }

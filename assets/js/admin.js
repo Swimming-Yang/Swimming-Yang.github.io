@@ -33,6 +33,14 @@
   let savedVisualRange = null;
   let currentPost = null;
   let postIndexLoaded = false;
+  const inlineDataImagePattern = /data:image\/(?:png|jpe?g|webp|gif)(?:;[^,]*)?;base64,[A-Za-z0-9+/=]+/gi;
+  const dataImageExtensions = new Map([
+    ["image/gif", "gif"],
+    ["image/jpeg", "jpg"],
+    ["image/jpg", "jpg"],
+    ["image/png", "png"],
+    ["image/webp", "webp"],
+  ]);
   const allowedInlineClasses = new Set([
     "text-font-sans",
     "text-font-serif",
@@ -322,7 +330,7 @@
   async function publish(event) {
     event.preventDefault();
 
-    const payload = getPayload();
+    let payload = getPayload();
 
     if (!payload.title || !payload.body) {
       setStatus("제목과 본문을 입력해주세요.", "error");
@@ -334,9 +342,10 @@
       return;
     }
 
-    setStatus("GitHub에 커밋하는 중...", "info");
-
     try {
+      payload = await preparePayloadImages(payload);
+      setStatus("GitHub에 커밋하는 중...", "info");
+
       const isEditing = Boolean(currentPost?.path);
       const data = await apiFetch(isEditing ? `/admin/posts?path=${encodeURIComponent(currentPost.path)}` : "/admin/posts", {
         method: isEditing ? "PUT" : "POST",
@@ -354,6 +363,105 @@
 
       setStatus(error.message, "error");
     }
+  }
+
+  async function preparePayloadImages(payload) {
+    const result = await uploadInlineDataImages(payload.body);
+
+    if (!result.changed) {
+      return payload;
+    }
+
+    fields.body.value = result.body.trim();
+    hydrateVisualEditorFromSource();
+
+    return {
+      ...payload,
+      body: fields.body.value,
+      image: getFirstBodyImage(fields.body.value),
+    };
+  }
+
+  async function uploadInlineDataImages(markdown) {
+    const body = String(markdown || "");
+    const dataUrls = getInlineDataImageUrls(body);
+
+    if (!dataUrls.length) {
+      return { body, changed: false };
+    }
+
+    const replacements = new Map();
+
+    for (let index = 0; index < dataUrls.length; index += 1) {
+      const dataUrl = dataUrls[index];
+      setStatus(`붙여넣은 이미지 업로드 중... (${index + 1}/${dataUrls.length})`, "info");
+      replacements.set(dataUrl, await uploadDataImage(dataUrl, index));
+    }
+
+    let nextBody = body;
+    replacements.forEach((url, dataUrl) => {
+      nextBody = nextBody.split(dataUrl).join(url);
+    });
+
+    return {
+      body: nextBody,
+      changed: nextBody !== body,
+    };
+  }
+
+  function getInlineDataImageUrls(markdown) {
+    return Array.from(new Set(String(markdown || "").match(inlineDataImagePattern) || []));
+  }
+
+  async function uploadDataImage(dataUrl, index) {
+    const image = dataImageToBlob(dataUrl);
+    const formData = new FormData();
+    const filename = `pasted-image-${Date.now()}-${index + 1}.${image.extension}`;
+
+    formData.append("image", image.blob, filename);
+    formData.append("alt", `pasted image ${index + 1}`);
+
+    const data = await apiUpload("/admin/uploads", formData);
+
+    if (!data.url) {
+      throw new Error("업로드된 이미지 주소를 받지 못했습니다.");
+    }
+
+    return data.url;
+  }
+
+  function dataImageToBlob(dataUrl) {
+    const match = String(dataUrl || "").match(/^data:(image\/(?:png|jpe?g|webp|gif))(?:;[^,]*)?;base64,([A-Za-z0-9+/=]+)$/i);
+
+    if (!match) {
+      throw new Error("붙여넣은 이미지 형식을 읽을 수 없습니다.");
+    }
+
+    const mimeType = match[1].toLowerCase();
+    const extension = dataImageExtensions.get(mimeType);
+
+    if (!extension) {
+      throw new Error("jpg, png, webp, gif 이미지만 업로드할 수 있습니다.");
+    }
+
+    let binary = "";
+
+    try {
+      binary = window.atob(match[2]);
+    } catch (_error) {
+      throw new Error("붙여넣은 이미지 데이터를 읽을 수 없습니다.");
+    }
+
+    const bytes = new Uint8Array(binary.length);
+
+    for (let index = 0; index < binary.length; index += 1) {
+      bytes[index] = binary.charCodeAt(index);
+    }
+
+    return {
+      blob: new Blob([bytes], { type: mimeType === "image/jpg" ? "image/jpeg" : mimeType }),
+      extension,
+    };
   }
 
   async function loadPostIndex() {

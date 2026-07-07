@@ -31,6 +31,27 @@
 {% endif %}
 
 {% if card_image == nil or card_image == "" %}
+  {% assign content_image = "" %}
+  {% assign content_image_parts = card_post.content | split: "<img " %}
+  {% if content_image_parts.size > 1 %}
+    {% assign content_image_tag = "" %}
+    {% for content_image_part in content_image_parts %}
+      {% if forloop.index == 2 %}
+        {% assign content_image_tag = content_image_part | split: ">" | first %}
+      {% endif %}
+    {% endfor %}
+    {% if content_image_tag contains 'src="' %}
+      {% assign content_image = content_image_tag | split: 'src="' | last | split: '"' | first %}
+    {% elsif content_image_tag contains "src='" %}
+      {% assign content_image = content_image_tag | split: "src='" | last | split: "'" | first %}
+    {% endif %}
+  {% endif %}
+  {% if content_image and content_image != "" %}
+    {% assign card_image = content_image %}
+  {% endif %}
+{% endif %}
+
+{% if card_image == nil or card_image == "" %}
   {% if site.default_post_image and site.default_post_image != "" %}
     {% assign card_image = site.default_post_image %}
   {% endif %}
@@ -44,7 +65,9 @@
 {% if has_card_image %}
   {% assign card_image_url = card_image %}
   {% unless card_image contains '://' %}
-    {% assign card_image_url = card_image | relative_url %}
+    {% unless card_image contains 'data:' %}
+      {% assign card_image_url = card_image | relative_url %}
+    {% endunless %}
   {% endunless %}
 {% endif %}
 

@@ -211,21 +211,24 @@ function parseReadme(readme) {
 }
 
 function parseProblemSections(readme) {
+  const statement = extractReadmeSection(
+    readme,
+    /###\s*문제\s*설명\s*\r?\n+/u,
+    /(?:\r?\n\s*<hr>\s*\r?\n+)?\s*<h5>\s*제한사항\s*<\/h5>/iu,
+  );
   const constraints = extractReadmeSection(
     readme,
     /<h5>\s*제한사항\s*<\/h5>\s*/iu,
     /(?:\r?\n\s*<hr>\s*\r?\n+)?\s*<h5>\s*입출력\s*예\s*<\/h5>/iu,
   );
   const examples = extractReadmeSection(readme, /<h5>\s*입출력\s*예\s*<\/h5>\s*/iu, /\r?\n>\s*출처:/u);
+  const statementParts = splitStatementOutputExample(statement);
+  const examplesText = htmlToPlainText(examples) || statementParts.outputExample;
 
   return {
-    statement: extractReadmeSection(
-      readme,
-      /###\s*문제\s*설명\s*\r?\n+/u,
-      /(?:\r?\n\s*<hr>\s*\r?\n+)?\s*<h5>\s*제한사항\s*<\/h5>/iu,
-    ),
+    statement: statementParts.statement,
     constraints: htmlToPlainText(constraints),
-    examples: htmlToPlainText(examples),
+    examples: examplesText,
   };
 }
 
@@ -248,7 +251,30 @@ function cleanProblemSection(value) {
   return value
     .replace(/^\s*<hr>\s*/iu, "")
     .replace(/\s*<hr>\s*$/iu, "")
+    .replace(/\r?\n>\s*출처:[\s\S]*$/u, "")
     .trim();
+}
+
+function splitStatementOutputExample(value) {
+  const outputLabel = /(?:\r?\n\s*<hr>\s*)?\r?\n*\s*<p>\s*출력\s*예시\s*<\/p>\s*/iu.exec(value);
+
+  if (!outputLabel) {
+    return {
+      statement: cleanProblemSection(value),
+      outputExample: "",
+    };
+  }
+
+  const statement = value.slice(0, outputLabel.index);
+  const rest = value.slice(outputLabel.index + outputLabel[0].length);
+  const source = /\r?\n>\s*출처:/u.exec(rest);
+  const outputExample = source ? rest.slice(0, source.index) : rest;
+  const outputText = htmlToPlainText(outputExample);
+
+  return {
+    statement: cleanProblemSection(statement),
+    outputExample: outputText ? `출력 예시\n\n${outputText}` : "",
+  };
 }
 
 function htmlToPlainText(value) {
@@ -440,7 +466,12 @@ function splitExampleBlocks(content) {
 
 function normalizeExampleLabel(value) {
   const match = normalizeText(value).match(/^(입력|출력)\s*#\s*(\d+)/u);
-  return match ? `${match[1]} #${match[2]}` : "";
+
+  if (match) {
+    return `${match[1]} #${match[2]}`;
+  }
+
+  return normalizeText(value).match(/^출력\s*예시$/u) ? "출력 예시" : "";
 }
 
 function renderFrontMatter(values) {

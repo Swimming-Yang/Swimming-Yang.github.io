@@ -44,7 +44,7 @@ jobs:
 
       - name: Commit generated posts
         run: |
-          if git diff --quiet -- _posts/coding/ps; then
+          if [ -z "$(git status --porcelain -- _posts/coding/ps)" ]; then
             echo "No Programmers posts to update."
             exit 0
           fi

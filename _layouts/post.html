@@ -84,19 +84,14 @@ layout: default
       <div class="post__tagbar">
         {% if page.tags.size > 0 %}
           <div class="tags">
+            <img class="post__tag-icon" src="{{ '/assets/images/icons/tag-black.png' | relative_url }}" alt="" loading="lazy" decoding="async" data-theme-image-light="{{ '/assets/images/icons/tag-black.png' | relative_url }}" data-theme-image-dark="{{ '/assets/images/icons/tag-white.png' | relative_url }}">
             {% for tag in page.tags %}
               <span>{{ tag }}</span>
             {% endfor %}
           </div>
         {% endif %}
         <button class="post__share" type="button" aria-label="글 주소 복사" title="글 주소 복사" data-post-share>
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <circle cx="18" cy="5" r="3"></circle>
-            <circle cx="6" cy="12" r="3"></circle>
-            <circle cx="18" cy="19" r="3"></circle>
-            <path d="m8.6 10.7 6.8-4.4"></path>
-            <path d="m8.6 13.3 6.8 4.4"></path>
-          </svg>
+          <img src="{{ '/assets/images/icons/share-black.png' | relative_url }}" alt="" decoding="async" data-theme-image-light="{{ '/assets/images/icons/share-black.png' | relative_url }}" data-theme-image-dark="{{ '/assets/images/icons/share-white.png' | relative_url }}">
         </button>
       </div>
     </div>

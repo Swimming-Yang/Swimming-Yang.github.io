@@ -112,18 +112,36 @@
     navigator.clipboard.writeText(text).then(finish);
   }
 
-  function renderShareIcon(copied) {
-    if (copied) {
-      return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>';
+  let toastTimer;
+
+  function showToast(message) {
+    let toast = document.querySelector("[data-site-toast]");
+
+    if (!toast) {
+      toast = document.createElement("div");
+      toast.className = "site-toast";
+      toast.dataset.siteToast = "true";
+      toast.setAttribute("role", "status");
+      toast.setAttribute("aria-live", "polite");
+      document.body.append(toast);
     }
 
-    return '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><path d="m8.6 10.7 6.8-4.4"></path><path d="m8.6 13.3 6.8 4.4"></path></svg>';
+    window.clearTimeout(toastTimer);
+    toast.textContent = message;
+    toast.classList.remove("is-visible");
+
+    window.requestAnimationFrame(() => {
+      toast.classList.add("is-visible");
+    });
+
+    toastTimer = window.setTimeout(() => {
+      toast.classList.remove("is-visible");
+    }, 2200);
   }
 
   function setShareButtonState(button, copied) {
     const label = copied ? "글 주소 복사 완료" : "글 주소 복사";
 
-    button.innerHTML = renderShareIcon(copied);
     button.classList.toggle("is-copied", copied);
     button.setAttribute("aria-label", label);
     button.title = label;
@@ -177,6 +195,7 @@
     button.addEventListener("click", () => {
       copyText(getCurrentPageUrl(), () => {
         setShareButtonState(button, true);
+        showToast("링크가 복사되었습니다.");
         window.setTimeout(() => setShareButtonState(button, false), 1600);
       });
     });

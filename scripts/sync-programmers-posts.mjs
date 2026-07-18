@@ -4,7 +4,8 @@ import { fileURLToPath } from "node:url";
 
 const SOURCE_REPO = "Swimming-Yang/CodingTest";
 const GENERATED_MARKER = "<!-- generated: programmers-sync -->";
-const PROGRAMMERS_IMAGE = "/assets/images/posts/coding/ps/programmers-logo.jpg";
+const PROGRAMMERS_IMAGE = "/assets/images/posts/coding/ps/programmers-logo-dark.png";
+const PROGRAMMERS_IMAGE_DARK = "/assets/images/posts/coding/ps/programmers-logo-light.png";
 const PROGRAMMERS_IMAGE_ALT = "Programmers 로고";
 
 const CODE_LANGUAGES = new Map([
@@ -253,6 +254,7 @@ function renderPost(problem, targetPath) {
     topic: "ps",
     description,
     image: PROGRAMMERS_IMAGE,
+    image_dark: PROGRAMMERS_IMAGE_DARK,
     image_alt: PROGRAMMERS_IMAGE_ALT,
     tags: "[programmers, ps, coding-test]",
     source: "programmers",

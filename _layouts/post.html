@@ -20,6 +20,7 @@ layout: default
 {% endif %}
 
 {% assign post_hero_image = page.image | default: page.thumbnail %}
+{% assign post_hero_image_dark = page.image_dark | default: post_hero_image %}
 
 {% if post_hero_image == nil or post_hero_image == "" %}
   {% assign content_image = "" %}
@@ -49,6 +50,7 @@ layout: default
 {% endif %}
 
 {% assign post_hero_image_url = post_hero_image %}
+{% assign post_hero_image_dark_url = post_hero_image_dark %}
 {% if post_hero_image and post_hero_image != "" %}
   {% unless post_hero_image contains '://' %}
     {% unless post_hero_image contains 'data:' %}
@@ -56,8 +58,15 @@ layout: default
     {% endunless %}
   {% endunless %}
 {% endif %}
+{% if post_hero_image_dark and post_hero_image_dark != "" %}
+  {% unless post_hero_image_dark contains '://' %}
+    {% unless post_hero_image_dark contains 'data:' %}
+      {% assign post_hero_image_dark_url = post_hero_image_dark | relative_url %}
+    {% endunless %}
+  {% endunless %}
+{% endif %}
 
-<header class="post__header" style="--post-hero-image: url('{{ post_hero_image_url | escape }}');">
+<header class="post__header" style="--post-hero-image-light: url('{{ post_hero_image_url | escape }}'); --post-hero-image-dark: url('{{ post_hero_image_dark_url | escape }}');">
   <div class="post__header-inner">
     <div class="post__header-content">
       <p class="post__meta">

@@ -202,10 +202,17 @@
   border-radius: 0;
   background:
     linear-gradient(180deg, rgba(13, 16, 28, 0.18), rgba(13, 16, 28, 0.78)),
-    var(--post-hero-image) center / cover no-repeat,
-    var(--surface-strong);
+    var(--post-hero-image-light) center / min(62vw, 720px) auto no-repeat,
+    linear-gradient(135deg, #f7faff, #d9e5f4);
   box-shadow: var(--shadow-soft);
   color: #ffffff;
+}
+
+html[data-theme="dark"] .post__header {
+  background:
+    linear-gradient(180deg, rgba(13, 16, 28, 0.18), rgba(13, 16, 28, 0.78)),
+    var(--post-hero-image-dark) center / min(62vw, 720px) auto no-repeat,
+    linear-gradient(135deg, #101827, #1d2a45);
 }
 
 .post__header-inner {

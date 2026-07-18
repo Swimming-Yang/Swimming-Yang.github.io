@@ -2,8 +2,14 @@ name: Sync Programmers Posts
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/sync-programmers.yml"
+      - "scripts/sync-programmers-posts.mjs"
   schedule:
-    - cron: "*/15 * * * *"
+    - cron: "7,22,37,52 * * * *"
 
 permissions:
   contents: write

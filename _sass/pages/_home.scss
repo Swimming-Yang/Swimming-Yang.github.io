@@ -770,6 +770,27 @@ body.layout-home .home-section {
   transition: transform 220ms ease;
 }
 
+.article-card--programmers .article-card__media {
+  display: grid;
+  place-items: center;
+  background:
+    linear-gradient(135deg, rgba(230, 238, 250, 0.84), rgba(255, 255, 255, 0.96)),
+    var(--surface-strong);
+}
+
+html[data-theme="dark"] .article-card--programmers .article-card__media {
+  background:
+    linear-gradient(135deg, rgba(14, 23, 43, 0.96), rgba(31, 42, 68, 0.92)),
+    var(--surface-strong);
+}
+
+.article-card--programmers .article-card__media img {
+  width: min(78%, 300px);
+  height: auto;
+  max-height: 68%;
+  object-fit: contain;
+}
+
 .article-card__link:hover .article-card__media img {
   transform: scale(1.04);
 }

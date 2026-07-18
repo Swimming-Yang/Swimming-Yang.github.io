@@ -708,6 +708,18 @@
     });
   }
 
+  function updateThemeImages(theme = document.documentElement.dataset.theme || "light") {
+    const images = document.querySelectorAll("[data-theme-image-light][data-theme-image-dark]");
+
+    images.forEach((image) => {
+      const nextSource = theme === "dark" ? image.dataset.themeImageDark : image.dataset.themeImageLight;
+
+      if (nextSource && image.getAttribute("src") !== nextSource) {
+        image.setAttribute("src", nextSource);
+      }
+    });
+  }
+
   function enhanceThemeToggle() {
     const button = document.querySelector("[data-theme-toggle]");
 
@@ -719,6 +731,7 @@
 
     const setTheme = (theme) => {
       document.documentElement.dataset.theme = theme;
+      updateThemeImages(theme);
       button.setAttribute("aria-label", theme === "dark" ? "밝은 테마로 변경" : "어두운 테마로 변경");
 
       try {
@@ -1425,6 +1438,7 @@
     enhanceHomeHeroVideo();
     enhanceHomeTyping();
     enhanceCategoryMenu();
+    updateThemeImages();
     enhanceThemeToggle();
     enhanceAdminEntry();
     enhanceSearch();

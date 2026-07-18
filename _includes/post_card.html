@@ -1,5 +1,6 @@
 {% assign card_post = include.post %}
 {% assign card_image = card_post.image | default: card_post.thumbnail %}
+{% assign card_image_dark = card_post.image_dark %}
 {% assign card_image_alt = card_post.image_alt | default: card_post.title %}
 {% assign card_topic = "" %}
 {% assign card_topic_label = "" %}
@@ -32,7 +33,8 @@
 
 {% if card_image == nil or card_image == "" %}
   {% if card_post.source == "programmers" or card_post.problem_url contains "programmers" %}
-    {% assign card_image = "/assets/images/posts/coding/ps/programmers-logo.jpg" %}
+    {% assign card_image = "/assets/images/posts/coding/ps/programmers-logo-dark.png" %}
+    {% assign card_image_dark = "/assets/images/posts/coding/ps/programmers-logo-light.png" %}
     {% assign card_image_alt = "Programmers 로고" %}
   {% endif %}
 {% endif %}
@@ -64,6 +66,10 @@
   {% endif %}
 {% endif %}
 
+{% if card_image_dark == nil or card_image_dark == "" %}
+  {% assign card_image_dark = card_image %}
+{% endif %}
+
 {% assign has_card_image = false %}
 {% if card_image and card_image != "" %}
   {% assign has_card_image = true %}
@@ -76,13 +82,19 @@
       {% assign card_image_url = card_image | relative_url %}
     {% endunless %}
   {% endunless %}
+  {% assign card_image_dark_url = card_image_dark %}
+  {% unless card_image_dark contains '://' %}
+    {% unless card_image_dark contains 'data:' %}
+      {% assign card_image_dark_url = card_image_dark | relative_url %}
+    {% endunless %}
+  {% endunless %}
 {% endif %}
 
-<article class="article-card article-card--{{ card_topic | default: 'default' }}">
+<article class="article-card article-card--{{ card_topic | default: 'default' }}{% if card_post.source == "programmers" or card_post.problem_url contains "programmers" %} article-card--programmers{% endif %}">
   <a class="article-card__link" href="{{ card_post.url | relative_url }}">
     <figure class="article-card__media{% unless has_card_image %} article-card__media--placeholder{% endunless %}">
       {% if has_card_image %}
-        <img src="{{ card_image_url }}" alt="{{ card_image_alt | escape }}" loading="lazy" decoding="async">
+        <img src="{{ card_image_url }}" alt="{{ card_image_alt | escape }}" loading="lazy" decoding="async" data-theme-image-light="{{ card_image_url }}" data-theme-image-dark="{{ card_image_dark_url }}">
       {% else %}
         <span>{{ card_topic_label }}</span>
       {% endif %}

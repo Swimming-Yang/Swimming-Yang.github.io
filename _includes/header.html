@@ -17,7 +17,7 @@
       <a class="{% if page.url == '/blog/' %}is-active{% endif %}" href="{{ '/blog/' | relative_url }}">전체 글</a>
       <a class="{% if page.url == '/coding/' or page.categories contains 'coding' %}is-active{% endif %}" href="{{ '/coding/' | relative_url }}">코딩</a>
       <a class="{% if page.url contains '/life/' or page.categories contains 'life' %}is-active{% endif %}" href="{{ '/life/' | relative_url }}">일상</a>
-      <a class="{% if page.url == '/about/' %}is-active{% endif %}" href="{{ '/about/' | relative_url }}">소개</a>
+      <a href="{{ '/' | relative_url }}#about">소개</a>
       <a class="{% if page.url == '/admin/' %}is-active{% endif %}" href="{{ '/admin/' | relative_url }}" data-admin-entry hidden>글쓰기</a>
     </nav>
 
@@ -82,7 +82,7 @@
               <span>전체 글</span>
               <em>{{ site.posts.size }}</em>
             </a>
-            <a class="{% if page.url == '/about/' %}is-active{% endif %}" href="{{ '/about/' | relative_url }}">
+            <a href="{{ '/' | relative_url }}#about">
               <span>소개</span>
               <em>About</em>
             </a>

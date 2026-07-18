@@ -1,4 +1,5 @@
 _site/
+.tmp/
 .tools/
 .wrangler/
 node_modules/

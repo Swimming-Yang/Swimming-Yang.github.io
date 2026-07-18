@@ -80,3 +80,15 @@ assets/images/posts/coding/ps/
 ```
 
 글 목록 카드에 보여줄 대표 이미지는 본문 첫 이미지에 의존하지 않고 Front Matter의 `image`와 `image_alt`에 명시하는 것을 권장합니다.
+
+## 프로그래머스 풀이 자동 동기화
+
+백준허브가 `Swimming-Yang/CodingTest` 저장소에 올린 프로그래머스 풀이를 `_posts/coding/ps/` 아래의 Jekyll 글로 변환합니다.
+
+GitHub Actions의 `Sync Programmers Posts` 워크플로가 3시간마다 실행되며, 새 풀이가 있으면 블로그 저장소에 자동 커밋합니다. 수동 실행은 GitHub Actions 화면에서 `workflow_dispatch`로 할 수 있습니다.
+
+로컬에서 확인하려면 `CodingTest` 저장소를 `.tmp/codingtest`에 받은 뒤 다음 명령을 실행합니다.
+
+```sh
+node scripts/sync-programmers-posts.mjs .tmp/codingtest
+```

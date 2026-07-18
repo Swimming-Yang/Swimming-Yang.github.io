@@ -1,0 +1,50 @@
+name: Sync Programmers Posts
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 */3 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-programmers-posts
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    name: Generate Jekyll posts
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout blog
+        uses: actions/checkout@v4
+
+      - name: Checkout CodingTest
+        uses: actions/checkout@v4
+        with:
+          repository: Swimming-Yang/CodingTest
+          ref: main
+          path: .tmp/codingtest
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Generate Programmers posts
+        run: node scripts/sync-programmers-posts.mjs .tmp/codingtest
+
+      - name: Commit generated posts
+        run: |
+          if git diff --quiet -- _posts/coding/ps; then
+            echo "No Programmers posts to update."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add _posts/coding/ps
+          git commit -m "Sync Programmers solution posts"
+          git push

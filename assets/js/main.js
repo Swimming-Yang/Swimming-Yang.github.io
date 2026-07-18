@@ -26,7 +26,7 @@
     markdown: "Markdown",
     md: "Markdown",
     sql: "SQL",
-    plaintext: "Code",
+    plaintext: "plainText",
     text: "Code",
   };
 

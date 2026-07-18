@@ -370,24 +370,77 @@ ${problem.codeFiles.map(renderCodeFile).join("\n\n")}
 }
 
 function renderProblemDetails(problem) {
-  const sections = [
-    { title: "문제", content: problem.statement, codeBlock: false },
-    { title: "제한사항", content: problem.constraints, codeBlock: true },
-    { title: "입출력 예", content: problem.examples, codeBlock: true },
-  ].filter(({ content }) => content && content.trim() !== "");
+  const sections = [];
 
-  if (sections.length === 0) {
-    return "";
+  if (problem.statement && problem.statement.trim() !== "") {
+    sections.push(`## 문제\n\n---\n\n${problem.statement}`);
   }
 
-  return `${sections
-    .map(({ title, content, codeBlock }) => `## ${title}\n\n---\n\n${codeBlock ? renderPlainTextBlock(content) : content}`)
-    .join("\n\n")}\n\n`;
+  if (problem.constraints && problem.constraints.trim() !== "") {
+    sections.push(`## 제한사항\n\n---\n\n${renderPlainTextBlock(problem.constraints)}`);
+  }
+
+  if (problem.examples && problem.examples.trim() !== "") {
+    sections.push(`## 입출력 예\n\n---\n\n${renderExampleBlocks(problem.examples)}`);
+  }
+
+  return sections.length > 0 ? `${sections.join("\n\n")}\n\n` : "";
 }
 
 function renderPlainTextBlock(content) {
   const fence = codeFenceFor(content);
-  return `${fence}plainText\n${content}\n${fence}`;
+  return `${fence}plaintext\n${content}\n${fence}`;
+}
+
+function renderExampleBlocks(content) {
+  const blocks = splitExampleBlocks(content);
+
+  if (blocks.length === 0) {
+    return renderPlainTextBlock(content);
+  }
+
+  return blocks
+    .map((block) => `<p class="programmers-example-label"><strong>${block.label}</strong></p>\n\n${renderPlainTextBlock(block.value)}`)
+    .join("\n\n");
+}
+
+function splitExampleBlocks(content) {
+  const lines = content.replace(/\r\n?/gu, "\n").split("\n");
+  const blocks = [];
+  let current = null;
+
+  for (const line of lines) {
+    const label = normalizeExampleLabel(line);
+
+    if (label) {
+      if (current && current.value.length > 0) {
+        blocks.push(current);
+      }
+
+      current = { label, value: [] };
+      continue;
+    }
+
+    if (current) {
+      current.value.push(line);
+    }
+  }
+
+  if (current && current.value.length > 0) {
+    blocks.push(current);
+  }
+
+  return blocks
+    .map((block) => ({
+      label: block.label,
+      value: block.value.join("\n").trim(),
+    }))
+    .filter((block) => block.value !== "");
+}
+
+function normalizeExampleLabel(value) {
+  const match = normalizeText(value).match(/^(입력|출력)\s*#\s*(\d+)/u);
+  return match ? `${match[1]} #${match[2]}` : "";
 }
 
 function renderFrontMatter(values) {

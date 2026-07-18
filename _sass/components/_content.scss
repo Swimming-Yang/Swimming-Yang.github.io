@@ -300,6 +300,14 @@
   background: transparent;
 }
 
+.content > pre {
+  margin: 1.8rem 0;
+  border-radius: var(--radius);
+  background: var(--code-bg);
+  color: var(--code-text);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.18);
+}
+
 .content pre {
   overflow-x: auto;
   margin: 0;
@@ -318,11 +326,32 @@
   font-size: 0.92em;
 }
 
+.content pre code {
+  color: inherit;
+}
+
 .content :not(pre) > code {
   padding: 0.13em 0.34em;
   border-radius: 5px;
   background: var(--accent-soft);
   color: var(--accent-strong);
+}
+
+.content .programmers-example-label {
+  margin: 1.5rem 0 0.55rem;
+  color: var(--text-strong);
+  font-size: 1.12rem;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+.content .programmers-example-label strong {
+  font-weight: 900;
+}
+
+.content .programmers-example-label + .highlighter-rouge,
+.content .programmers-example-label + pre {
+  margin-top: 0.55rem;
 }
 
 .content .text-font-sans {

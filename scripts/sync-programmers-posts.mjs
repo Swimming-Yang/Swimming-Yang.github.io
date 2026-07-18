@@ -176,6 +176,9 @@ function readProblem(problemDir) {
     problemId,
     level,
     problemUrl,
+    statement: parsedReadme.statement ?? "",
+    constraints: parsedReadme.constraints ?? "",
+    examples: parsedReadme.examples ?? "",
     submittedAt,
     relativeDir,
     sourceUrl: `https://github.com/${SOURCE_REPO}/tree/main/${encodePath(relativeDir)}`,
@@ -191,9 +194,10 @@ function parseReadme(readme) {
   const heading = readme.match(/^#\s*\[([^\]]+)\]\s*(.+?)\s*-\s*(\d+)\s*$/mu);
   const problemUrl = readme.match(/https:\/\/school\.programmers\.co\.kr\/learn\/courses\/\d+\/lessons\/\d+/u)?.[0];
   const submittedAt = parseSubmittedAt(readme);
+  const sections = parseProblemSections(readme);
 
   if (!heading) {
-    return { problemUrl, submittedAt };
+    return { problemUrl, submittedAt, ...sections };
   }
 
   return {
@@ -202,7 +206,46 @@ function parseReadme(readme) {
     id: heading[3],
     problemUrl,
     submittedAt,
+    ...sections,
   };
+}
+
+function parseProblemSections(readme) {
+  return {
+    statement: extractReadmeSection(
+      readme,
+      /###\s*문제\s*설명\s*\r?\n+/u,
+      /(?:\r?\n\s*<hr>\s*\r?\n+)?\s*<h5>\s*제한사항\s*<\/h5>/iu,
+    ),
+    constraints: extractReadmeSection(
+      readme,
+      /<h5>\s*제한사항\s*<\/h5>\s*/iu,
+      /(?:\r?\n\s*<hr>\s*\r?\n+)?\s*<h5>\s*입출력\s*예\s*<\/h5>/iu,
+    ),
+    examples: extractReadmeSection(readme, /<h5>\s*입출력\s*예\s*<\/h5>\s*/iu, /\r?\n>\s*출처:/u),
+  };
+}
+
+function extractReadmeSection(readme, startPattern, endPattern) {
+  const startMatch = startPattern.exec(readme);
+
+  if (!startMatch) {
+    return "";
+  }
+
+  const startIndex = startMatch.index + startMatch[0].length;
+  const rest = readme.slice(startIndex);
+  const endMatch = endPattern.exec(rest);
+  const rawSection = endMatch ? rest.slice(0, endMatch.index) : rest;
+
+  return cleanProblemSection(rawSection);
+}
+
+function cleanProblemSection(value) {
+  return value
+    .replace(/^\s*<hr>\s*/iu, "")
+    .replace(/\s*<hr>\s*$/iu, "")
+    .trim();
 }
 
 function parseSubmittedAt(readme) {
@@ -266,19 +309,38 @@ function renderPost(problem, targetPath) {
   })}
 ${GENERATED_MARKER}
 
-> 이 글은 [${SOURCE_REPO}](https://github.com/${SOURCE_REPO}) 저장소의 백준허브 풀이를 바탕으로 자동 생성되었습니다.
-
 ## 문제 정보
+
+---
 
 | 항목 | 내용 |
 | --- | --- |
 | 플랫폼 | Programmers |
-${problem.level ? `| 난이도 | ${escapeTableCell(problem.level)} |\n` : ""}${problem.problemId ? `| 문제 번호 | ${escapeTableCell(problem.problemId)} |\n` : ""}${problem.problemUrl ? `| 문제 링크 | [문제 보기](${problem.problemUrl}) |\n` : ""}| 저장소 기록 | [${escapeTableCell(problem.relativeDir)}](${problem.sourceUrl}) |
+${problem.level ? `| 난이도 | ${escapeTableCell(problem.level)} |\n` : ""}${problem.problemId ? `| 문제 번호 | ${escapeTableCell(problem.problemId)} |\n` : ""}${problem.problemUrl ? `| 문제 링크 | [문제 보기](${problem.problemUrl}) |\n` : ""}| GitHub Link | [${escapeTableCell(problem.relativeDir)}](${problem.sourceUrl}) |
 
+${renderProblemDetails(problem)}
 ## 풀이 코드
+
+---
 
 ${problem.codeFiles.map(renderCodeFile).join("\n\n")}
 `;
+}
+
+function renderProblemDetails(problem) {
+  const sections = [
+    ["문제", problem.statement],
+    ["제한사항", problem.constraints],
+    ["입출력 예", problem.examples],
+  ].filter(([, content]) => content && content.trim() !== "");
+
+  if (sections.length === 0) {
+    return "";
+  }
+
+  return `${sections
+    .map(([title, content]) => `## ${title}\n\n---\n\n${content}`)
+    .join("\n\n")}\n\n`;
 }
 
 function renderFrontMatter(values) {

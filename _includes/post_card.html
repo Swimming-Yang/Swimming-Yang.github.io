@@ -4,6 +4,11 @@
 {% assign card_image_alt = card_post.image_alt | default: card_post.title %}
 {% assign card_topic = "" %}
 {% assign card_topic_label = "" %}
+{% assign is_programmers_card = false %}
+
+{% if card_post.source == "programmers" or card_post.problem_url contains "programmers" or card_post.tags contains "programmers" %}
+  {% assign is_programmers_card = true %}
+{% endif %}
 
 {% if card_post.topic and card_post.categories contains "coding" %}
   {% assign card_topic = card_post.topic %}
@@ -32,11 +37,15 @@
 {% endif %}
 
 {% if card_image == nil or card_image == "" %}
-  {% if card_post.source == "programmers" or card_post.problem_url contains "programmers" %}
+  {% if is_programmers_card %}
     {% assign card_image = "/assets/images/posts/coding/ps/programmers-logo-dark.png" %}
     {% assign card_image_dark = "/assets/images/posts/coding/ps/programmers-logo-light.png" %}
     {% assign card_image_alt = "Programmers 로고" %}
   {% endif %}
+{% endif %}
+
+{% if card_image contains "programmers-logo" %}
+  {% assign is_programmers_card = true %}
 {% endif %}
 
 {% if card_image == nil or card_image == "" %}
@@ -90,7 +99,7 @@
   {% endunless %}
 {% endif %}
 
-<article class="article-card article-card--{{ card_topic | default: 'default' }}{% if card_post.source == "programmers" or card_post.problem_url contains "programmers" %} article-card--programmers{% endif %}">
+<article class="article-card article-card--{{ card_topic | default: 'default' }}{% if is_programmers_card %} article-card--programmers{% endif %}">
   <a class="article-card__link" href="{{ card_post.url | relative_url }}">
     <figure class="article-card__media{% unless has_card_image %} article-card__media--placeholder{% endunless %}">
       {% if has_card_image %}

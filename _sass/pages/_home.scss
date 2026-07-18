@@ -785,14 +785,19 @@ html[data-theme="dark"] .article-card--programmers .article-card__media {
 }
 
 .article-card--programmers .article-card__media img {
-  width: min(78%, 300px);
+  width: min(64%, 220px);
   height: auto;
-  max-height: 68%;
+  max-width: calc(100% - 56px);
+  max-height: 56%;
   object-fit: contain;
 }
 
 .article-card__link:hover .article-card__media img {
   transform: scale(1.04);
+}
+
+.article-card--programmers .article-card__link:hover .article-card__media img {
+  transform: scale(1.02);
 }
 
 .article-card__media--placeholder {

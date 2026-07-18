@@ -10,8 +10,8 @@
 }
 
 body.layout-post .site-frame {
-  width: min(100% - 32px, 1540px);
-  gap: 36px;
+  width: min(100% - 32px, 1660px);
+  gap: 38px;
 }
 
 .site-main {
@@ -29,6 +29,8 @@ body.layout-post .site-main {
 
 .post-frame__content {
   min-width: 0;
+  padding-left: 38px;
+  border-left: 4px solid var(--line-strong);
 }
 
 body.layout-post .post-frame .site-sidebar {

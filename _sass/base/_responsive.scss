@@ -57,6 +57,12 @@
     width: min(100%, 820px);
   }
 
+  .post-frame__content,
+  .post-sidebar {
+    padding-left: 0;
+    border-left: 0;
+  }
+
   .related-posts,
   .comments {
     width: 100%;

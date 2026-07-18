@@ -19,6 +19,22 @@ body.layout-post .site-frame {
   padding: 38px 0 84px;
 }
 
+body.layout-post .site-main {
+  padding: 0 0 84px;
+}
+
+.post-frame {
+  margin-top: 38px;
+}
+
+.post-frame__content {
+  min-width: 0;
+}
+
+body.layout-post .post-frame .site-sidebar {
+  margin-top: 0;
+}
+
 body.layout-home .site-frame {
   display: block;
   width: 100%;

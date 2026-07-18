@@ -31,6 +31,13 @@
 {% endif %}
 
 {% if card_image == nil or card_image == "" %}
+  {% if card_post.source == "programmers" or card_post.problem_url contains "programmers" %}
+    {% assign card_image = "/assets/images/posts/coding/ps/programmers-logo.jpg" %}
+    {% assign card_image_alt = "Programmers 로고" %}
+  {% endif %}
+{% endif %}
+
+{% if card_image == nil or card_image == "" %}
   {% assign content_image = "" %}
   {% assign content_image_parts = card_post.content | split: "<img " %}
   {% if content_image_parts.size > 1 %}

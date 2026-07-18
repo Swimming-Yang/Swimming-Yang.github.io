@@ -62,6 +62,16 @@
     width: 100%;
   }
 
+  .post__header-inner {
+    grid-template-columns: 1fr;
+    width: min(100% - 32px, 820px);
+    padding: 56px 0 46px;
+  }
+
+  .post__header-content {
+    grid-column: 1;
+  }
+
   .post-sidebar {
     position: static;
     order: 2;
@@ -122,7 +132,7 @@
   }
 
   body.layout-post .site-main {
-    padding-top: 28px;
+    padding-top: 0;
   }
 
   body.layout-post .post-shell {
@@ -346,9 +356,9 @@
     width: 100%;
   }
 
-  .post__header {
+  .post__header-inner {
     min-height: 300px;
-    padding: 28px;
+    padding: 44px 0;
   }
 
   .post__tagbar {
@@ -498,9 +508,9 @@
     font-size: 2.05rem;
   }
 
-  .post__header {
+  .post__header-inner {
     min-height: 260px;
-    padding: 22px;
+    padding: 34px 0;
   }
 
   .post__header h1 {

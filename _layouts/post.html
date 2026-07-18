@@ -57,9 +57,9 @@ layout: default
   {% endunless %}
 {% endif %}
 
-<div class="post-shell">
-  <article class="post">
-    <header class="post__header" style="--post-hero-image: url('{{ post_hero_image_url | escape }}');">
+<header class="post__header" style="--post-hero-image: url('{{ post_hero_image_url | escape }}');">
+  <div class="post__header-inner">
+    <div class="post__header-content">
       <p class="post__meta">
         <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%Y.%m.%d" }}</time>
         {% if topic_title != "" %}
@@ -90,23 +90,33 @@ layout: default
           </svg>
         </button>
       </div>
-    </header>
-
-    <div class="content post-content">
-      {{ content }}
     </div>
-  </article>
+  </div>
+</header>
 
-  <aside class="post-sidebar" aria-label="글 목차">
-    <a class="post-sidebar__back" href="{{ '/blog/' | relative_url }}">전체 글</a>
-    <div class="post-sidebar__toc" data-toc>
-      <p>On this page</p>
-      <div data-toc-list></div>
+<div class="site-frame post-frame">
+  {% include sidebar.html %}
+
+  <div class="post-frame__content">
+    <div class="post-shell">
+      <article class="post">
+        <div class="content post-content">
+          {{ content }}
+        </div>
+      </article>
+
+      <aside class="post-sidebar" aria-label="글 목차">
+        <a class="post-sidebar__back" href="{{ '/blog/' | relative_url }}">전체 글</a>
+        <div class="post-sidebar__toc" data-toc>
+          <p>On this page</p>
+          <div data-toc-list></div>
+        </div>
+      </aside>
     </div>
-  </aside>
-</div>
 
-<div class="post-after">
-  {% include related_posts.html %}
-  {% include comments.html %}
+    <div class="post-after">
+      {% include related_posts.html %}
+      {% include comments.html %}
+    </div>
+  </div>
 </div>

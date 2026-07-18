@@ -46,12 +46,18 @@
         </div>
       </div>
     </div>
-    <div class="site-frame">
-      {% include sidebar.html %}
-      <main class="site-main" id="content">
+    {% if page.layout == "post" %}
+      <main class="site-main site-main--post" id="content">
         {{ content }}
       </main>
-    </div>
+    {% else %}
+      <div class="site-frame">
+        {% include sidebar.html %}
+        <main class="site-main" id="content">
+          {{ content }}
+        </main>
+      </div>
+    {% endif %}
     {% include footer.html %}
     <script src="{{ '/assets/js/main.js' | relative_url }}?v={{ site.time | date: '%s' }}" defer></script>
     {% if page.extra_js %}

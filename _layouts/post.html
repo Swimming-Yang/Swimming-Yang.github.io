@@ -19,9 +19,47 @@ layout: default
   {% endfor %}
 {% endif %}
 
+{% assign post_hero_image = page.image | default: page.thumbnail %}
+
+{% if post_hero_image == nil or post_hero_image == "" %}
+  {% assign content_image = "" %}
+  {% assign content_image_parts = content | split: "<img " %}
+  {% if content_image_parts.size > 1 %}
+    {% assign content_image_tag = "" %}
+    {% for content_image_part in content_image_parts %}
+      {% if forloop.index == 2 %}
+        {% assign content_image_tag = content_image_part | split: ">" | first %}
+      {% endif %}
+    {% endfor %}
+    {% if content_image_tag contains 'src="' %}
+      {% assign content_image = content_image_tag | split: 'src="' | last | split: '"' | first %}
+    {% elsif content_image_tag contains "src='" %}
+      {% assign content_image = content_image_tag | split: "src='" | last | split: "'" | first %}
+    {% endif %}
+  {% endif %}
+  {% if content_image and content_image != "" %}
+    {% assign post_hero_image = content_image %}
+  {% endif %}
+{% endif %}
+
+{% if post_hero_image == nil or post_hero_image == "" %}
+  {% if site.default_post_image and site.default_post_image != "" %}
+    {% assign post_hero_image = site.default_post_image %}
+  {% endif %}
+{% endif %}
+
+{% assign post_hero_image_url = post_hero_image %}
+{% if post_hero_image and post_hero_image != "" %}
+  {% unless post_hero_image contains '://' %}
+    {% unless post_hero_image contains 'data:' %}
+      {% assign post_hero_image_url = post_hero_image | relative_url %}
+    {% endunless %}
+  {% endunless %}
+{% endif %}
+
 <div class="post-shell">
   <article class="post">
-    <header class="post__header">
+    <header class="post__header" style="--post-hero-image: url('{{ post_hero_image_url | escape }}');">
       <p class="post__meta">
         <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%Y.%m.%d" }}</time>
         {% if topic_title != "" %}

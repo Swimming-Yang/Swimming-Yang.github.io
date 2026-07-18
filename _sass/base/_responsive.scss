@@ -346,6 +346,15 @@
     width: 100%;
   }
 
+  .post__header {
+    min-height: 300px;
+    padding: 28px;
+  }
+
+  .post__tagbar {
+    align-items: flex-start;
+  }
+
   .site-footer__inner {
     grid-template-columns: 1fr;
   }
@@ -489,8 +498,17 @@
     font-size: 2.05rem;
   }
 
+  .post__header {
+    min-height: 260px;
+    padding: 22px;
+  }
+
   .post__header h1 {
     font-size: 1.82rem;
+  }
+
+  .post__tagbar {
+    gap: 10px;
   }
 
   .content {

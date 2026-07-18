@@ -191,9 +191,21 @@
 }
 
 .post__header {
+  position: relative;
+  display: grid;
+  min-height: 330px;
+  align-content: end;
+  overflow: hidden;
   margin-bottom: 34px;
-  padding-bottom: 26px;
-  border-bottom: 1px solid var(--line);
+  padding: 42px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(180deg, rgba(13, 16, 28, 0.18), rgba(13, 16, 28, 0.78)),
+    var(--post-hero-image) center / cover no-repeat,
+    var(--surface-strong);
+  box-shadow: var(--shadow-soft);
+  color: #ffffff;
 }
 
 .post__meta {
@@ -201,31 +213,35 @@
   flex-wrap: wrap;
   gap: 8px;
   margin: 0 0 14px;
-  color: var(--accent-strong);
+  color: rgba(255, 255, 255, 0.84);
   font-family: "JetBrains Mono", monospace;
   font-size: 0.82rem;
   font-weight: 900;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.42);
 }
 
 .post__meta span::before {
-  color: var(--line-strong);
+  color: rgba(255, 255, 255, 0.48);
   content: "/";
   margin-right: 8px;
 }
 
 .post__header h1 {
   margin: 0;
-  color: var(--text-strong);
+  max-width: 760px;
+  color: #ffffff;
   font-size: clamp(1.9rem, 4vw, 3.15rem);
   font-weight: 900;
   line-height: 1.16;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.5);
 }
 
 .post__description {
   max-width: 720px;
   margin: 18px 0 0;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.82);
   font-size: 1.05rem;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.42);
 }
 
 .post__tagbar {
@@ -253,6 +269,13 @@
   font-weight: 900;
 }
 
+.post__header .tags span {
+  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  backdrop-filter: blur(10px);
+}
+
 .post__share {
   display: inline-grid;
   width: 36px;
@@ -262,9 +285,10 @@
   place-items: center;
   border: 0;
   border-radius: 50%;
-  background: transparent;
-  color: var(--muted);
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
   cursor: pointer;
+  backdrop-filter: blur(10px);
 }
 
 .post__share svg {
@@ -279,11 +303,11 @@
 
 .post__share:hover,
 .post__share.is-copied {
-  color: var(--accent-strong);
-  background: var(--accent-soft);
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.24);
 }
 
 .post__share:focus-visible {
-  outline: 2px solid var(--accent-ring);
+  outline: 2px solid rgba(255, 255, 255, 0.62);
   outline-offset: 3px;
 }

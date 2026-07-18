@@ -4,6 +4,8 @@ import { fileURLToPath } from "node:url";
 
 const SOURCE_REPO = "Swimming-Yang/CodingTest";
 const GENERATED_MARKER = "<!-- generated: programmers-sync -->";
+const PROGRAMMERS_IMAGE = "/assets/images/posts/coding/ps/programmers-logo.jpg";
+const PROGRAMMERS_IMAGE_ALT = "Programmers 로고";
 
 const CODE_LANGUAGES = new Map([
   [".c", "c"],
@@ -250,6 +252,8 @@ function renderPost(problem, targetPath) {
     categories: "[coding, ps]",
     topic: "ps",
     description,
+    image: PROGRAMMERS_IMAGE,
+    image_alt: PROGRAMMERS_IMAGE_ALT,
     tags: "[programmers, ps, coding-test]",
     source: "programmers",
     problem_id: problem.problemId,

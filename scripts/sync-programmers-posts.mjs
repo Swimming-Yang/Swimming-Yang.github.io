@@ -211,18 +211,21 @@ function parseReadme(readme) {
 }
 
 function parseProblemSections(readme) {
+  const constraints = extractReadmeSection(
+    readme,
+    /<h5>\s*제한사항\s*<\/h5>\s*/iu,
+    /(?:\r?\n\s*<hr>\s*\r?\n+)?\s*<h5>\s*입출력\s*예\s*<\/h5>/iu,
+  );
+  const examples = extractReadmeSection(readme, /<h5>\s*입출력\s*예\s*<\/h5>\s*/iu, /\r?\n>\s*출처:/u);
+
   return {
     statement: extractReadmeSection(
       readme,
       /###\s*문제\s*설명\s*\r?\n+/u,
       /(?:\r?\n\s*<hr>\s*\r?\n+)?\s*<h5>\s*제한사항\s*<\/h5>/iu,
     ),
-    constraints: extractReadmeSection(
-      readme,
-      /<h5>\s*제한사항\s*<\/h5>\s*/iu,
-      /(?:\r?\n\s*<hr>\s*\r?\n+)?\s*<h5>\s*입출력\s*예\s*<\/h5>/iu,
-    ),
-    examples: extractReadmeSection(readme, /<h5>\s*입출력\s*예\s*<\/h5>\s*/iu, /\r?\n>\s*출처:/u),
+    constraints: htmlToPlainText(constraints),
+    examples: htmlToPlainText(examples),
   };
 }
 
@@ -246,6 +249,45 @@ function cleanProblemSection(value) {
     .replace(/^\s*<hr>\s*/iu, "")
     .replace(/\s*<hr>\s*$/iu, "")
     .trim();
+}
+
+function htmlToPlainText(value) {
+  const text = value
+    .replace(/\r\n?/gu, "\n")
+    .replace(/<br\s*\/?>/giu, "\n")
+    .replace(/<\/p>\s*/giu, "\n\n")
+    .replace(/<p[^>]*>/giu, "")
+    .replace(/<li[^>]*>/giu, "- ")
+    .replace(/<\/li>\s*/giu, "\n")
+    .replace(/<\/(?:th|td)>\s*<(?=(?:th|td)\b)/giu, " | <")
+    .replace(/<tr[^>]*>/giu, "")
+    .replace(/<\/tr>\s*/giu, "\n")
+    .replace(/<\/?(?:table|thead|tbody|th|td)[^>]*>/giu, "")
+    .replace(/<\/?(?:ul|ol)[^>]*>/giu, "")
+    .replace(/<\/?(?:div|pre|code)[^>]*>/giu, "")
+    .replace(/<[^>]+>/gu, "")
+    .replace(/[ \t]+\n/gu, "\n")
+    .replace(/\n[ \t]+/gu, "\n")
+    .replace(/\n{3,}/gu, "\n\n")
+    .trim();
+
+  return decodeHtmlEntities(text);
+}
+
+function decodeHtmlEntities(value) {
+  return value
+    .replace(/&nbsp;/giu, " ")
+    .replace(/&lt;/giu, "<")
+    .replace(/&gt;/giu, ">")
+    .replace(/&le;/giu, "≤")
+    .replace(/&ge;/giu, "≥")
+    .replace(/&times;/giu, "×")
+    .replace(/&minus;/giu, "−")
+    .replace(/&amp;/giu, "&")
+    .replace(/&quot;/giu, '"')
+    .replace(/&#39;/giu, "'")
+    .replace(/&#(\d+);/gu, (_, codePoint) => String.fromCodePoint(Number(codePoint)))
+    .replace(/&#x([\da-f]+);/giu, (_, codePoint) => String.fromCodePoint(Number.parseInt(codePoint, 16)));
 }
 
 function parseSubmittedAt(readme) {
@@ -329,18 +371,23 @@ ${problem.codeFiles.map(renderCodeFile).join("\n\n")}
 
 function renderProblemDetails(problem) {
   const sections = [
-    ["문제", problem.statement],
-    ["제한사항", problem.constraints],
-    ["입출력 예", problem.examples],
-  ].filter(([, content]) => content && content.trim() !== "");
+    { title: "문제", content: problem.statement, codeBlock: false },
+    { title: "제한사항", content: problem.constraints, codeBlock: true },
+    { title: "입출력 예", content: problem.examples, codeBlock: true },
+  ].filter(({ content }) => content && content.trim() !== "");
 
   if (sections.length === 0) {
     return "";
   }
 
   return `${sections
-    .map(([title, content]) => `## ${title}\n\n---\n\n${content}`)
+    .map(({ title, content, codeBlock }) => `## ${title}\n\n---\n\n${codeBlock ? renderPlainTextBlock(content) : content}`)
     .join("\n\n")}\n\n`;
+}
+
+function renderPlainTextBlock(content) {
+  const fence = codeFenceFor(content);
+  return `${fence}plainText\n${content}\n${fence}`;
 }
 
 function renderFrontMatter(values) {

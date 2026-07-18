@@ -1,16 +1,18 @@
 <aside class="site-sidebar" aria-label="블로그 사이드 메뉴">
-  <section class="site-sidebar__block site-sidebar__profile">
-    <div class="site-sidebar__profile-card">
-      <div class="site-sidebar__avatar">
-        <img src="{{ '/assets/images/profile-swimming-yang.jpg' | relative_url }}" alt="Swimming-Yang 프로필 사진" loading="lazy" decoding="async">
+  {% unless page.layout == "post" %}
+    <section class="site-sidebar__block site-sidebar__profile">
+      <div class="site-sidebar__profile-card">
+        <div class="site-sidebar__avatar">
+          <img src="{{ '/assets/images/profile-swimming-yang.jpg' | relative_url }}" alt="Swimming-Yang 프로필 사진" loading="lazy" decoding="async">
+        </div>
+        <div class="site-sidebar__profile-text">
+          <p class="section-kicker">Profile</p>
+          <strong>Swimming-Yang</strong>
+          <span>개발 기록과 일상 아카이브</span>
+        </div>
       </div>
-      <div class="site-sidebar__profile-text">
-        <p class="section-kicker">Profile</p>
-        <strong>Swimming-Yang</strong>
-        <span>개발 기록과 일상 아카이브</span>
-      </div>
-    </div>
-  </section>
+    </section>
+  {% endunless %}
 
   <nav class="site-sidebar__block site-sidebar__nav" aria-label="카테고리 메뉴">
     <a class="{% if page.url == '/' %}is-active{% endif %}" href="{{ '/' | relative_url }}">
@@ -57,39 +59,41 @@
     </a>
   </nav>
 
-  <section class="site-sidebar__block">
-    <div class="site-sidebar__heading">
-      <strong>최근 글</strong>
-      <a href="{{ '/blog/' | relative_url }}">All</a>
-    </div>
-    <div class="site-sidebar__posts">
-      {% for post in site.posts limit:5 %}
-        {% assign post_topic = "" %}
-        {% if post.topic and post.categories contains "coding" %}
-          {% for topic in site.data.coding_topics %}
-            {% if topic.slug == post.topic %}
-              {% assign post_topic = topic.title %}
-            {% endif %}
-          {% endfor %}
-        {% elsif post.topic and post.categories contains "life" %}
-          {% for topic in site.data.life_topics %}
-            {% if topic.slug == post.topic %}
-              {% assign post_topic = topic.title %}
-            {% endif %}
-          {% endfor %}
-        {% elsif post.categories contains "life" %}
-          {% assign post_topic = "Life" %}
-        {% endif %}
-        <a class="site-sidebar__post" href="{{ post.url | relative_url }}">
-          <span>
-            <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y.%m.%d" }}</time>
-            {% if post_topic != "" %}<em>{{ post_topic }}</em>{% endif %}
-          </span>
-          <strong>{{ post.title }}</strong>
-        </a>
-      {% endfor %}
-    </div>
-  </section>
+  {% unless page.layout == "post" %}
+    <section class="site-sidebar__block">
+      <div class="site-sidebar__heading">
+        <strong>최근 글</strong>
+        <a href="{{ '/blog/' | relative_url }}">All</a>
+      </div>
+      <div class="site-sidebar__posts">
+        {% for post in site.posts limit:5 %}
+          {% assign post_topic = "" %}
+          {% if post.topic and post.categories contains "coding" %}
+            {% for topic in site.data.coding_topics %}
+              {% if topic.slug == post.topic %}
+                {% assign post_topic = topic.title %}
+              {% endif %}
+            {% endfor %}
+          {% elsif post.topic and post.categories contains "life" %}
+            {% for topic in site.data.life_topics %}
+              {% if topic.slug == post.topic %}
+                {% assign post_topic = topic.title %}
+              {% endif %}
+            {% endfor %}
+          {% elsif post.categories contains "life" %}
+            {% assign post_topic = "Life" %}
+          {% endif %}
+          <a class="site-sidebar__post" href="{{ post.url | relative_url }}">
+            <span>
+              <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y.%m.%d" }}</time>
+              {% if post_topic != "" %}<em>{{ post_topic }}</em>{% endif %}
+            </span>
+            <strong>{{ post.title }}</strong>
+          </a>
+        {% endfor %}
+      </div>
+    </section>
+  {% endunless %}
 
   {% if page.layout == "post" %}
     <section class="site-sidebar__block site-sidebar__pager" aria-label="글 이동">

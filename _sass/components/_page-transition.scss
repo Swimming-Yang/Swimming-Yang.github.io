@@ -115,11 +115,6 @@ html.is-page-transition-arriving .page-transition__inner {
   transition: width 0.16s linear;
 }
 
-html:not([data-theme="dark"]) .page-transition__bar span {
-  background: linear-gradient(90deg, #5c351b, #8a5a32);
-  box-shadow: 0 0 18px rgba(138, 90, 50, 0.18);
-}
-
 .page-transition__bar span.is-resetting {
   transition: none;
 }

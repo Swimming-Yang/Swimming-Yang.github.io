@@ -9,6 +9,10 @@
   align-items: start;
 }
 
+.site-frame--after-page-hero {
+  margin-top: 28px;
+}
+
 body.layout-post .site-frame {
   width: min(100% - 32px, 1660px);
   gap: 38px;
@@ -21,6 +25,10 @@ body.layout-post .site-frame {
 
 body.layout-post .site-main {
   padding: 0 0 84px;
+}
+
+.site-frame--after-page-hero .site-main {
+  padding-top: 0;
 }
 
 .post-frame {
@@ -147,6 +155,10 @@ body.layout-home .category-menu__panel {
   border-radius: var(--radius);
   background: var(--surface);
   box-shadow: var(--shadow-soft);
+}
+
+.site-frame--after-page-hero .site-sidebar {
+  margin-top: 0;
 }
 
 .site-sidebar__block {

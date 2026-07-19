@@ -46,12 +46,27 @@
         </div>
       </div>
     </div>
+    {% assign has_frame_hero = false %}
+    {% if page.layout == "page" or page.layout == "coding_topic" or page.layout == "life_topic" %}
+      {% assign has_frame_hero = true %}
+    {% endif %}
     {% if page.layout == "post" %}
       <main class="site-main site-main--post" id="content">
         {{ content }}
       </main>
     {% else %}
-      <div class="site-frame">
+      {% if has_frame_hero %}
+        <section class="page-hero page-hero--frame" aria-labelledby="page-title">
+          <div class="page-hero__inner">
+            <p class="section-kicker">{{ page.kicker | default: "Archive" }}</p>
+            <h1 id="page-title">{{ page.title }}</h1>
+            {% if page.description %}
+              <p>{{ page.description }}</p>
+            {% endif %}
+          </div>
+        </section>
+      {% endif %}
+      <div class="site-frame{% if has_frame_hero %} site-frame--after-page-hero{% endif %}">
         {% include sidebar.html %}
         <main class="site-main" id="content">
           {{ content }}

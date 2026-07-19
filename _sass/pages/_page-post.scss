@@ -12,12 +12,27 @@
 .page-hero {
   display: grid;
   gap: 8px;
-  margin-bottom: 26px;
-  padding: 34px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.page-hero--frame {
+  margin-top: 0;
+  border-bottom: 1px solid var(--line);
   background: var(--surface);
   box-shadow: var(--shadow-soft);
+}
+
+.page-hero__inner {
+  display: grid;
+  gap: 8px;
+  width: min(100% - 32px, var(--frame-width));
+  margin: 0 auto;
+  padding: 44px 0;
 }
 
 .page-hero h1 {

@@ -323,11 +323,14 @@
   }
 
   .curation-board,
-  .page-hero,
   .coding-board__header,
   .comments,
   .about-hero {
     padding: 20px;
+  }
+
+  .page-hero__inner {
+    padding: 28px 0;
   }
 
   .coding-board__header,
@@ -392,6 +395,7 @@
 @media (max-width: 460px) {
   .site-header__inner,
   .site-frame,
+  .page-hero__inner,
   .site-footer__inner {
     width: min(100% - 22px, var(--frame-width));
   }

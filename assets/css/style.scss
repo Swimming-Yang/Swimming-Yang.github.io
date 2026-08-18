@@ -172,17 +172,10 @@ a { color: inherit; }
 }
 .home-action--naver:hover,
 .home-action--naver:focus-visible { background: #03c75a; }
-.home-action svg {
+.home-action img {
   width: 27px;
   height: 27px;
-  fill: none;
-  stroke: currentColor;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 1.8;
 }
-.home-action--github svg,
-.home-action--naver svg { fill: currentColor; stroke: none; }
 .home-hero__stats { justify-content: center; margin-top: 0; color: #fff; font-weight: 800; text-shadow: 0 2px 16px rgba(0,0,0,.42); }
 .home-hero__scroll-cue { position: absolute; right: 0; bottom: 0; left: 0; z-index: 4; display: flex; height: 92px; align-items: flex-end; justify-content: center; pointer-events: none; }
 .home-hero__scroll-cue::before { position: absolute; right: 0; bottom: -6px; left: 0; height: 12px; background: linear-gradient(90deg, var(--accent-strong), var(--accent), var(--accent-strong)); box-shadow: 0 -10px 30px var(--accent-ring); content: ""; }

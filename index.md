@@ -20,20 +20,13 @@ title: 양수영 | Portfolio
       </div>
       <div class="home-hero__actions">
         <a class="home-action home-action--portfolio" href="{{ '/portfolio/' | relative_url }}" aria-label="포트폴리오" title="포트폴리오">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <rect x="3" y="7" width="18" height="13" rx="2"></rect>
-            <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18M10 12v2h4v-2"></path>
-          </svg>
+          <img src="https://api.iconify.design/lucide/briefcase-business.svg?color=white" alt="" width="27" height="27">
         </a>
         <a class="home-action home-action--github" href="https://github.com/Swimming-Yang" target="_blank" rel="noopener noreferrer" aria-label="GitHub" title="GitHub">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.8c-2.8.6-3.4-1.2-3.4-1.2-.5-1.1-1.1-1.4-1.1-1.4-.9-.6.1-.6.1-.6 1 0 1.6 1.1 1.6 1.1.9 1.5 2.4 1.1 3 .8.1-.7.4-1.1.7-1.4-2.2-.3-4.6-1.1-4.6-5A3.9 3.9 0 0 1 6.8 6.8c-.1-.3-.5-1.3.1-2.7 0 0 .9-.3 2.8 1a9.7 9.7 0 0 1 5.1 0c1.9-1.3 2.8-1 2.8-1 .6 1.4.2 2.4.1 2.7a3.9 3.9 0 0 1 1 2.7c0 3.9-2.3 4.7-4.6 5 .4.3.7 1 .7 2v3c0 .3.2.6.7.5A10 10 0 0 0 12 2z"></path>
-          </svg>
+          <img src="https://api.iconify.design/mdi/github.svg?color=white" alt="" width="27" height="27">
         </a>
         <a class="home-action home-action--naver" href="https://blog.naver.com/ysw1mst" target="_blank" rel="noopener noreferrer" aria-label="네이버 블로그" title="네이버 블로그">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M6 4h4.1l3.8 6.6V4H18v16h-4.1l-3.8-6.6V20H6z"></path>
-          </svg>
+          <img src="https://api.iconify.design/simple-icons/naver.svg?color=white" alt="" width="27" height="27">
         </a>
       </div>
       <div class="home-hero__stats" data-visitor-endpoint="{{ site.visitor_api_endpoint | default: '' }}">

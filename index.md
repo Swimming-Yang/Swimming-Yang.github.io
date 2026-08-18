@@ -10,9 +10,14 @@ title: 양수영 | Portfolio
   </video>
   <div class="home-hero__content">
     <div class="home-hero__stage">
-      <p class="section-kicker">Portfolio</p>
-      <h1 id="home-title" class="home-hero__title"><span data-home-title-text="Swimming-Yang"></span></h1>
-      <p class="home-hero__summary">사용자 경험과 유지보수 가능한 구현을 고민하는 개발자, 양수영입니다.</p>
+      <div class="home-hero__typing" data-home-typing aria-label="Ysw1mst's Portfolio 인사말">
+        <h1 id="home-title" class="home-hero__title">
+          <span class="home-hero__title-line" data-home-title-text="Ysw1mst's Portfolio" data-home-title-accent="Portfolio"></span>
+        </h1>
+        <p class="home-hero__code-line" aria-live="polite" aria-atomic="true">
+          <code data-home-code></code>
+        </p>
+      </div>
       <div class="home-hero__actions">
         <a class="button button--primary" href="{{ '/portfolio/' | relative_url }}">포트폴리오 보기</a>
         <a class="button" href="https://github.com/Swimming-Yang" target="_blank" rel="noopener noreferrer">GitHub</a>
@@ -22,6 +27,9 @@ title: 양수영 | Portfolio
         <span>오늘 방문자 <strong data-visitor-today>...</strong></span>
       </div>
     </div>
+  </div>
+  <div class="home-hero__scroll-cue" aria-hidden="true">
+    <span class="home-hero__scroll-circle"><span></span><span></span><span></span></span>
   </div>
 </section>
 

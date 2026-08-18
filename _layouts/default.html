@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#121212" media="(prefers-color-scheme: dark)">
-    <meta name="site-baseurl" content="{{ site.baseurl }}">
     {% seo %}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,66 +18,19 @@
           var storedTheme = localStorage.getItem("site-theme");
           var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
           document.documentElement.dataset.theme = storedTheme || (prefersDark ? "dark" : "light");
-          if (sessionStorage.getItem("page-transition-active") === "true") {
-            document.documentElement.classList.add("is-page-transition-arriving");
-          }
         } catch (error) {
           document.documentElement.dataset.theme = "light";
         }
       })();
     </script>
     <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}?v={{ site.time | date: '%s' }}">
-    <link rel="alternate" type="application/rss+xml" title="{{ site.title }}" href="{{ '/feed.xml' | relative_url }}">
   </head>
   <body class="layout-{{ page.layout | default: 'default' }}">
     {% include header.html %}
-    <div class="page-transition" data-page-transition role="status" aria-live="polite" aria-label="페이지 이동 중">
-      <div class="page-transition__inner">
-        <div class="page-transition__runner-frame" aria-hidden="true">
-          <img class="page-transition__runner" src="{{ '/assets/images/page-transition-runner.gif' | relative_url }}" alt="">
-        </div>
-        <p class="page-transition__tip" data-page-transition-tip>코드는 미래의 나에게 쓰는 편지입니다.</p>
-        <div class="page-transition__progress" aria-hidden="true">
-          <div class="page-transition__bar">
-            <span data-page-transition-progress></span>
-          </div>
-          <span class="page-transition__percent" data-page-transition-percent>0%</span>
-        </div>
-      </div>
-    </div>
-    {% assign has_frame_hero = false %}
-    {% if page.layout == "page" or page.layout == "coding_topic" or page.layout == "life_topic" %}
-      {% assign has_frame_hero = true %}
-    {% endif %}
-    {% if page.layout == "post" %}
-      <main class="site-main site-main--post" id="content">
-        {{ content }}
-      </main>
-    {% else %}
-      {% if has_frame_hero %}
-        <section class="page-hero page-hero--frame" aria-labelledby="page-title">
-          <div class="page-hero__inner">
-            <p class="section-kicker">{{ page.kicker | default: "Archive" }}</p>
-            <h1 id="page-title">{{ page.title }}</h1>
-            {% if page.description %}
-              <p>{{ page.description }}</p>
-            {% endif %}
-          </div>
-        </section>
-      {% endif %}
-      <div class="site-frame{% if has_frame_hero %} site-frame--after-page-hero{% endif %}">
-        {% include sidebar.html %}
-        <main class="site-main" id="content">
-          {{ content }}
-        </main>
-      </div>
-    {% endif %}
+    <main id="content">
+      {{ content }}
+    </main>
     {% include footer.html %}
     <script src="{{ '/assets/js/main.js' | relative_url }}?v={{ site.time | date: '%s' }}" defer></script>
-    {% if page.extra_js %}
-      {% for script in page.extra_js %}
-        <script src="{{ script | relative_url }}?v={{ site.time | date: '%s' }}" defer></script>
-      {% endfor %}
-    {% endif %}
   </body>
 </html>

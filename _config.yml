@@ -1,49 +1,16 @@
 title: 양수영
-description: 코딩과 일상을 차분히 기록하는 개인 블로그
+description: 양수영의 포트폴리오
 lang: ko-KR
 timezone: Asia/Seoul
-blog_start_date: "2026-05-31"
 visitor_api_endpoint: "https://ysw-blog-visitor-counter.ysw1mst.workers.dev/visit"
-admin_api_endpoint: "https://ysw-blog-visitor-counter.ysw1mst.workers.dev"
-default_post_image: "/assets/images/home-workspace-768.jpg"
-
-comments:
-  enabled: true
-  provider: giscus
-  giscus:
-    repo: "Swimming-Yang/Swimming-Yang.github.io"
-    repo_id: "R_kgDOPXaCGA"
-    category: "General"
-    category_id: "DIC_kwDOPXaCGM4C-oVJ"
-    mapping: "pathname"
-    strict: "0"
-    reactions_enabled: "1"
-    emit_metadata: "1"
-    input_position: "bottom"
-    theme: "https://xn--9p4bn7dwj.com/assets/css/giscus-theme.css"
-    lang: "ko"
 
 url: "https://xn--9p4bn7dwj.com"
-# If this is a project page like https://username.github.io/repository,
-# set baseurl to "/repository". Keep it empty for username.github.io.
 baseurl: ""
 
-permalink: /:categories/:year/:month/:day/:title/
-
 markdown: kramdown
-highlighter: rouge
 
 plugins:
-  - jekyll-feed
   - jekyll-seo-tag
-
-defaults:
-  - scope:
-      path: ""
-      type: "posts"
-    values:
-      layout: post
-      author: swimming
 
 exclude:
   - .bundle

@@ -1,6 +1,6 @@
-# Swimming Notes
+# Swimming-Yang Portfolio
 
-개인 코딩 + 일상 블로그를 위한 Jekyll 기반 GitHub Pages 프로젝트입니다.
+양수영의 정적 포트폴리오 사이트입니다. Jekyll과 GitHub Pages로 빌드·배포합니다.
 
 ## 로컬 실행
 
@@ -9,86 +9,6 @@ bundle install
 bundle exec jekyll serve
 ```
 
-브라우저에서 `http://127.0.0.1:4000`을 열어 확인합니다.
+브라우저에서 http://127.0.0.1:4000 을 열어 확인합니다.
 
-## GitHub Pages 설정
-
-저장소가 `username.github.io` 형식이면 `_config.yml`의 `baseurl`은 빈 값으로 둡니다.
-
-프로젝트 페이지로 배포한다면, 예를 들어 저장소 이름이 `GitHubPages`일 때는 다음처럼 바꿉니다.
-
-```yaml
-baseurl: "/GitHubPages"
-```
-
-## 글 쓰기
-
-`_posts/` 아래에 카테고리별 폴더를 만들고, 날짜가 포함된 Markdown 파일을 추가합니다.
-
-```text
-_posts/life/2026-05-31-daily-note.md
-_posts/coding/csharp/2026-06-01-csharp-note.md
-_posts/coding/wpf/2026-06-01-wpf-note.md
-```
-
-글 상단에는 Front Matter를 넣습니다.
-
-```yaml
----
-layout: post
-title: "글 제목"
-date: 2026-05-31 10:00:00 +0900
-categories: coding
-image: /assets/images/posts/coding/wpf/example.png
-image_alt: "글 카드와 공유 미리보기에 사용할 이미지 설명"
-tags: [jekyll, github-pages]
----
-```
-
-코딩 글은 `categories: coding`을 유지하고, 세부 게시판은 `topic`으로 지정합니다.
-
-```yaml
----
-layout: post
-title: "C# 기록 예시"
-date: 2026-06-01 10:00:00 +0900
-categories: coding
-topic: csharp
-tags: [csharp, dotnet]
----
-```
-
-사용 가능한 코딩 세부 게시판은 `csharp`, `wpf`, `unity`, `cs`, `ps`입니다.
-
-## 이미지 넣기
-
-글에 사용하는 이미지는 `assets/images/posts/` 아래에 카테고리별로 보관합니다.
-
-```text
-assets/images/posts/life/
-assets/images/posts/coding/csharp/
-assets/images/posts/coding/wpf/
-assets/images/posts/coding/unity/
-assets/images/posts/coding/cs/
-assets/images/posts/coding/ps/
-```
-
-마크다운에서는 사이트 루트 기준 경로로 불러옵니다.
-
-```md
-![WPF 바인딩 예시](/assets/images/posts/coding/wpf/2026-06-03-binding-example.png)
-```
-
-글 목록 카드에 보여줄 대표 이미지는 본문 첫 이미지에 의존하지 않고 Front Matter의 `image`와 `image_alt`에 명시하는 것을 권장합니다.
-
-## 프로그래머스 풀이 자동 동기화
-
-백준허브가 `Swimming-Yang/CodingTest` 저장소에 올린 프로그래머스 풀이를 `_posts/coding/ps/` 아래의 Jekyll 글로 변환합니다.
-
-GitHub Actions의 `Sync Programmers Posts` 워크플로가 3시간마다 실행되며, 새 풀이가 있으면 블로그 저장소에 자동 커밋합니다. 수동 실행은 GitHub Actions 화면에서 `workflow_dispatch`로 할 수 있습니다.
-
-로컬에서 확인하려면 `CodingTest` 저장소를 `.tmp/codingtest`에 받은 뒤 다음 명령을 실행합니다.
-
-```sh
-node scripts/sync-programmers-posts.mjs .tmp/codingtest
-```
+사이트는 홈과 포트폴리오 페이지로 구성됩니다.

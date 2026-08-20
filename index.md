@@ -10,9 +10,19 @@ title: 양수영 | Portfolio
   </video>
   <div class="home-hero__content">
     <div class="home-hero__stage">
-      <div class="home-hero__typing" data-home-typing aria-label="Ysw1mst's Portfolio 인사말">
+      <div class="home-hero__typing" data-home-typing>
         <h1 id="home-title" class="home-hero__title">
-          <span class="home-hero__title-line" data-home-title-text="Ysw1mst's Portfolio" data-home-title-accent="Portfolio"></span>
+          <span class="home-hero__greeting-viewport" data-home-greeting>
+            <span class="home-hero__greeting is-active" data-home-greeting-item lang="ko">
+              <span>안녕하세요, </span><span class="home-hero__title-accent">양수영</span><span>입니다.</span>
+            </span>
+            <span class="home-hero__greeting" data-home-greeting-item lang="en" hidden>
+              <span>Hello, I'm </span><span class="home-hero__title-accent">Sooyoung Yang</span><span>.</span>
+            </span>
+            <span class="home-hero__greeting" data-home-greeting-item lang="ja" hidden>
+              <span>こんにちは、</span><span class="home-hero__title-accent">ヤン・スヨン</span><span>です。</span>
+            </span>
+          </span>
         </h1>
         <p class="home-hero__code-line" aria-live="polite" aria-atomic="true">
           <code data-home-code></code>

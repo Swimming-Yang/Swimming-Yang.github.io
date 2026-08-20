@@ -24,33 +24,15 @@
 
   const initializeHomeTyping = () => {
     const container = document.querySelector("[data-home-typing]");
-    const title = container?.querySelector("[data-home-title-text]");
     const code = container?.querySelector("[data-home-code]");
-    if (!container || !title || !code) return;
+    if (!container || !code) return;
 
-    const titleText = title.dataset.homeTitleText || "";
-    const accent = title.dataset.homeTitleAccent || "";
     const examples = [
       [{ text: "Console", tone: "type" }, { text: ".", tone: "punctuation" }, { text: "WriteLine", tone: "method" }, { text: "(", tone: "punctuation" }, { text: '"Hello I\'m Suyeong"', tone: "string" }, { text: ");", tone: "punctuation" }],
       [{ text: "print", tone: "function" }, { text: "(", tone: "punctuation" }, { text: '"Hello I\'m Suyeong"', tone: "string" }, { text: ")", tone: "punctuation" }],
       [{ text: "console", tone: "namespace" }, { text: ".", tone: "punctuation" }, { text: "log", tone: "method" }, { text: "(", tone: "punctuation" }, { text: '"Hello I\'m Suyeong"', tone: "string" }, { text: ");", tone: "punctuation" }],
       [{ text: "어떻게~화이팅!", tone: "comment" }, { text: " Hello I'm Suyeong ", tone: "string" }, { text: "~이 사람이름이냐ㅋㅋ", tone: "comment" }],
     ];
-
-    const renderTitle = (length) => {
-      const visible = titleText.slice(0, length);
-      const accentIndex = accent ? visible.indexOf(accent) : -1;
-      title.textContent = "";
-      if (accentIndex < 0) {
-        title.textContent = visible;
-        return;
-      }
-      title.append(visible.slice(0, accentIndex));
-      const accentElement = document.createElement("span");
-      accentElement.className = "home-hero__title-accent";
-      accentElement.textContent = accent;
-      title.append(accentElement, visible.slice(accentIndex + accent.length));
-    };
 
     const renderCode = (tokens, length) => {
       let consumed = 0;
@@ -68,13 +50,6 @@
       code.append(fragment);
     };
 
-    const typeTitle = async () => {
-      for (let index = 1; index <= titleText.length; index += 1) {
-        renderTitle(index);
-        await wait(78);
-      }
-    };
-
     const animateCode = async (tokens) => {
       const text = tokens.map((token) => token.text).join("");
       for (let index = 1; index <= text.length; index += 1) {
@@ -90,11 +65,7 @@
     };
 
     const run = async () => {
-      title.textContent = "";
       code.textContent = "";
-      await typeTitle();
-      container.classList.add("is-title-complete");
-      await wait(260);
       while (document.body.contains(container)) {
         for (const example of examples) {
           code.classList.toggle("is-hangul-code", example.some((token) => /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(token.text)));
@@ -104,8 +75,50 @@
     };
 
     run().catch(() => {
-      renderTitle(titleText.length);
       renderCode(examples[0], examples[0].map((token) => token.text).join("").length);
+    });
+  };
+
+  const initializeHomeGreeting = () => {
+    const viewport = document.querySelector("[data-home-greeting]");
+    const greetings = [...(viewport?.querySelectorAll("[data-home-greeting-item]") || [])];
+    if (!viewport || greetings.length < 2) return;
+
+    let activeIndex = 0;
+
+    const showNextGreeting = async () => {
+      const current = greetings[activeIndex];
+      const nextIndex = (activeIndex + 1) % greetings.length;
+      const next = greetings[nextIndex];
+
+      next.hidden = false;
+      next.classList.remove("is-leaving");
+      await new Promise((resolve) => window.requestAnimationFrame(() => window.requestAnimationFrame(resolve)));
+
+      current.classList.remove("is-active");
+      current.classList.add("is-leaving");
+      next.classList.add("is-active");
+
+      await wait(680);
+      current.hidden = true;
+      current.classList.remove("is-leaving");
+      activeIndex = nextIndex;
+    };
+
+    const run = async () => {
+      await wait(3500);
+      while (document.body.contains(viewport)) {
+        await showNextGreeting();
+        await wait(3500);
+      }
+    };
+
+    run().catch(() => {
+      greetings.forEach((greeting, index) => {
+        greeting.hidden = index !== activeIndex;
+        greeting.classList.toggle("is-active", index === activeIndex);
+        greeting.classList.remove("is-leaving");
+      });
     });
   };
 
@@ -138,6 +151,7 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     initializeTheme();
+    initializeHomeGreeting();
     initializeHomeTyping();
     initializeHeroVideo();
     initializeVisitorStats();

@@ -46,7 +46,7 @@ title: 양수영 | Portfolio
     </div>
   </div>
   <div class="home-hero__scroll-cue" aria-hidden="true">
-    <span class="home-hero__scroll-circle"><span></span><span></span><span></span></span>
+    <span class="home-hero__scroll-arrows"><span></span><span></span><span></span></span>
   </div>
 </section>
 

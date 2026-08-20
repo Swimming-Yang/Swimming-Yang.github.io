@@ -17,7 +17,7 @@ title: 양수영 | Portfolio
               <span>안녕하세요, </span><span class="home-hero__title-accent">양수영</span><span>입니다.</span>
             </span>
             <span class="home-hero__greeting" data-home-greeting-item lang="en" hidden>
-              <span>Hello, I'm </span><span class="home-hero__title-accent">YangSuYeong</span><span>.</span>
+              <span>Hello, I'm </span><span class="home-hero__title-accent">Suyeong Yang</span><span>.</span>
             </span>
             <span class="home-hero__greeting" data-home-greeting-item lang="ja" hidden>
               <span>こんにちは、</span><span class="home-hero__title-accent">ヤン・スヨン</span><span>です。</span>

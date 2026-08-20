@@ -11,9 +11,19 @@
     const button = document.querySelector("[data-theme-toggle]");
     if (!button) return;
 
+    const updateButtonLabel = () => {
+      const isDark = document.documentElement.dataset.theme === "dark";
+      const label = isDark ? "Dracula 테마로 변경" : "JetBrains Darcula 테마로 변경";
+      button.setAttribute("aria-label", label);
+      button.setAttribute("title", label);
+    };
+
+    updateButtonLabel();
+
     button.addEventListener("click", () => {
       const nextTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
       document.documentElement.dataset.theme = nextTheme;
+      updateButtonLabel();
       try {
         localStorage.setItem("site-theme", nextTheme);
       } catch (error) {
@@ -89,6 +99,18 @@
     });
   };
 
+  const initializeFrameScrollbar = () => {
+    const canvas = document.querySelector(".ide-frame__canvas");
+    if (!canvas) return;
+
+    let hideTimer;
+    canvas.addEventListener("scroll", () => {
+      canvas.classList.add("is-scrolling");
+      window.clearTimeout(hideTimer);
+      hideTimer = window.setTimeout(() => canvas.classList.remove("is-scrolling"), 700);
+    }, { passive: true });
+  };
+
   const initializeHomeGreeting = () => {
     const viewport = document.querySelector("[data-home-greeting]");
     const greetings = [...(viewport?.querySelectorAll("[data-home-greeting-item]") || [])];
@@ -161,6 +183,7 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     initializeTheme();
+    initializeFrameScrollbar();
     initializeHomeGreeting();
     initializeHomeTyping();
     initializeHeroVideo();

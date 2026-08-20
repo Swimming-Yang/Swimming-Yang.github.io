@@ -50,9 +50,18 @@ title: 양수영 | Portfolio
   </div>
 </section>
 
-<section class="home-intro" aria-labelledby="intro-title">
-  <p class="section-kicker">About</p>
-  <h2 id="intro-title">함께 성장하는 개발자를 지향합니다.</h2>
-  <p>경험과 기술, 그리고 연락처는 포트폴리오 페이지에서 확인할 수 있습니다.</p>
-  <a class="button" href="{{ '/portfolio/' | relative_url }}">자기소개 보기</a>
+<section class="home-intro home-console" aria-labelledby="intro-title">
+  <div class="home-console__toolbar" aria-hidden="true">
+    <span class="home-console__tool-icon">&gt;_</span>
+    <strong>Run: About</strong>
+    <span class="home-console__toolbar-spacer"></span>
+    <span>about</span>
+  </div>
+  <div class="home-console__body">
+    <p class="home-console__command"><span>&gt;</span> profile --summary</p>
+    <h2 id="intro-title">함께 성장하는 개발자를 지향합니다.</h2>
+    <p class="home-console__copy">경험과 기술, 그리고 연락처는 포트폴리오 페이지에서 확인할 수 있습니다.</p>
+    <a class="home-console__action" href="{{ '/portfolio/' | relative_url }}"><span aria-hidden="true">&gt;</span> open /portfolio</a>
+    <p class="home-console__status" aria-hidden="true">Process finished with exit code <strong>0</strong></p>
+  </div>
 </section>

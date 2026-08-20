@@ -31,7 +31,17 @@
       [{ text: "Console", tone: "type" }, { text: ".", tone: "punctuation" }, { text: "WriteLine", tone: "method" }, { text: "(", tone: "punctuation" }, { text: '"Hello, I\'m YangSuYeong"', tone: "string" }, { text: ");", tone: "punctuation" }],
       [{ text: "print", tone: "function" }, { text: "(", tone: "punctuation" }, { text: '"Hello, I\'m YangSuYeong"', tone: "string" }, { text: ")", tone: "punctuation" }],
       [{ text: "console", tone: "namespace" }, { text: ".", tone: "punctuation" }, { text: "log", tone: "method" }, { text: "(", tone: "punctuation" }, { text: '"Hello, I\'m YangSuYeong"', tone: "string" }, { text: ");", tone: "punctuation" }],
-      [{ text: "어떻게~화이팅!", tone: "comment" }, { text: " Hello, I'm YangSuYeong ", tone: "string" }, { text: "~이 사람이름이냐ㅋㅋ", tone: "comment" }],
+      [
+        { text: "어떻게", tone: "keyword" },
+        { text: "~", tone: "operator" },
+        { text: "화이팅!", tone: "function" },
+        { text: " ", tone: "punctuation" },
+        { text: "Hello, I'm YangSuYeong", tone: "string" },
+        { text: " ", tone: "punctuation" },
+        { text: "~", tone: "operator" },
+        { text: "이 사람이름이냐", tone: "property" },
+        { text: "ㅋㅋ", tone: "comment" },
+      ],
     ];
 
     const renderCode = (tokens, length) => {

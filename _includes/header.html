@@ -5,9 +5,15 @@
       <span class="site-brand__text"><strong>Ysw1mst</strong></span>
     </a>
     <nav class="site-nav" aria-label="주요 메뉴">
-      <a class="{% if page.url == '/' %}is-active{% endif %}" href="{{ '/' | relative_url }}">홈</a>
-      <a class="{% if page.url == '/portfolio/' %}is-active{% endif %}" href="{{ '/portfolio/' | relative_url }}">포트폴리오</a>
+      <a class="site-nav__button {% if page.url == '/' %}is-active{% endif %}" href="{{ '/' | relative_url }}" aria-label="홈" title="홈">
+        <img src="https://api.iconify.design/lucide/house.svg?color=%23b8bac3" alt="" width="21" height="21">
+      </a>
+      <a class="site-nav__button {% if page.url == '/portfolio/' %}is-active{% endif %}" href="{{ '/portfolio/' | relative_url }}" aria-label="포트폴리오" title="포트폴리오">
+        <img src="https://api.iconify.design/lucide/briefcase-business.svg?color=%23b8bac3" alt="" width="21" height="21">
+      </a>
+      <button class="site-nav__button theme-switch" type="button" data-theme-toggle aria-label="테마 변경" title="테마 변경">
+        <img src="https://api.iconify.design/lucide/circle-half.svg?color=%23b8bac3" alt="" width="21" height="21">
+      </button>
     </nav>
-    <button class="theme-switch" type="button" data-theme-toggle aria-label="테마 변경"><span aria-hidden="true">◐</span></button>
   </div>
 </header>

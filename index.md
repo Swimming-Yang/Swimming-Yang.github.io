@@ -52,16 +52,22 @@ title: 양수영 | Portfolio
 
 <section class="home-intro home-console" aria-labelledby="intro-title">
   <div class="home-console__toolbar" aria-hidden="true">
-    <span class="home-console__tool-icon">&gt;_</span>
-    <strong>Run: About</strong>
+    <strong class="home-console__toolbar-title">터미널</strong>
+    <span class="home-console__tab"><span class="home-console__tool-icon">&gt;_</span> 로컬 <span class="home-console__tab-close">×</span></span>
+    <span class="home-console__toolbar-button">＋</span>
+    <span class="home-console__toolbar-button">⌄</span>
     <span class="home-console__toolbar-spacer"></span>
-    <span>about</span>
+    <span class="home-console__toolbar-meta">ABOUT</span>
+    <span class="home-console__toolbar-button">⋮</span>
+    <span class="home-console__toolbar-button">—</span>
   </div>
   <div class="home-console__body">
-    <p class="home-console__command"><span>&gt;</span> profile --summary</p>
+    <p class="home-console__banner">Portfolio PowerShell</p>
+    <p class="home-console__copyright">Copyright (c) YangSuYeong. All rights reserved.</p>
+    <div class="home-console__rule" aria-hidden="true"></div>
+    <p class="home-console__command"><span>PS</span> C:\Portfolio\About&gt; profile --summary</p>
     <h2 id="intro-title">함께 성장하는 개발자를 지향합니다.</h2>
     <p class="home-console__copy">경험과 기술, 그리고 연락처는 포트폴리오 페이지에서 확인할 수 있습니다.</p>
-    <a class="home-console__action" href="{{ '/portfolio/' | relative_url }}"><span aria-hidden="true">&gt;</span> open /portfolio</a>
-    <p class="home-console__status" aria-hidden="true">Process finished with exit code <strong>0</strong></p>
+    <a class="home-console__action" href="{{ '/portfolio/' | relative_url }}"><span aria-hidden="true">PS C:\Portfolio\About&gt;</span> open /portfolio</a>
   </div>
 </section>

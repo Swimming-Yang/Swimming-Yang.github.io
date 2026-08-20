@@ -129,11 +129,11 @@ a { color: inherit; }
 .home-hero__video { z-index: 1; opacity: 0; transition: opacity .7s ease; }
 .home-hero__video.is-ready { opacity: 1; }
 .home-hero__content { z-index: 3; width: 100%; min-height: 100svh; place-items: center; padding: 96px 24px 72px; text-align: center; }
-.home-hero__stage { display: grid; justify-items: center; width: min(100%, 1050px); gap: 28px; max-width: none; transform: translateY(-5vh); }
+.home-hero__stage { display: grid; justify-items: center; width: min(100%, 1480px); gap: 28px; max-width: none; transform: translateY(-5vh); }
 .home-hero__typing { display: grid; justify-items: center; width: 100%; gap: 22px; }
-.home-hero h1 { width: 100%; color: #fff; font-size: clamp(2.4rem, 6.2vw, 5.5rem); font-weight: 900; line-height: 1.08; letter-spacing: -.065em; text-shadow: 0 4px 28px rgba(0, 0, 0, .48); }
-.home-hero__greeting-viewport { position: relative; display: grid; width: 100%; min-height: 2.2em; align-items: center; perspective: 900px; animation: homeGreetingIntro .8s ease both; }
-.home-hero__greeting { grid-area: 1 / 1; width: 100%; backface-visibility: hidden; transform: translateY(48%) rotateX(-82deg); transform-origin: center top; opacity: 0; transition: transform .68s cubic-bezier(.22, .8, .22, 1), opacity .38s ease; }
+.home-hero h1 { width: 100%; color: #fff; font-size: clamp(1rem, 5.4vw, 5.2rem); font-weight: 900; line-height: 1.08; letter-spacing: -.065em; text-shadow: 0 4px 28px rgba(0, 0, 0, .48); }
+.home-hero__greeting-viewport { position: relative; display: grid; width: 100%; min-height: 1.3em; align-items: center; perspective: 900px; animation: homeGreetingIntro .8s ease both; }
+.home-hero__greeting { grid-area: 1 / 1; width: 100%; backface-visibility: hidden; white-space: nowrap; transform: translateY(48%) rotateX(-82deg); transform-origin: center top; opacity: 0; transition: transform .68s cubic-bezier(.22, .8, .22, 1), opacity .38s ease; }
 .home-hero__greeting.is-active { transform: translateY(0) rotateX(0); opacity: 1; }
 .home-hero__greeting.is-leaving { transform: translateY(-48%) rotateX(82deg); transform-origin: center bottom; opacity: 0; }
 .home-hero__greeting[hidden] { display: none; }
@@ -192,8 +192,8 @@ a { color: inherit; }
 @media (max-width: 760px) {
   .home-hero__content { padding: 88px 22px 64px; }
   .home-hero__stage { gap: 24px; transform: translateY(-4vh); }
-  .home-hero h1 { font-size: clamp(2rem, 10.5vw, 3.9rem); line-height: 1.14; }
-  .home-hero__greeting-viewport { min-height: 2.55em; }
+  .home-hero h1 { line-height: 1.14; }
+  .home-hero__greeting-viewport { min-height: 1.35em; }
   .home-hero__code-line code { font-size: 1.18rem; }
 }
 

@@ -17,7 +17,7 @@
   --accent-border: rgba(80, 250, 123, .78);
   --accent-ring: rgba(80, 250, 123, .24);
   --ide-outer: #14151b;
-  --ide-frame-bg: #282a36;
+  --ide-frame-bg: #21222c;
   --ide-chrome: #21222c;
   --ide-control-bg: #21222c;
   --ide-control-hover: #30323e;
@@ -88,7 +88,7 @@ a { color: inherit; }
   background: var(--ide-frame-bg);
   box-shadow: none;
 }
-.ide-frame__workspace { display: grid; min-height: 0; grid-template-columns: var(--ide-rail-size) minmax(0, 1fr) var(--ide-rail-size); }
+.ide-frame__workspace { display: grid; min-height: 0; grid-template-columns: var(--ide-rail-size) minmax(0, 1fr) var(--ide-rail-size); background: var(--ide-chrome); }
 .ide-frame__canvas { min-width: 0; overflow-x: hidden; overflow-y: auto; border-radius: 14px; background: var(--bg); scrollbar-color: transparent transparent; scrollbar-width: thin; }
 .ide-frame__canvas.is-scrolling { scrollbar-color: var(--ide-scroll-thumb) transparent; }
 .ide-frame__canvas::-webkit-scrollbar { width: 8px; }

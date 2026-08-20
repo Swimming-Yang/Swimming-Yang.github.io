@@ -1,9 +1,14 @@
 <header class="site-header">
   <a class="skip-link" href="#content">본문으로 이동</a>
   <div class="site-header__inner">
-    <a class="site-brand" href="{{ '/' | relative_url }}" aria-label="홈">
-      <span class="site-brand__text"><strong>Ysw1mst</strong></span>
-    </a>
+    <div class="site-brand-group">
+      <span class="site-menu-fake" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </span>
+      <a class="site-brand" href="{{ '/' | relative_url }}" aria-label="홈">
+        <span class="site-brand__text"><strong>Ysw1mst</strong></span>
+      </a>
+    </div>
     <nav class="site-nav" aria-label="주요 메뉴">
       <a class="site-nav__button {% if page.url == '/' %}is-active{% endif %}" href="{{ '/' | relative_url }}" aria-label="홈" title="홈">
         <img src="https://api.iconify.design/lucide/house.svg?color=%23b8bac3" alt="" width="21" height="21">

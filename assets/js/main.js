@@ -111,6 +111,35 @@
     }, { passive: true });
   };
 
+  const initializeMapleCursor = () => {
+    if (!window.matchMedia || !window.matchMedia("(pointer: fine)").matches) return;
+
+    const root = document.documentElement;
+    let clickCursorTimer;
+
+    const clearClickCursor = () => {
+      window.clearTimeout(clickCursorTimer);
+      root.classList.remove("is-click-cursor");
+    };
+
+    const finishClickCursor = () => {
+      window.clearTimeout(clickCursorTimer);
+      clickCursorTimer = window.setTimeout(clearClickCursor, 160);
+    };
+
+    window.addEventListener("pointerdown", (event) => {
+      if (event.button !== undefined && event.button !== 0) return;
+      window.clearTimeout(clickCursorTimer);
+      root.classList.add("is-click-cursor");
+    });
+    window.addEventListener("pointerup", finishClickCursor);
+    window.addEventListener("pointercancel", clearClickCursor);
+    window.addEventListener("blur", clearClickCursor);
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) clearClickCursor();
+    });
+  };
+
   const initializeHomeGreeting = () => {
     const viewport = document.querySelector("[data-home-greeting]");
     const greetings = [...(viewport?.querySelectorAll("[data-home-greeting-item]") || [])];
@@ -184,6 +213,7 @@
   document.addEventListener("DOMContentLoaded", () => {
     initializeTheme();
     initializeFrameScrollbar();
+    initializeMapleCursor();
     initializeHomeGreeting();
     initializeHomeTyping();
     initializeHeroVideo();

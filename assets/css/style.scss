@@ -16,6 +16,7 @@
   --ink: #191a21;
   --accent-border: rgba(80, 250, 123, .78);
   --accent-ring: rgba(80, 250, 123, .24);
+  --hero-accent: #50fa7b;
   --ide-outer: #14151b;
   --ide-frame-bg: #21222c;
   --ide-chrome: #21222c;
@@ -248,7 +249,7 @@ html[data-theme="dark"] .theme-switch .theme-icon--moon { display: block; }
 .home-hero__greeting.is-active { transform: translateY(0) rotateX(0); opacity: 1; }
 .home-hero__greeting.is-leaving { transform: translateY(-48%) rotateX(82deg); transform-origin: center bottom; opacity: 0; }
 .home-hero__greeting[hidden] { display: none; }
-.home-hero__title-accent { color: var(--accent); }
+.home-hero__title-accent { color: var(--hero-accent); }
 .home-hero__code-line code::after { display: inline-block; width: .08em; height: .88em; margin-left: .12em; background: currentColor; content: ""; vertical-align: -.08em; animation: homeTypingCursor .86s steps(1, end) infinite; }
 .home-hero__code-line { width: min(100%, 920px); min-height: 2.4em; margin: 0; color: rgba(255,255,255,.9); font-family: "JetBrains Mono", monospace; text-shadow: 0 3px 20px rgba(0,0,0,.42); }
 .home-hero__code-line code { color: inherit; font: 700 1.55rem/1.55 "JetBrains Mono", monospace; overflow-wrap: anywhere; white-space: pre-wrap; }
@@ -272,7 +273,7 @@ html[data-theme="dark"] .theme-switch .theme-icon--moon { display: block; }
   height: 62px;
   place-items: center;
   border: 1px solid rgba(255, 255, 255, .32);
-  border-radius: 50%;
+  border-radius: 14px;
   background: rgba(10, 22, 40, .44);
   box-shadow: 0 10px 28px rgba(0, 0, 0, .2);
   color: #fff;
@@ -282,10 +283,13 @@ html[data-theme="dark"] .theme-switch .theme-icon--moon { display: block; }
 .home-action:hover,
 .home-action:focus-visible {
   border-color: #fff;
-  background: var(--accent);
   color: #fff;
   transform: translateY(-4px);
 }
+.home-action--portfolio:hover,
+.home-action--portfolio:focus-visible { background: #5b5f66; }
+.home-action--github:hover,
+.home-action--github:focus-visible { background: #24292f; }
 .home-action--naver:hover,
 .home-action--naver:focus-visible { background: #03c75a; }
 .home-action img {
@@ -327,4 +331,79 @@ html[data-theme="dark"] .theme-switch .theme-icon--moon { display: block; }
   .home-hero__greeting,
   .home-hero__greeting.is-active,
   .home-hero__greeting.is-leaving { transform: none; transition: opacity .3s ease; }
+}
+
+@media (pointer: fine) {
+  html,
+  body {
+    cursor: url("/assets/cursors/maplestory/aero_arrow.cur"), auto;
+  }
+
+  p,
+  li,
+  blockquote,
+  figcaption,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  code,
+  pre,
+  input:not([type]),
+  input[type="email"],
+  input[type="number"],
+  input[type="password"],
+  input[type="search"],
+  input[type="tel"],
+  input[type="text"],
+  input[type="url"],
+  textarea,
+  [contenteditable="true"] {
+    cursor: url("/assets/cursors/maplestory/aero_select.cur"), text;
+  }
+
+  a,
+  button,
+  select,
+  summary,
+  label,
+  [onclick],
+  [role="button"],
+  input[type="button"],
+  input[type="checkbox"],
+  input[type="color"],
+  input[type="date"],
+  input[type="datetime-local"],
+  input[type="file"]::file-selector-button,
+  input[type="month"],
+  input[type="radio"],
+  input[type="range"],
+  input[type="reset"],
+  input[type="submit"],
+  input[type="time"],
+  input[type="week"] {
+    cursor: url("/assets/cursors/maplestory/aero_arrow.cur"), pointer;
+  }
+
+  button:disabled,
+  input:disabled,
+  select:disabled,
+  textarea:disabled,
+  [aria-disabled="true"] {
+    cursor: url("/assets/cursors/maplestory/aero_unavail.cur"), not-allowed;
+  }
+
+  [draggable="true"] {
+    cursor: url("/assets/cursors/maplestory/aero_move.cur"), move;
+  }
+
+  html.is-click-cursor,
+  html.is-click-cursor * {
+    cursor:
+      url("/assets/cursors/maplestory/aero_link.ani"),
+      url("/assets/cursors/maplestory/aero_arrow.cur"),
+      pointer !important;
+  }
 }
